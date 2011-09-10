@@ -1,0 +1,93 @@
+#albums, 
+#artists{
+}
+
+#albums a,
+#artists a {
+    color: #1E5AA8;
+    font-family: tahoma;
+    font-size: 20px;
+    text-decoration: none;
+}
+    
+#albums a:hover,
+#artists a:hover {
+	text-decoration	: underline;
+}    
+
+.album {
+	display: inline-block;
+	width: 167px;
+}
+
+.album h1 {
+	color: #999;
+	font-size: 11px;
+	overflow: hidden;
+	margin-right: 25px;
+}
+
+.current_album	{
+	width	: 200px;
+	margin-top	: 20px;
+	float		: left;
+}
+#curr_album_img_div {
+	box-shadow: 0 0 20px #ddd
+}
+	
+#img_div {
+	width: 123px;
+	height: 123px;
+	overflow: hidden;
+	box-shadow: 0 0 10px #999;
+}
+	
+#img_div:hover {
+	box-shadow: 0 0 10px #555;
+	cursor		: pointer;
+}
+
+#album {
+	margin: 30px auto 0px auto;
+	width	: 800px;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+}
+
+.album img {
+	width: 125px;
+	height: 125px;
+	margin: -1px;
+}
+
+
+#album table {
+	width			: 600px;
+	border-spacing	: 0;
+	margin-left: 235px;
+}
+
+#album table th {
+ 	text-align		: left;
+ 	padding			: 10px;
+ 	color			: #000000;
+}
+
+#album table td {
+ 	text-align		: left;
+ 	padding			: 3px 10px;
+}
+
+#album table tr {
+	padding		: 5px;
+	cursor		: pointer;
+	color		: #555555;
+}
+
+#album tr:hover {
+	background	: #f7f7f7;
+}

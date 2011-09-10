@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block head %}
+	    <link rel="stylesheet" type="text/css" href="/static/css/music.css" />
+{% endblock %}
+{% block content %}
+	
+	<div id="page_header"> Music Albums {% if artist %} by {{artist.artist}}{% endif %}</div>
+	{% if albums %}
+	<div id="albums">
+		{% for album in albums %}
+			{% if artist %}
+				<a href="/album/{{album.id}}">{{ album.album }}</a><br />
+			{% else %}
+				<a href="/album/{{album.id}}">{{ album.artist.artist }} - {{ album.album }}</a><br />
+			{% endif %}
+		{% endfor %}
+	</div>
+	{% endif %}
+	
+{% endblock %}
