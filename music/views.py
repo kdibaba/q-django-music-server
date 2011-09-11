@@ -101,7 +101,7 @@ LETTERS = ['A','B','C','D','E','F','G']
 def catalog_drive_music ():
     
     for letter in LETTERS: 
-        directory = 'c:/QmA/Development/media/static/music/'+'/'+letter+'/'
+        directory = 'l:/media/static/music/'+letter+'/'
         files = get_folder_names(directory)
         cataloged = []
         problems = []
@@ -114,9 +114,11 @@ def catalog_drive_music ():
         
         for file_object in files:
             file = str(file_object).split('-')
-            if file.__len__() > 1:
+            album_exists = Music_Album.objects.filter(folder=str(file_object))
+            if file.__len__() > 1 and not album_exists:
                 cataloged.append(str(file_object))
-                songs = os.listdir(directory+str(file_object))
+                try: songs = os.listdir(directory+str(file_object))
+                except: songs = []
                 artist_name = file[0].replace('.', ' ')
                 artist = Music_Artist.objects.filter(artist=artist_name)
                 if not artist:
@@ -131,21 +133,29 @@ def catalog_drive_music ():
                 id3_info = {}
                 for song in songs:
                     if song.rsplit('.')[-1] == 'mp3':
-                        id3 = EasyID3(directory+str(file_object)+'/'+song)
-                        property = MP3(directory+str(file_object)+'/'+song)
-                        result = time.strftime('%M:%S', time.gmtime(property.info.length))
-                        Music_Song.objects.create(artist=artist, 
-                                                  album=album, 
-                                                  filename=song, 
-                                                  type=song.rsplit('.')[-1],
-                                                  path=str(file_object),
-                                                  title=id3['title'][0],
-                                                  length=str(result),
-                                                  letter=letter
-                                                  )            
+                        try:
+                            id3 = EasyID3(directory+str(file_object)+'/'+song)
+                            property = MP3(directory+str(file_object)+'/'+song)
+                            result = time.strftime('%M:%S', time.gmtime(property.info.length))
+                            title=''
+                            try:title=id3['title'][0]
+                            except:title=filename
+                            Music_Song.objects.create(artist=artist, 
+                                                      album=album, 
+                                                      filename=song, 
+                                                      type=song.rsplit('.')[-1],
+                                                      path=str(file_object),
+                                                      title=title,
+                                                      length=str(result),
+                                                      letter=letter
+                                                      )
+                        except:
+                            problems.append(str(file_object))
+                                        
                 
             else:
                 problems.append(str(file_object))
+                print "skipping " +str(file_object)
         
     return cataloged, problems
 
