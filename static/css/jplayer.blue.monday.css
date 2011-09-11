@@ -21,7 +21,7 @@ div.jp-video {
 	 * Eg. 1.25em = 1 / 0.8em
 	 */
 
-	font-size:1em; /* 1.25em for testing in site pages */ /* No parent CSS that can effect the size in the demos ZIP */
+	font-size:2em; /* 1.25em for testing in site pages */ /* No parent CSS that can effect the size in the demos ZIP */
 
 	font-family:Verdana, Arial, sans-serif;
 	line-height:1.6;
@@ -31,7 +31,7 @@ div.jp-video {
 	position:relative;
 }
 div.jp-audio {
-	width:420px;
+	width:1440px;
 }
 div.jp-video-270p {
 	width:480px;
@@ -73,7 +73,7 @@ div.jp-video-full div.jp-interface {
 
 div.jp-interface {
 	position: relative;
-	background-color:#eee;
+	background-color:#ffffff;
 	width:100%;
 }
 
@@ -107,7 +107,7 @@ div.jp-interface ul.jp-controls {
 }
 
 div.jp-audio ul.jp-controls {
-	width: 380px;
+	width: 1400px;
 	padding:20px 20px 0 20px;
 }
 
@@ -195,7 +195,7 @@ div.jp-audio div.jp-progress {
 }
 div.jp-audio div.jp-type-single div.jp-progress {
 	left:110px;
-	width:186px;
+	width:1175px;
 }
 div.jp-audio div.jp-type-playlist div.jp-progress {
 	left:166px;
@@ -239,7 +239,7 @@ a.jp-volume-max {
 
 div.jp-audio div.jp-type-single a.jp-mute,
 div.jp-audio div.jp-type-single a.jp-unmute {
-	margin-left: 210px;	
+	margin-left: 1200px;	
 }
 
 div.jp-audio div.jp-type-playlist a.jp-mute,
@@ -298,7 +298,7 @@ div.jp-volume-bar {
 }
 div.jp-audio div.jp-volume-bar {
 	top:37px;
-	left:330px;
+	left:1318px;
 }
 div.jp-video div.jp-volume-bar {
 	top:17px;
@@ -319,8 +319,8 @@ div.jp-audio div.jp-time-holder {
 	top:50px;
 }
 div.jp-audio div.jp-type-single div.jp-time-holder {
-	left:110px;
-	width:186px;
+	left:111px;
+	width:1159px;
 }
 div.jp-audio div.jp-type-playlist div.jp-time-holder {
 	left:166px;

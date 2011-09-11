@@ -27,11 +27,8 @@ def handle_music_drive(request):
     duplicates = []
     if request.method == 'POST':
         form = Drive_form(request.POST)
-        if request.POST['drive']:
-            directory = str(request.POST['drive']) + '/' 
-            file_list = get_folder_names(directory)
-            if 'catalog_drive' in request.POST:
-                cataloged, problems = catalog_drive_music (file_list, request.POST['drive_name'], directory)
+        if 'catalog_drive' in request.POST:
+            cataloged, problems = catalog_drive_music ()
         elif 'filter_nzbs' in request.POST:
             if request.POST['nzbs']:
                 num_of_copies, copies  = filter_nzbs_music (file_list, request.POST['nzbs'])
@@ -99,50 +96,56 @@ def fix_albums (directory):
     
                 
     return duplicates
+LETTERS = ['A','B','C','D','E','F','G']
 
-def catalog_drive_music (files, drive, directory):
-    cataloged = []
-    problems = []
+def catalog_drive_music ():
     
-    #Delete all records for this drive
-    #Music_Drive.objects.filter(drive=drive).delete()
-    
-    #Save the drive data
-    #drive = Music_Drive.objects.create(drive=drive)
-    
-    for file_object in files:
-        file = str(file_object).split('-')
-        if file.__len__() > 1:
-            cataloged.append(str(file_object))
-            songs = os.listdir(directory+str(file_object))
-            artist_name = file[0].replace('.', ' ')
-            artist = Music_Artist.objects.filter(artist=artist_name)
-            if not artist:
-                artist = Music_Artist.objects.create(artist=artist_name)
-            else: artist = artist[0]
-            album_name = file[1]
-            album_art = True
-            if 'Folder.jpg' not in songs:
-                album_art=False
-            
-            album = Music_Album.objects.create(artist=artist, album=album_name, folder=str(file_object), album_art=album_art)
-            id3_info = {}
-            for song in songs:
-                if song.rsplit('.')[-1] == 'mp3':
-                    id3 = EasyID3(directory+str(file_object)+'/'+song)
-                    property = MP3(directory+str(file_object)+'/'+song)
-                    result = time.strftime('%M:%S', time.gmtime(property.info.length))
-                    Music_Song.objects.create(artist=artist, 
-                                              album=album, 
-                                              filename=song, 
-                                              type=song.rsplit('.')[-1],
-                                              path='A/'+str(file_object),
-                                              title=id3['title'][0],
-                                              length=str(result)
-                                              )            
-            
-        else:
-            problems.append(str(file_object))
+    for letter in LETTERS: 
+        directory = 'c:/QmA/Development/media/static/music/'+'/'+letter+'/'
+        files = get_folder_names(directory)
+        cataloged = []
+        problems = []
+        
+        #Delete all records for this drive
+        #Music_Drive.objects.filter(drive=drive).delete()
+        
+        #Save the drive data
+        #drive = Music_Drive.objects.create(drive=drive)
+        
+        for file_object in files:
+            file = str(file_object).split('-')
+            if file.__len__() > 1:
+                cataloged.append(str(file_object))
+                songs = os.listdir(directory+str(file_object))
+                artist_name = file[0].replace('.', ' ')
+                artist = Music_Artist.objects.filter(artist=artist_name)
+                if not artist:
+                    artist = Music_Artist.objects.create(artist=artist_name)
+                else: artist = artist[0]
+                album_name = file[1]
+                album_art = True
+                if 'Folder.jpg' not in songs:
+                    album_art=False
+                
+                album = Music_Album.objects.create(artist=artist, album=album_name, folder=str(file_object), album_art=album_art, letter=letter)
+                id3_info = {}
+                for song in songs:
+                    if song.rsplit('.')[-1] == 'mp3':
+                        id3 = EasyID3(directory+str(file_object)+'/'+song)
+                        property = MP3(directory+str(file_object)+'/'+song)
+                        result = time.strftime('%M:%S', time.gmtime(property.info.length))
+                        Music_Song.objects.create(artist=artist, 
+                                                  album=album, 
+                                                  filename=song, 
+                                                  type=song.rsplit('.')[-1],
+                                                  path=str(file_object),
+                                                  title=id3['title'][0],
+                                                  length=str(result),
+                                                  letter=letter
+                                                  )            
+                
+            else:
+                problems.append(str(file_object))
         
     return cataloged, problems
 
@@ -215,9 +218,7 @@ def albums(request):
 
 def album_info(request, album_id):
     albuminfo = ''
-    print album_id
     album = Music_Album.objects.get(id=album_id)
-    print album
     if request.is_ajax():
         mimetype = 'application/javascript'
         albuminfo = serializers.serialize('json', Music_Album.objects.filter(id=album_id))

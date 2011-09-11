@@ -8,6 +8,7 @@ class Music_Album(models.Model):
     artist      = models.ForeignKey( Music_Artist )
     album       = models.CharField( max_length = 200 ) 
     folder      = models.CharField( max_length = 200 )
+    letter      = models.CharField( max_length = 1 )
     album_art   = models.BooleanField( )    
     
 class Music_Song(models.Model):
@@ -17,4 +18,5 @@ class Music_Song(models.Model):
     length      = models.CharField( max_length = 50,null=True, blank=True)
     title       = models.CharField( max_length = 400, null=True, blank=True )
     type        = models.CharField( max_length = 200 ) 
-    path        = models.CharField( max_length = 400 ) 
+    path        = models.CharField( max_length = 400 )
+    letter      = models.CharField( max_length = 1 ) 
