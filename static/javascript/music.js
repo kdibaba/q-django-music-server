@@ -99,3 +99,49 @@ function play_song(song_id, type, letter, path, song) {
 	});
 	$("#jquery_jplayer_1").jPlayer("play", 0);
 }
+
+function recreate_playlist(){
+	$('#jplayer_div').remove()
+	$('#footer').append('<div id="jplayer_div"></div>')
+	$('#jplayer_div').append('<div id="jquery_jplayer_1" class="jp-jplayer"></div>')
+
+	$('#jplayer_div').append('<div id="jp_container_1" class="jp-audio"></div>')
+	$('#jp_container_1').append('<div class="jp-type-playlist"></div>')
+	$('.jp-type-playlist').append('<div class="jp-gui jp-interface"></div>')
+	$('.jp-interface').append('<ul class="jp-controls"></ul>')
+	$('.jp-controls').append('<li><a href="javascript:;" class="jp-previous" tabindex="1">previous</a></li>')
+	$('.jp-controls').append('<li><a href="javascript:;" class="jp-play" tabindex="1">play</a></li>')
+	$('.jp-controls').append('<li><a href="javascript:;" class="jp-pause" tabindex="1">pause</a></li>')
+	$('.jp-controls').append('<li><a href="javascript:;" class="jp-next" tabindex="1">next</a></li>')
+	$('.jp-controls').append('<li><a href="javascript:;" class="jp-stop" tabindex="1">stop</a></li>')
+	$('.jp-controls').append('<li><a href="javascript:;" class="jp-mute" tabindex="1" title="mute">mute</a></li>')
+	$('.jp-controls').append('<li><a href="javascript:;" class="jp-unmute" tabindex="1" title="unmute">unmute</a></li>')
+	$('.jp-controls').append('<li><a href="javascript:;" class="jp-volume-max" tabindex="1" title="max volume">max volume</a></li>')
+	$('.jp-interface').append('<div class="jp-progress"></div>')
+	$('.jp-progress').append('<div class="jp-seek-bar"></div>')
+	$('.jp-seek-bar').append('<div class="jp-play-bar"></div>')
+	$('.jp-interface').append('<div class="jp-volume-bar"></div>')
+	$('.jp-volume-bar').append('<div class="jp-volume-bar-value"></div>')
+	$('.jp-interface').append('<div class="jp-time-holder"></div>')
+	$('.jp-time-holde').append('<div class="jp-current-time"></div>')
+	$('.jp-time-holde').append('<div class="jp-duration"></div>')
+	$('.jp-interface').append('<ul class="jp-toggles">')
+	$('.jp-toggles').append('<li><a href="javascript:;" class="jp-shuffle" tabindex="1" title="shuffle">shuffle</a></li>')
+	$('.jp-toggles').append('<li><a href="javascript:;" class="jp-shuffle-off" tabindex="1" title="shuffle off">shuffle off</a></li>')
+	$('.jp-toggles').append('<li><a href="javascript:;" class="jp-repeat" tabindex="1" title="repeat">repeat</a></li>')
+	$('.jp-toggles').append('<li><a href="javascript:;" class="jp-repeat-off" tabindex="1" title="repeat off">repeat off</a></li>')
+	$('.jp-type-playlist').append('<div class="jp-playlist"></div>')
+	$('.jp-playlist').append('<ul><li></li></ul>')
+	$('.jp-type-playlist').append('<div class="jp-no-solution"></div>')
+	$('.jp-no-solution').append('<span>Update Required</span>')
+	$('.jp-no-solution').append('To play the media you will need to either update your browser to a recent version or update your <a href="http://get.adobe.com/flashplayer/" target="_blank">Flash plugin</a>.')
+}
+
+function show_playlist(){
+	final_height =  $('.jp-playlist').height()+82
+	$("#footer_wrapper").animate({height: final_height}, 1000)
+}
+
+function hide_playlist(){
+	$("#footer_wrapper").animate({height: '82px'}, 1000)
+}
