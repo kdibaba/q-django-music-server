@@ -5,9 +5,9 @@ from django.core import serializers
 from media.music.forms import *
 from media.music.models import *
 
-import os, sys, shutil, win32file, re, time
+import os, sys, shutil, win32file, re, time, unicodedata
 
-from mutagen.easyid3 import EasyID3
+from mutagen.id3 import ID3
 from mutagen.mp3 import MP3
 
 def music(request):
@@ -116,6 +116,8 @@ def catalog_drive_music ():
             file = str(file_object).split('-')
             album_exists = Music_Album.objects.filter(folder=str(file_object))
             if file.__len__() > 1 and not album_exists:
+                album_length = 0
+                album_year = 0
                 cataloged.append(str(file_object))
                 try: songs = os.listdir(directory+str(file_object))
                 except: songs = []
@@ -124,40 +126,66 @@ def catalog_drive_music ():
                 if not artist:
                     artist = Music_Artist.objects.create(artist=artist_name)
                 else: artist = artist[0]
-                album_name = file[1]
+                album_name = file[1].replace('.', ' ')
                 album_art = True
                 if 'Folder.jpg' not in songs:
                     album_art=False
                 
                 album = Music_Album.objects.create(artist=artist, album=album_name, folder=str(file_object), album_art=album_art, letter=letter)
                 id3_info = {}
+                song_count = 0
                 for song in songs:
                     if song.rsplit('.')[-1] == 'mp3':
-                        try:
-                            id3 = EasyID3(directory+str(file_object)+'/'+song)
-                            property = MP3(directory+str(file_object)+'/'+song)
-                            result = time.strftime('%M:%S', time.gmtime(property.info.length))
-                            title=''
-                            try:title=id3['title'][0]
-                            except:title=filename
-                            Music_Song.objects.create(artist=artist, 
-                                                      album=album, 
-                                                      filename=song, 
-                                                      type=song.rsplit('.')[-1],
-                                                      path=str(file_object),
-                                                      title=title,
-                                                      length=str(result),
-                                                      letter=letter
-                                                      )
-                        except:
-                            problems.append(str(file_object))
-                                        
+                        song_length = 0
+                        song_rating = 0
+#                        try:
+                        id3 = ID3(directory+str(file_object)+'/'+song)
+                        property = MP3(directory+str(file_object)+'/'+song)
+                        song_length = property.info.length
+                        album_length += song_length
+                        result = time.strftime('%M:%S', time.gmtime(song_length))
+                        title=''
+                        try:title=id3.getall('TIT2')[0].text[0]
+                        except:title=filename
+                        if not album_year:
+                            try:album_year=id3.getall('TDRC')[0].text[0]
+                            except:pass
+                        try:song_rating=get_rating(id3.getall('POPM')[0].rating)
+                        except:pass
+                        Music_Song.objects.create(artist=artist, 
+                                                  album=album, 
+                                                  filename=song, 
+                                                  type=song.rsplit('.')[-1],
+                                                  path=str(file_object),
+                                                  title=title,
+                                                  length=str(result),
+                                                  letter=letter,
+                                                  rating=song_rating
+                                                  )
+                        song_count += 1
+#                        except:
+#                            problems.append(str(file_object))
+                album.length = time.strftime('%M:%S', time.gmtime(album_length))
+                album.song_count = song_count
+                if album_year: 
+                    string_album_year = album_year.encode('ascii','ignore')
+                    album.year = int(string_album_year[0]+string_album_year[1]+string_album_year[2]+string_album_year[3])
+                album.save()
                 
             else:
                 problems.append(str(file_object))
                 print "skipping " +str(file_object)
         
     return cataloged, problems
+
+def get_rating(rating):
+    if rating == 255:
+        return 5
+    elif rating < 255 and rating >=196:
+        return 4
+    elif rating < 196 and rating >=128:
+        return 3
+    return 0
 
 def filter_nzbs_music (files, nzb_location):
     
@@ -220,10 +248,10 @@ def filter_nzbs_music (files, nzb_location):
     return counter, copies
 
 def albums(request):
-    albums = ''
+    all_albums = Music_Album.objects.all()
     if request.is_ajax():
         mimetype = 'application/javascript'
-        albums = serializers.serialize('json', Music_Album.objects.all())
+        albums = serializers.serialize('json', all_albums)
     return HttpResponse(albums, mimetype)
 
 def album_info(request, album_id):
@@ -239,7 +267,7 @@ def album(request, album_id):
     songs = ''
     if request.is_ajax():
         mimetype = 'application/javascript'
-        songs = serializers.serialize('json', Music_Song.objects.filter(album=album, type="mp3"))
+        songs = serializers.serialize('json', Music_Song.objects.filter(album=album, type="mp3").order_by('filename'))
     return HttpResponse(songs, mimetype)
 
 def albums_by_artist(request, artist_id):

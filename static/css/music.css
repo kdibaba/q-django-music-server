@@ -18,13 +18,21 @@
 .album {
 	display: inline-block;
 	width: 167px;
+	font-size: 10px;
+	height	: 180px;
+}
+
+.album text {	
+	color	: #999999;
 }
 
 .album h1 {
-	color: #999;
 	font-size: 11px;
+	font-weight	: normal;
 	overflow: hidden;
 	margin-right: 25px;
+	white-space: nowrap;
+	color	: #555555;
 }
 
 .current_album	{
@@ -33,7 +41,7 @@
 	float		: left;
 }
 #curr_album_img_div {
-	box-shadow: 0 0 20px #ddd
+	box-shadow: 0 0 10px #999999;
 }
 	
 #img_div {
@@ -91,3 +99,38 @@
 #album tr:hover {
 	background	: #f7f7f7;
 }
+
+#playlist_button_wrapper {
+	margin: auto;
+	width: 1440px;
+	background: white;
+}
+
+#playlist_button {
+	background: url('/static/images/main_menu_bg.jpg') white;
+	border: 1px solid #cccccc;
+	padding: 4px;
+	width: 200px;
+	cursor: pointer;
+	color: #666666;
+	font-size: 14px;
+	margin	: 2px 6px;
+}
+
+#play_album_button {
+	background: url('/static/images/main_menu_bg.jpg') white;
+	border: 1px solid #cccccc;
+	padding: 4px;
+	width: 200px;
+	cursor: pointer;
+	color: #666666;
+	font-size: 14px;
+}
+
+#play_album_button:hover {
+	box-shadow: 0 0 2px #555555;
+}
+
+.artist_name {
+	cursor	: pointer;
+	}

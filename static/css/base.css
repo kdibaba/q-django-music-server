@@ -38,7 +38,7 @@ body {
 }
 
 #content {
-	padding-bottom: 100px;
+	padding-bottom: 130px;
 }
 
 .nav_header {
@@ -54,21 +54,21 @@ body {
 }
 
 .nav_button a {
-	background: none repeat scroll 0 0 #F1F1F1;
+	background: url('/static/images/main_menu_bg.jpg') white;
 	border: 1px solid #CCC;
-	color: #666;
+	color: #666666;
 	display: inline-block;
-	font: bold 16px arial,sans-serif;
-	margin: 7px 0;
-	padding: 4px 10px;
+	font-size: 20px;
+	margin: 10px -2px;
 	text-decoration: none;
 	text-align: center;
+	text-shadow: 0 0 1px #999999;
+	padding: 10px 0px;
 	width: 200px;
-	text-shadow: 0 0 1px white;
 }
 
 .nav_button a:hover {  
-    border: 1px solid #848181;
+	text-shadow: 0 0 2px #777777;
     }
     
 .header_button {
@@ -146,18 +146,19 @@ body {
 #footer_wrapper {
 	bottom			: 0;
 	color			: #FFFFFF;
-    height			: 82px;
+    height			: 112px;
     width			: 100%;   
     z-index			: 2; 
     position		: fixed;
 }
 
 #footer {
-	bottom			: 0;
-	color			: #FFFFFF;
-    height			: 60px;
-    width			: 1440px;
-    margin-left		: auto ;
-    margin-right	: auto ;
-    text-align		: center;
+	bottom: 0;
+	color: white;
+	height: 112px;
+	width: 1440px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+	border: 1px solid #DDD;
 }

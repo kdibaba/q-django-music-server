@@ -13,18 +13,31 @@
 	    <script src="/static/javascript/music.js" type="text/javascript" charset="utf-8"></script>
 	    <script type="text/javascript">
 	    $(document).ready(function(){
-	    	new jPlayerPlaylist({
+	    	PLAYLIST = new jPlayerPlaylist({
 	    		jPlayer: "#jquery_jplayer_1",
 	    		cssSelectorAncestor: "#jp_container_1"
-	    	},  [{title:'test 3',
-	    	    				'mp3':"/static/music/A/AARON.NEVILLE-GOLD-2CD-2008-C4/111-aaron_neville-the_greatest_love.mp3",
-	                                             },
-	                                            {title:'test 4',
-	    	    				'mp3':"/static/music/A/AARON.NEVILLE-GOLD-2CD-2008-C4/111-aaron_neville-the_greatest_love.mp3",
-	                                             }], {
-	    		swfPath: "/static/javascript/lib/",
-	    		supplied: "oga, mp3"
+	    	},  [], {
+	    		swfPath: "/static/javascript/",
+	    		supplied: "oga, mp3",
+	    		solution: "flash, html"
 	    	});
+	    	$(document.documentElement).keyup(function (event) {
+	    		if (event.keyCode == 32) {
+		    		if(NOW_PLAYING){
+		    		    PLAYLIST.pause();
+		    			NOW_PLAYING = false
+		    		}
+		    		else{
+			    		PLAYLIST.play();
+			    		NOW_PLAYING = true
+	    		  	}
+	    		}
+	    		else if (event.keyCode == 78) {
+		    		if(PLAYLIST){
+		    		    PLAYLIST.next();
+		    		}
+	    		}
+	    		});
 	    });
 	    </script>
 	    {% block head %}{% endblock %}
@@ -48,6 +61,10 @@
 			</div>
 			<div id="footer_wrapper">
 				<div id="footer">
+				<div id="playlist_button_wrapper">')
+					<button id="playlist_button" onclick="show_playlist()">Show Playlist</button>'
+					<button id="playlist_button" onclick="hide_playlist()">Hide Playlist</button>'
+				</div>
 				<div id="jplayer_div">
 				<div id="jquery_jplayer_1" class="jp-jplayer"></div>
 				

@@ -9,6 +9,9 @@ class Music_Album(models.Model):
     album       = models.CharField( max_length = 200 ) 
     folder      = models.CharField( max_length = 200 )
     letter      = models.CharField( max_length = 1 )
+    year        = models.IntegerField(null=True, blank=True)
+    song_count  = models.IntegerField(null=True, blank=True)
+    length      = models.CharField( max_length = 50, null=True, blank=True)
     album_art   = models.BooleanField( )    
     
 class Music_Song(models.Model):
@@ -20,3 +23,4 @@ class Music_Song(models.Model):
     type        = models.CharField( max_length = 200 ) 
     path        = models.CharField( max_length = 400 )
     letter      = models.CharField( max_length = 1 ) 
+    rating      = models.IntegerField(null=True, blank=True)
