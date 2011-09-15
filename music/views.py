@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.core import serializers
+from django.contrib.auth.decorators import login_required
 
 from media.music.forms import *
 from media.music.models import *
@@ -10,9 +11,11 @@ import os, sys, shutil, win32file, re, time, unicodedata
 from mutagen.id3 import ID3
 from mutagen.mp3 import MP3
 
+@login_required
 def music(request):
     return render_to_response('base.html', locals)
 
+@login_required
 def handle_music_drive(request):
     msg = ''
     directory = ''
@@ -49,7 +52,7 @@ def handle_music_drive(request):
                                                             'duplicates'        : duplicates,
                                                             'msg'               : msg, } )    
     
-
+@login_required
 def get_folder_names (directory):
     folder_names = []
     counter = 0
@@ -58,6 +61,7 @@ def get_folder_names (directory):
             folder_names.append(dir)
     return folder_names
 
+@login_required
 def fix_albums (directory):
     
     albums = os.listdir(directory)
@@ -98,6 +102,7 @@ def fix_albums (directory):
     return duplicates
 LETTERS = ['A','B','C','D','E','F','G']
 
+@login_required
 def catalog_drive_music ():
     
     for letter in LETTERS: 
@@ -247,6 +252,7 @@ def filter_nzbs_music (files, nzb_location):
         
     return counter, copies
 
+@login_required
 def albums(request):
     all_albums = Music_Album.objects.all()
     if request.is_ajax():
@@ -254,6 +260,7 @@ def albums(request):
         albums = serializers.serialize('json', all_albums)
     return HttpResponse(albums, mimetype)
 
+@login_required
 def album_info(request, album_id):
     albuminfo = ''
     album = Music_Album.objects.get(id=album_id)
@@ -262,6 +269,7 @@ def album_info(request, album_id):
         albuminfo = serializers.serialize('json', Music_Album.objects.filter(id=album_id))
     return HttpResponse(albuminfo, mimetype)
 
+@login_required
 def album(request, album_id):
     album = Music_Album.objects.get(id=album_id)
     songs = ''
@@ -270,6 +278,7 @@ def album(request, album_id):
         songs = serializers.serialize('json', Music_Song.objects.filter(album=album, type="mp3").order_by('filename'))
     return HttpResponse(songs, mimetype)
 
+@login_required
 def albums_by_artist(request, artist_id):
     artist = Music_Artist.objects.get(id=artist_id)
     albums = ''
@@ -278,6 +287,7 @@ def albums_by_artist(request, artist_id):
         albums = serializers.serialize('json', Music_Album.objects.filter(artist=artist))
     return HttpResponse(albums, mimetype)
 
+@login_required
 def artists(request):
     artists = ''
     if request.is_ajax():
@@ -285,7 +295,7 @@ def artists(request):
         artists = serializers.serialize('json', Music_Artist.objects.all())
     return HttpResponse(artists, mimetype)
     
-    
+@login_required    
 def search_music(request):
     results = []
     num_of_results = 0

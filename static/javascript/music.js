@@ -26,8 +26,10 @@ function show_artists(jsonArtists) {
 }
 
 function get_all_albums() {
-	$.get("/albums/", function(jsonAlbums) {
-		show_albums(jsonAlbums);
+	jQuery.ajax({
+		url: "/albums/", 
+		success: function(jsonAlbums) {show_albums(jsonAlbums)},
+		async	: false
 	});
 };
 
