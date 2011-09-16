@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.core import serializers
+from django.utils import simplejson
 from django.contrib.auth.decorators import login_required
 
 from media.music.forms import *
@@ -162,7 +163,7 @@ def catalog_drive_music ():
                                                   filename=song, 
                                                   type=song.rsplit('.')[-1],
                                                   path=str(file_object),
-                                                  title=title,
+                                                  title=title.replace('\'', '\'\''),
                                                   length=str(result),
                                                   letter=letter,
                                                   rating=song_rating
@@ -180,9 +181,7 @@ def catalog_drive_music ():
             else:
                 problems.append(str(file_object))
                 print "skipping " +str(file_object)
-        
     return cataloged, problems
-
 def get_rating(rating):
     if rating == 255:
         return 5
@@ -255,9 +254,23 @@ def filter_nzbs_music (files, nzb_location):
 @login_required
 def albums(request):
     all_albums = Music_Album.objects.all()
+    dictionary_albums = []
+    for album in all_albums:
+        album_info = {}
+        album_info['artist'] = album.artist.artist
+        album_info['artist_id'] = album.artist.id
+        album_info['pk'] = album.id
+        album_info['album'] = album.album
+        album_info['song_count'] = album.song_count
+        album_info['letter'] = album.letter
+        album_info['folder'] = album.folder
+        album_info['album_art'] = album.album_art
+        album_info['year'] = album.year
+        dictionary_albums.append(album_info)
+        
     if request.is_ajax():
         mimetype = 'application/javascript'
-        albums = serializers.serialize('json', all_albums)
+        albums = simplejson.dumps(dictionary_albums)
     return HttpResponse(albums, mimetype)
 
 @login_required
@@ -281,19 +294,53 @@ def album(request, album_id):
 @login_required
 def albums_by_artist(request, artist_id):
     artist = Music_Artist.objects.get(id=artist_id)
-    albums = ''
+    all_albums = Music_Album.objects.filter(artist=artist)
+    dictionary_albums = []
+    for album in all_albums:
+        album_info = {}
+        album_info['artist'] = album.artist.artist
+        album_info['artist_id'] = album.artist.id
+        album_info['pk'] = album.id
+        album_info['album'] = album.album
+        album_info['song_count'] = album.song_count
+        album_info['letter'] = album.letter
+        album_info['folder'] = album.folder
+        album_info['album_art'] = album.album_art
+        album_info['year'] = album.year
+        dictionary_albums.append(album_info)
+        
     if request.is_ajax():
         mimetype = 'application/javascript'
-        albums = serializers.serialize('json', Music_Album.objects.filter(artist=artist))
+        albums = simplejson.dumps(dictionary_albums)
     return HttpResponse(albums, mimetype)
 
 @login_required
 def artists(request):
-    artists = ''
+    get_artists = Music_Artist.objects.all()
+    artists = []
+    for get_artist in get_artists:
+        artist = {}
+        artist['pk'] = get_artist.id
+        artist['name'] = get_artist.artist
+        artist['song_count'] = 0
+        artist['album_count'] = 0
+        artist['albums'] = []
+        get_albums = Music_Album.objects.filter(artist=get_artist.id)
+        for get_album in get_albums:
+            album = {}
+            album['letter'] = get_album.letter
+            album['folder'] = get_album.folder
+            album['album_art'] = get_album.album_art
+            album['pk'] = get_album.id
+            
+            artist['song_count'] += get_album.song_count
+            artist['album_count'] += 1
+            artist['albums'].append(album)
+        artists.append(artist)
     if request.is_ajax():
         mimetype = 'application/javascript'
-        artists = serializers.serialize('json', Music_Artist.objects.all())
-    return HttpResponse(artists, mimetype)
+        artists = simplejson.dumps(artists)
+    return HttpResponse(artists, mimetype)   
     
 @login_required    
 def search_music(request):

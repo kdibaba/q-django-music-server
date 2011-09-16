@@ -7,50 +7,36 @@ body {
 	background: #F7F7F7;
 	}
 
-#site_body {
-	margin		: auto;
-	width		: 1440px;
-	}
 	
 #site_header_wrapper { 
-    background: url('/static/images/site_header.jpg') #dddddd;
+    background: url("/static/images/site_header.jpg") repeat scroll 0 0 #DDDDDD;
+    height: 80px;
     margin: 0;
-    width	: 100%;
-    height	: 100px;
+    width: 100%;
 }
 
 #site_header {
-	padding		: 10px 10px 10px 20px;
-	width		: 1440px;
+    color: #575757;
+    font-size: 60px;
+    text-shadow: 3px 0 8px white;
+    width: 100%;
+}
+
+#site_title {
+	margin: 20px 30px;
+}
+
+
+#site_body {
 	margin		: auto;
-    color		: #575757;
-	font-size	: 60px;
-	text-shadow	: 3px 0px 8px white;
+	width		: 100%;
 }
-
-#page_header {
-    color: #10448C;
-    font-size: 30px;
-    font-weight: bold;
-    padding-top: 10px;
-    padding-bottom	: 20px; 
-    display		: inline;
-}
-
-#content {
-	padding-bottom: 130px;
-}
-
-.nav_header {
-	font-size	: 18px;
-	font-weight	: bold;
-	color		: #555555;
-}
+	
 	
 .nav_button {
 	height: 100%;
 	margin: auto;
-	width: 911px;
+	width: 811px;
 }
 
 .nav_button a {
@@ -69,8 +55,28 @@ body {
 
 .nav_button a:hover {  
 	text-shadow: 0 0 2px #777777;
-    }
-    
+}
+
+#page_header {
+    color: #10448C;
+    font-size: 30px;
+    font-weight: bold;
+    padding-top: 10px;
+    padding-bottom	: 20px; 
+    display		: inline;
+}
+
+#content {
+    margin: 10px 30px;
+    padding-bottom: 130px;
+}
+
+.nav_header {
+	font-size	: 18px;
+	font-weight	: bold;
+	color		: #555555;
+}
+
 .header_button {
     height: 100%;
 }

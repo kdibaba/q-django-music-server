@@ -16,10 +16,10 @@
 }    
 
 .album {
-	display: inline-block;
-	width: 167px;
-	font-size: 10px;
-	height	: 180px;
+    display: inline-block;
+    font-size: 10px;
+    height: 190px;
+    width: 167px;
 }
 
 .album text {	
@@ -27,14 +27,73 @@
 }
 
 .album h1 {
-	font-size: 11px;
-	font-weight	: normal;
-	overflow: hidden;
-	margin-right: 25px;
-	white-space: nowrap;
-	color	: #555555;
+    color: #555555;
+    font-size: 11px;
+    font-weight: normal;
+    margin: 4px 2px 0 0;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.album h2 {
+    color: #555555;
+    font-size: 11px;
+    font-weight: normal;
+    margin: 2px 2px 0 0;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
+.album h2:hover {
+    text-decoration : underline;
+    color			: #333333;
+    cursor			: pointer;
+}
+.album h3 {
+    color: #777777;
+    font-size: 10px;
+    font-weight: normal;
+    margin: 4px 2px 0 0;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+	
+.artist_album {
+    display: inline-block;
+    font-size: 10px;
+    height: 125px;
+    width: 44px;
+}
+
+.artist_album img {
+	width: 125px;
+	height: 125px;
+	margin: -1px;
+}
+
+.artist_name {
+	cursor	: pointer;
+	margin	: 5px 0;
+	color	: #333333;
+}
+	
+.artist_name:hover {
+	text-decoration	: underline
+}
+
+.album_art_wrapper {
+	background	: url("/static/images/artist_album_bg.jpg") repeat scroll 0 0 #ccc;
+	height: 124px;
+}
+	
+.artist_albums {
+	width		: 300px;
+	white-space: nowrap;	
+	height		: 165px;
+	display		: inline-block;
+    overflow: hidden;
+    margin-right	: 20px
+}
 .current_album	{
 	width	: 200px;
 	margin-top	: 20px;
@@ -90,14 +149,23 @@
  	padding			: 3px 10px;
 }
 
-#album table tr {
+#album table tr.songs{
 	padding		: 5px;
 	cursor		: pointer;
 	color		: #555555;
+	background	: #f7f7f7;
 }
 
-#album tr:hover {
-	background	: #f7f7f7;
+#album table tr.now_playing{
+	padding		: 5px;
+	cursor		: pointer;
+	color		: #FFFFFF;
+	background	: #7FAD35;
+}
+
+#album table tr.songs:hover {
+	background	: #7FAD35;
+	color		: #FFFFFF;
 }
 
 #playlist_button_wrapper {
@@ -131,6 +199,6 @@
 	box-shadow: 0 0 2px #555555;
 }
 
-.artist_name {
-	cursor	: pointer;
-	}
+
+
+

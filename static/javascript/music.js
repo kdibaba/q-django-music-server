@@ -16,10 +16,21 @@ function show_artists(jsonArtists) {
 
 	$('#content').replaceWith('<div id="content"></div>')
 	$('#content').append('<div id="artists"></div>');
-	$('#artists').append('<ul>');
-	$.each(artists, function(i,item){
-		artist_count+=1;
-		$('#artists').append('<div onclick="get_albums_by_artist('+item.pk+')"><text class="artist_name" >' + item.fields.artist + '</text></div>');
+	$.each(artists, function(i,items){
+		$('#artists').append('<div class="artist_albums artist_albums_'+items.pk+'"></div>');
+		$('.artist_albums_'+items.pk).prepend('<div class="album_art_wrapper album_art_wrapper_' + items.pk+ '"></div>');
+		artist_count+=1;		
+		$.each(items.albums, function(g,item){
+			$('.album_art_wrapper_'+items.pk).prepend('<div class="artist_album album_' + item.pk+ '"></div>');
+			if (item.album_art){
+				//cover_count += 1;
+				$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="get_album_show('+item.pk+')"' + '><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
+			else {
+				//missing_cover_count += 1
+				;$('.album_'+item.pk).prepend( '<div id="img_div"><img src="/static/images/default_album_art.jpg" /></div>' )}
+		})
+		$('.artist_albums_'+items.pk).prepend('<p onclick="get_albums_by_artist('+items.pk+')" class="artist_name" >' + items.name + '</p>');
+		
 	})
 	$('#artists').append('</ul>');
 	$('#artists').prepend('<p class="nav_header">' + artist_count + ' Artists</p>');
@@ -38,16 +49,17 @@ function show_albums(jsonAlbums) {
 	var album_count = 0
 	var cover_count = 0;
 	var missing_cover_count = 0;
-
+	
 	$('#content').replaceWith('<div id="content"></div>')
 	$('#content').append('<div id="albums"></div>');
 	$.each(albums, function(i,item){
 		album_count+=1;
-		$('#albums').append('<div class="album album_' + item.pk + '" onclick="get_album_show('+item.pk+')">' + '<h1 class="album_name">' + item.fields.album + '</h1>' + '</div>');
-		$('.album_' + item.pk).append('<text>' + item.fields.song_count + ' SONGS</text>')
-		if (item.fields.album_art){
+		$('#albums').append('<div class="album album_' + item.pk+ '"><h1 class="album_name">' + item.album + '</h1>' + '</div>');
+		$('.album_' + item.pk).append('<h2 onclick="get_albums_by_artist('+item.artist_id+')">' + item.artist + '</h2>')
+		$('.album_' + item.pk).append('<h3>' + item.song_count + ' SONGS</h3>')
+		if (item.album_art){
 			//cover_count += 1;
-			$('.album_'+item.pk).prepend( '<div id="img_div"><img src="/static/music/'+ item.fields.letter +'/' + item.fields.folder + '/Folder.jpg' + '" /></div>' )}
+			$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="get_album_show('+item.pk+')"' + '><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
 		else {
 			//missing_cover_count += 1
 			;$('.album_'+item.pk).prepend( '<div id="img_div"><img src="/static/images/default_album_art.jpg" /></div>' )}
@@ -105,7 +117,7 @@ function show_album(jsonAlbum, show_or_play) {
 	$('#album').append('<table id="song_table"><tr><th>Title</th><th>Length</th><th>Rating</th></tr></table>')
 	$.each(album, function(i,item){
 		if (item.fields.type == 'mp3'){
-			$('#song_table').append('<tr class="songs" id="song_'+item.pk+'" ><td ondblclick="play_song(\''+item.pk+'\', \'' + item.fields.type + '\', \'' + item.fields.letter + '\', \'' + item.fields.path + '\', \'' + item.fields.filename + '\')">' + item.fields.title + '</td>' +
+			$('#song_table').append('<tr class="songs" id="song_'+item.pk+'" ><td ondblclick="play_song(\''+item.pk+'\', \'' + item.fields.type + '\', \'' + item.fields.letter + '\', \'' + item.fields.path + '\', \'' + item.fields.filename  + '\', \'' + item.fields.title+ '\')">' + item.fields.title + '</td>' +
 			'<td>' + item.fields.length + '</td>' + '<td>' + item.fields.rating + '</td>');
 		}
 	})
@@ -113,9 +125,10 @@ function show_album(jsonAlbum, show_or_play) {
 	if (show_or_play == 2){play_album(jsonAlbum)}
 }
 
-function play_song(song_id, type, letter, path, song) {
-	$('.songs').css('background', '#F7F7F7').css('color', '#555555')
-	$('#song_' + song_id).css('background', '#7FAD35').css('color', '#ffffff')
+function play_song(song_id, type, letter, path, song, song_title) {
+
+	$('.songs').removeClass("now_playing")
+	$('#song_' + song_id).addClass("now_playing")
 	
 	//If playlist is being displayed when someone wants to play a single song,
 	//Hide the playlist.
@@ -126,15 +139,13 @@ function play_song(song_id, type, letter, path, song) {
 	PLAYLIST = new jPlayerPlaylist({
 		jPlayer: "#jquery_jplayer_1",
 		cssSelectorAncestor: "#jp_container_1"
-	},  [], {
+	},  [{	title: song_title,
+			'mp3': destiny}],
+		{
 		swfPath: "/static/javascript/",
-		supplied: "oga, mp3",
-		solution: "html, flash"
+		supplied: "mp3",
+		solution: "flash, html"
 	});	
-	
-	$("#jquery_jplayer_1").jPlayer("setMedia", {
-		'mp3': destiny,
-	}).jPlayer("play");
 	NOW_PLAYING = true
 }
 
@@ -153,7 +164,7 @@ function play_album(jsonAlbum){
 			cssSelectorAncestor: "#jp_container_1"
 		},  album_songs, {
     		swfPath: "/static/javascript/",
-			supplied: "oga, mp3",
+			supplied: "mp3",
     		solution: "flash, html"
 		});	
 	NOW_PLAYING = true

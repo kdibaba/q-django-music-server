@@ -18,7 +18,7 @@ def user_login(request):
             message = 'Your username and password didn\'t match. Please try again.'
         else:                
             login(request, user)
-            request.session.set_expiry(300);
+            request.session.set_expiry(9999);
             if request.POST.get('home', None):
                 return HttpResponseRedirect('/')
             return HttpResponseRedirect( request.META.get('HTTP_REFERER', None) or '/')
@@ -27,4 +27,3 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     return HttpResponseRedirect( request.META.get('HTTP_REFERER', None) or '/')
-
