@@ -3,6 +3,7 @@ from django.shortcuts import render_to_response
 from django.core import serializers
 from django.utils import simplejson
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 
 from media.music.forms import *
 from media.music.models import *
@@ -11,12 +12,35 @@ import os, sys, shutil, win32file, re, time, unicodedata
 
 from mutagen.id3 import ID3
 from mutagen.mp3 import MP3
+import mutagen.id3
+
+
+LETTERS = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
+SET_RATING = {'1': 32, '2': 64, '3': 128,'4':196, '5':255}
 
 @login_required
 def music(request):
-    return render_to_response('base.html', locals)
+    letter_list = LETTERS
+    return render_to_response('base.html', locals())
 
 @login_required
+def add_to_music_db(request):
+    result = 0    
+    if request.is_ajax():
+        mimetype = 'application/javascript'
+        catalog_drive_music('add')
+        result = 1
+    return HttpResponse(result, mimetype)
+    
+@login_required
+def rebuild_music_db(request):
+    result = 0        
+    if request.is_ajax():
+        mimetype = 'application/javascript'
+        catalog_drive_music('rebuild')
+        result = 1
+    return HttpResponse(result, mimetype)
+        
 def handle_music_drive(request):
     msg = ''
     directory = ''
@@ -53,7 +77,6 @@ def handle_music_drive(request):
                                                             'duplicates'        : duplicates,
                                                             'msg'               : msg, } )    
     
-@login_required
 def get_folder_names (directory):
     folder_names = []
     counter = 0
@@ -62,7 +85,6 @@ def get_folder_names (directory):
             folder_names.append(dir)
     return folder_names
 
-@login_required
 def fix_albums (directory):
     
     albums = os.listdir(directory)
@@ -101,13 +123,14 @@ def fix_albums (directory):
     
                 
     return duplicates
-LETTERS = ['A','B','C','D','E','F','G']
 
-@login_required
-def catalog_drive_music ():
-    
+def catalog_drive_music(type):
+    if type == 'rebuild':
+        Music_Song.objects.all().delete()
+        Music_Artist.objects.all().delete()
+        Music_Album.objects.all().delete()
     for letter in LETTERS: 
-        directory = 'l:/media/static/music/'+letter+'/'
+        directory = settings.MUSIC_DIRECTORY + letter + "/"
         files = get_folder_names(directory)
         cataloged = []
         problems = []
@@ -138,6 +161,8 @@ def catalog_drive_music ():
                     album_art=False
                 
                 album = Music_Album.objects.create(artist=artist, album=album_name, folder=str(file_object), album_art=album_art, letter=letter)
+                artist.letter = letter
+                artist.save()
                 id3_info = {}
                 song_count = 0
                 for song in songs:
@@ -163,7 +188,7 @@ def catalog_drive_music ():
                                                   filename=song, 
                                                   type=song.rsplit('.')[-1],
                                                   path=str(file_object),
-                                                  title=title.replace('\'', '\'\''),
+                                                  title=title,
                                                   length=str(result),
                                                   letter=letter,
                                                   rating=song_rating
@@ -175,13 +200,15 @@ def catalog_drive_music ():
                 album.song_count = song_count
                 if album_year: 
                     string_album_year = album_year.encode('ascii','ignore')
-                    album.year = int(string_album_year[0]+string_album_year[1]+string_album_year[2]+string_album_year[3])
+                    try: album.year = int(string_album_year[0]+string_album_year[1]+string_album_year[2]+string_album_year[3])
+                    except: pass
                 album.save()
                 
             else:
                 problems.append(str(file_object))
                 print "skipping " +str(file_object)
     return cataloged, problems
+
 def get_rating(rating):
     if rating == 255:
         return 5
@@ -252,8 +279,8 @@ def filter_nzbs_music (files, nzb_location):
     return counter, copies
 
 @login_required
-def albums(request):
-    all_albums = Music_Album.objects.all()
+def albums(request, letter):
+    all_albums = Music_Album.objects.filter(letter=letter).order_by('album')
     dictionary_albums = []
     for album in all_albums:
         album_info = {}
@@ -284,12 +311,46 @@ def album_info(request, album_id):
 
 @login_required
 def album(request, album_id):
-    album = Music_Album.objects.get(id=album_id)
-    songs = ''
+    original_album = Music_Album.objects.get(id=album_id)
+    songs = Music_Song.objects.filter(album=original_album, type="mp3").order_by('filename')
+    all_album = []
+    album = {}
+    album['pk'] = original_album.id 
+    album['album'] = original_album.album 
+    album['folder'] = original_album.folder 
+    album['letter'] = original_album.letter 
+    album['year'] = original_album.year 
+    album['song_count'] = original_album.song_count 
+    album['artist'] = original_album.artist.artist 
+    album['artist_id'] = original_album.artist.id 
+    album['album_art'] = original_album.album_art
+    album['songs'] = []
+    for song in songs:
+        song_dict = {}
+        song_dict['pk']  =  song.id
+        song_dict['filename']  =  song.filename
+        song_dict['length']  =  song.length
+        song_dict['title']  =  song.title
+        song_dict['type']  =  song.type
+        song_dict['path']  =  song.path
+        song_dict['letter']  =  song.letter
+        song_dict['rating']  =  song.rating
+        album['songs'].append(song_dict)
+    all_album.append(album)    
     if request.is_ajax():
         mimetype = 'application/javascript'
-        songs = serializers.serialize('json', Music_Song.objects.filter(album=album, type="mp3").order_by('filename'))
-    return HttpResponse(songs, mimetype)
+    return HttpResponse(simplejson.dumps(all_album), mimetype)
+
+@login_required
+def get_song(request, song_id):
+    original_song = Music_Song.objects.get(id=song_id)
+    song = {}
+    song['pk'] = original_song.id 
+    song['full_path'] = "/static/music/"+original_song.letter+"/"+original_song.path+"/"+original_song.filename
+    song['title'] = original_song.title 
+    if request.is_ajax():
+        mimetype = 'application/javascript'
+    return HttpResponse(simplejson.dumps(song), mimetype)
 
 @login_required
 def albums_by_artist(request, artist_id):
@@ -315,8 +376,8 @@ def albums_by_artist(request, artist_id):
     return HttpResponse(albums, mimetype)
 
 @login_required
-def artists(request):
-    get_artists = Music_Artist.objects.all()
+def artists(request, letter):
+    get_artists = Music_Artist.objects.filter(letter=letter).order_by('artist')
     artists = []
     for get_artist in get_artists:
         artist = {}
@@ -325,7 +386,7 @@ def artists(request):
         artist['song_count'] = 0
         artist['album_count'] = 0
         artist['albums'] = []
-        get_albums = Music_Album.objects.filter(artist=get_artist.id)
+        get_albums = Music_Album.objects.filter(artist=get_artist.id).order_by('id')
         for get_album in get_albums:
             album = {}
             album['letter'] = get_album.letter
@@ -341,6 +402,27 @@ def artists(request):
         mimetype = 'application/javascript'
         artists = simplejson.dumps(artists)
     return HttpResponse(artists, mimetype)   
+    
+@login_required
+def set_rating(request, song_id, rating):
+    song = Music_Song.objects.get(id=song_id)
+    path_to_song = settings.MUSIC_DIRECTORY + song.letter +"/"+song.path+"/"+song.filename
+    audio = ID3(path_to_song)
+    key_found = False
+    for key in audio.keys():
+        if 'POPM' in key:
+            key_found = True
+            audio.getall('POPM')[0].rating=SET_RATING[str(rating)]
+            audio.save()    
+    if not key_found:
+        print 'Creating the key'
+        audio.add(mutagen.id3.POPM(email=u'Windows Media Player 9 Series', rating=SET_RATING[str(rating)]))
+        audio.save()
+    song.rating = rating
+    song.save()
+    if request.is_ajax():
+        mimetype = 'application/javascript'
+    return HttpResponse(mimetype)
     
 @login_required    
 def search_music(request):

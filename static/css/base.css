@@ -13,16 +13,45 @@ body {
     height: 80px;
     margin: 0;
     width: 100%;
+    border-bottom	: 1px solid #CCCCCC;
 }
 
 #site_header {
-    color: #575757;
-    font-size: 60px;
-    text-shadow: 3px 0 8px white;
     width: 100%;
 }
 
+#site_header text{
+    color: #575757;
+    text-shadow: 3px 0 8px white;
+    font-size	: 16px;
+}
+#site_header a{
+	color: #444;
+	font-size: 16px;
+	text-shadow: 3px 0 8px white;
+	text-decoration: none;
+	background: #F2F2F2;
+	padding: 1px 20px;
+	border: 1px solid #999;
+	margin-left	: 10px;
+}
+
+#site_header a:hover{
+    color: #333333;
+    font-size: 16px;
+    border	: 1px solid #555555;
+}
+
+#logout {
+	margin-right: 20px;
+	margin-top: -43px;
+	text-align: right;
+}
+
 #site_title {
+    color: #575757;
+    text-shadow: 3px 0 8px white;
+    font-size: 60px;
 	margin: 20px 30px;
 }
 
@@ -37,6 +66,7 @@ body {
 	height: 100%;
 	margin: auto;
 	width: 811px;
+	text-align	: center;
 }
 
 .nav_button a {
@@ -45,7 +75,7 @@ body {
 	color: #666666;
 	display: inline-block;
 	font-size: 20px;
-	margin: 10px -2px;
+	margin: 10px -2px 0px; -2px;
 	text-decoration: none;
 	text-align: center;
 	text-shadow: 0 0 1px #999999;
@@ -56,6 +86,34 @@ body {
 .nav_button a:hover {  
 	text-shadow: 0 0 2px #777777;
 }
+
+.nav_button_albums,
+.nav_button_artists {
+	height: 100%;
+	margin: auto;
+	width: 811px;
+	text-align	: center;
+}
+
+.nav_button_albums a,
+.nav_button_artists a{
+	background: url('/static/images/main_menu_bg.jpg') white;
+	border: 1px solid #CCC;
+	color: #666666;
+	display: inline-block;
+	font-size: 20px;
+	margin: -1px -2px;
+	text-decoration: none;
+	text-align: center;
+	text-shadow: 0 0 1px #999999;
+	padding: 5px 8px;
+}
+
+.nav_button_albums a:hover,
+.nav_button_artists a:hover{  
+	text-shadow: 0 0 2px #777777;
+}
+
 
 #page_header {
     color: #10448C;
@@ -190,7 +248,7 @@ input:-webkit-autofill {
 #footer_wrapper {
 	bottom			: 0;
 	color			: #FFFFFF;
-    height			: 112px;
+    height			: 110px;
     width			: 100%;   
     z-index			: 2; 
     position		: fixed;

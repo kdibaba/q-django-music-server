@@ -13,6 +13,12 @@
 	    <script src="/static/javascript/music.js" type="text/javascript" charset="utf-8"></script>
 	    <script type="text/javascript">
 	    $(document).ready(function(){
+		    $('#menu_albums').bind('click', function(){$('.nav_button_albums').toggle()});
+		    $('#menu_artists').bind('click', function(){$('.nav_button_artists').toggle()});
+		    
+		    $('.nav_button_artists').hover(function(){}, function(){$('.nav_button_artists').toggle()});
+		    $('.nav_button_albums').hover(function(){}, function(){$('.nav_button_albums').toggle()});
+				    
 	    	PLAYLIST = new jPlayerPlaylist({
 	    		jPlayer: "#jquery_jplayer_1",
 	    		cssSelectorAncestor: "#jp_container_1"
@@ -46,14 +52,32 @@
 	</head>
 	<body>
 		<div id="site_header_wrapper">
-			<div id="site_header"><text id="site_title">Q Music</text></div>
+			<div id="site_header">
+				<qtext id="site_title">Q Music</qtext>
+		   		{% if request.user.is_authenticated  %}
+		   		<div id="logout">
+		   			<text>Logged In : {{request.user.username.upper}}</text>
+		   			<a href="/logout">Logout</a>
+		   		</div>
+		    	{% endif %}</text>
+		    </div>
 		</div>
 		<div id="site_body">
 			<div class=nav_button>
-				<a href="/add_music">Add Music</a>
-				<a href="#" onclick="get_all_artists(); return false">Artists</a>
-				<a href="#" onclick="get_all_albums(); return false">Albums</a>
-				<a href="/search_music">Search Music</a>
+				<a href="/" >Home</a>
+				<a href="#" onclick="add_music(); return false">Add Music</a>
+				<a href="#" id="menu_artists">Artists</a>
+				<a href="#" id="menu_albums">Albums</a>
+			</div>
+			<div class="nav_button_albums" style="display:none;">
+				{% for letter in letter_list %}
+					<a href="#" onclick="get_all_albums('{{letter}}'); return false">{{letter}}</a>
+				{% endfor %}
+			</div>
+			<div class="nav_button_artists" style="display:none;">
+				{% for letter in letter_list %}
+					<a href="#" onclick="get_all_artists('{{letter}}'); return false">{{letter}}</a>
+				{% endfor %}
 			</div>
 			<div id=content>
 				{% block content %}{% endblock %}

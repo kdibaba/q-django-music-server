@@ -3,6 +3,7 @@ from django.db import models
 # Create your models here.
 class Music_Artist(models.Model):
     artist      = models.CharField( max_length = 200 )
+    letter      = models.CharField( max_length = 1 ) 
     
 class Music_Album(models.Model):
     artist      = models.ForeignKey( Music_Artist )
