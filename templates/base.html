@@ -66,17 +66,17 @@
 			<div class=nav_button>
 				<a href="/" >Home</a>
 				<a href="#" onclick="add_music(); return false">Add Music</a>
-				<a href="#" id="menu_artists">Artists</a>
-				<a href="#" id="menu_albums">Albums</a>
+				<a href="#" ondblclick="get_all_artists('all'); return false;" id="menu_artists">Artists</a>
+				<a href="#" ondblclick="get_all_albums('all'); return false;" id="menu_albums">Albums</a>
 			</div>
 			<div class="nav_button_albums" style="display:none;">
 				{% for letter in letter_list %}
-					<a href="#" onclick="get_all_albums('{{letter}}'); return false">{{letter}}</a>
+					<a href="#" onclick="get_all_albums('{{letter}}'); return false;">{{letter}}</a>
 				{% endfor %}
 			</div>
 			<div class="nav_button_artists" style="display:none;">
 				{% for letter in letter_list %}
-					<a href="#" onclick="get_all_artists('{{letter}}'); return false">{{letter}}</a>
+					<a href="#" onclick="get_all_artists('{{letter}}'); return false;">{{letter}}</a>
 				{% endfor %}
 			</div>
 			<div id=content>

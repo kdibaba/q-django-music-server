@@ -166,6 +166,7 @@ def catalog_drive_music(type):
                 id3_info = {}
                 song_count = 0
                 for song in songs:
+                    #print file, ' ----- ', song
                     if song.rsplit('.')[-1] == 'mp3':
                         song_length = 0
                         song_rating = 0
@@ -280,7 +281,24 @@ def filter_nzbs_music (files, nzb_location):
 
 @login_required
 def albums(request, letter):
-    all_albums = Music_Album.objects.filter(letter=letter).order_by('album')
+    all_albums_full = Music_Album.objects.all().order_by('album')
+    all_albums = []
+    if letter == "all":
+        all_albums = all_albums_full
+    else:
+        all_albums = []
+        for all_album_full in all_albums_full:
+            try: 
+                if all_album_full.album[0] == letter and letter != 'T':
+                    all_albums.append(all_album_full) 
+                elif all_album_full.album[0] == 'T' and letter == 'T':
+                    if all_album_full.album[1] != 'H':
+                        all_albums.append(all_album_full)
+                elif all_album_full.album[0] == 'T':
+                    if all_album_full.album[1] == 'H' and all_album_full.album[2] == 'E' and all_album_full.album[4] == letter :
+                        all_albums.append(all_album_full)
+            except:
+                pass 
     dictionary_albums = []
     for album in all_albums:
         album_info = {}
@@ -377,7 +395,10 @@ def albums_by_artist(request, artist_id):
 
 @login_required
 def artists(request, letter):
-    get_artists = Music_Artist.objects.filter(letter=letter).order_by('artist')
+    if letter == 'all':
+        get_artists = Music_Artist.objects.all().order_by('artist')
+    else:
+        get_artists = Music_Artist.objects.filter(letter=letter).order_by('artist')
     artists = []
     for get_artist in get_artists:
         artist = {}

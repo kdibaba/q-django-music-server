@@ -50,6 +50,7 @@ urlpatterns = patterns('',
     (r'^artists/X/$',                           'media.music.views.artists', {'letter': 'X'}),
     (r'^artists/Y/$',                           'media.music.views.artists', {'letter': 'Y'}),
     (r'^artists/Z/$',                           'media.music.views.artists', {'letter': 'Z'}),
+    (r'^artists/all/$',                           'media.music.views.artists', {'letter': 'all'}),
     
     (r'^albums/A/$',                           'media.music.views.albums', {'letter': 'A'}),
     (r'^albums/B/$',                           'media.music.views.albums', {'letter': 'B'}),
@@ -77,6 +78,7 @@ urlpatterns = patterns('',
     (r'^albums/X/$',                           'media.music.views.albums', {'letter': 'X'}),
     (r'^albums/Y/$',                           'media.music.views.albums', {'letter': 'Y'}),
     (r'^albums/Z/$',                           'media.music.views.albums', {'letter': 'Z'}),
+    (r'^albums/all/$',                           'media.music.views.albums', {'letter': 'all'}),
 )
 
 if settings.DEBUG:
