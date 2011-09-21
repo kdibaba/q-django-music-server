@@ -207,15 +207,16 @@ body {
 }
 
 #login_form {
-	padding: 200px;
-	background: #DDDDDD;
-	width: 510px;
-	margin: auto;
-	margin-top: 75px;
+	padding: 150px 0px;
+	width: 100%;
+	color: #777777;
+	height: 500px;
 }
 
 #login_form form{
 	text-align: center;
+	width: 500px;
+	margin: auto;
 }
 
 #login_form label {
@@ -227,17 +228,17 @@ input:-webkit-autofill {
 }
 
 #login_form input[name="username"], input[name="password"] {
-	width: 190px;
+	width: 220px;
 	height: 30px;
 	font-size: 19px;
-	background: #f7f7f7 !important;
-	text-align	: center;
-	box-shadow	: 0 0 5px #000000;
-	border		: 2px solid #FFFFFF;
+	background: #F7F7F7 !important;
+	text-align: center;
+	box-shadow: 0 0 15px #CCC inset;
+	border: 2px solid #CCC;
 }
 
 #login_form p {
-	color: #721D0E;
+	color: #FFFFFF;
 	padding: 5px 27px;
 }
 

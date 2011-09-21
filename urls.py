@@ -18,6 +18,7 @@ urlpatterns = patterns('',
       
     (r'^album_info/(?P<album_id>\d+)/$',        'media.music.views.album_info'),
     (r'^album/(?P<album_id>\d+)/$',             'media.music.views.album'),
+    (r'^album/delete/(?P<album_id>\d+)/$',             'media.music.views.delete_album'),
     (r'^albums/(?P<artist_id>\d+)/$',           'media.music.views.albums_by_artist'),
     (r'^song/(?P<song_id>\d+)/$',               'media.music.views.get_song'),
     

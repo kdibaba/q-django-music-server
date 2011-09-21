@@ -147,6 +147,7 @@ def catalog_drive_music(type):
             if file.__len__() > 1 and not album_exists:
                 album_length = 0
                 album_year = 0
+                album_size = 0
                 cataloged.append(str(file_object))
                 try: songs = os.listdir(directory+str(file_object))
                 except: songs = []
@@ -170,12 +171,16 @@ def catalog_drive_music(type):
                     if song.rsplit('.')[-1] == 'mp3':
                         song_length = 0
                         song_rating = 0
+                        file_size = ''
 #                        try:
                         id3 = ID3(directory+str(file_object)+'/'+song)
                         property = MP3(directory+str(file_object)+'/'+song)
                         song_length = property.info.length
                         album_length += song_length
                         result = time.strftime('%M:%S', time.gmtime(song_length))
+                        #print directory+str(file_object)+'/'+song
+                        file_size=os.path.getsize(directory+str(file_object)+'/'+song)
+                        album_size += file_size
                         title=''
                         try:title=id3.getall('TIT2')[0].text[0]
                         except:title=filename
@@ -192,13 +197,15 @@ def catalog_drive_music(type):
                                                   title=title,
                                                   length=str(result),
                                                   letter=letter,
-                                                  rating=song_rating
+                                                  rating=song_rating,
+                                                  file_size=str(file_size)
                                                   )
                         song_count += 1
 #                        except:
 #                            problems.append(str(file_object))
                 album.length = time.strftime('%M:%S', time.gmtime(album_length))
                 album.song_count = song_count
+                album.album_size = str(album_size)
                 if album_year: 
                     string_album_year = album_year.encode('ascii','ignore')
                     try: album.year = int(string_album_year[0]+string_album_year[1]+string_album_year[2]+string_album_year[3])
@@ -311,6 +318,7 @@ def albums(request, letter):
         album_info['folder'] = album.folder
         album_info['album_art'] = album.album_art
         album_info['year'] = album.year
+        album_info['album_size'] = album.get_album_size()
         dictionary_albums.append(album_info)
         
     if request.is_ajax():
@@ -342,6 +350,7 @@ def album(request, album_id):
     album['artist'] = original_album.artist.artist 
     album['artist_id'] = original_album.artist.id 
     album['album_art'] = original_album.album_art
+    album['album_size'] = original_album.get_album_size()
     album['songs'] = []
     for song in songs:
         song_dict = {}
@@ -353,11 +362,21 @@ def album(request, album_id):
         song_dict['path']  =  song.path
         song_dict['letter']  =  song.letter
         song_dict['rating']  =  song.rating
+        song_dict['file_size']  =  song.get_file_size()
         album['songs'].append(song_dict)
     all_album.append(album)    
     if request.is_ajax():
         mimetype = 'application/javascript'
     return HttpResponse(simplejson.dumps(all_album), mimetype)
+
+@login_required
+def delete_album(request, album_id):
+    album = Music_Album.objects.get(id=album_id)
+    shutil.rmtree(settings.MUSIC_DIRECTORY+album.letter+'/'+album.folder)
+    album.delete()      
+    if request.is_ajax():
+        mimetype = 'application/javascript'
+    return HttpResponse('', mimetype)
 
 @login_required
 def get_song(request, song_id):
@@ -386,6 +405,7 @@ def albums_by_artist(request, artist_id):
         album_info['folder'] = album.folder
         album_info['album_art'] = album.album_art
         album_info['year'] = album.year
+        album_info['album_size'] = album.get_album_size()
         dictionary_albums.append(album_info)
         
     if request.is_ajax():
