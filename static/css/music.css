@@ -85,12 +85,12 @@
 
 .artist_info {
 	display: inline-block;
-	padding-left: 20px;
+	padding-left: 10px;
 }
 	
 .artist_info h1 {
     color: #0000000;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: normal;
     margin: 6px 8px 0 0;
     overflow: hidden;
@@ -114,7 +114,7 @@
 
 .artist_info h3 {
     color: #777777;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: normal;
     margin: 4px 2px 0 0;
     overflow: hidden;
@@ -123,19 +123,18 @@
 
 .album_art_wrapper {
 	height: 124px;
-	margin-left: 25px;
+	margin: 28px;
 	width: 125px;
-	margin-right: 25px;
 	display: inline-block;
 }
 	
 .artist_albums {
-	width		: 300px;
+	width		: 333px;
 	white-space: nowrap;	
-	height		: 165px;
+	height		: 200px;
 	display		: inline-block;
     overflow: hidden;
-    margin-right	: 20px
+    margin-right	: 10px
 }
 .current_album	{
 	width	: 200px;

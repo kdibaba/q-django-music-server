@@ -13,6 +13,8 @@
 	    <script src="/static/javascript/music.js" type="text/javascript" charset="utf-8"></script>
 	    <script type="text/javascript">
 	    $(document).ready(function(){
+		    $(window).bind( 'hashchange', function(){handle_hash()});
+		    handle_hash();
 		    $('#menu_albums').bind('click', function(){$('.nav_button_albums').toggle()});
 		    $('#menu_artists').bind('click', function(){$('.nav_button_artists').toggle()});
 		    
@@ -65,18 +67,18 @@
 		<div id="site_body">
 			<div class=nav_button>
 				<a href="/" >Home</a>
-				<a href="#" onclick="add_music(); return false">Add Music</a>
-				<a href="#" ondblclick="get_all_artists('all'); return false;" id="menu_artists">Artists</a>
-				<a href="#" ondblclick="get_all_albums('all'); return false;" id="menu_albums">Albums</a>
+				<atext onclick="add_music(); return false">Add Music</atext>
+				<atext ondblclick="location.href='#/artists/all'" id="menu_artists">Artists</atext>
+				<atext ondblclick="location.href='#/albums/all'" id="menu_albums">Albums</atext>
 			</div>
 			<div class="nav_button_albums" style="display:none;">
 				{% for letter in letter_list %}
-					<a href="#" onclick="get_all_albums('{{letter}}'); return false;">{{letter}}</a>
+					<atext onclick="location.href='/#/albums/{{letter}}'">{{letter}}</atext>
 				{% endfor %}
 			</div>
 			<div class="nav_button_artists" style="display:none;">
 				{% for letter in letter_list %}
-					<a href="#" onclick="get_all_artists('{{letter}}'); return false;">{{letter}}</a>
+					<atext onclick="location.href='/#/artists/{{letter}}'">{{letter}}</atext>
 				{% endfor %}
 			</div>
 			<div id=content>

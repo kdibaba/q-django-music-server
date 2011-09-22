@@ -4,6 +4,23 @@ CURRENT_ALBUM = ''
 PLAYLIST = ''
 NOW_PLAYING = false
 
+function handle_hash(){
+	var destination = location.hash.replace('#', '')
+	destination = destination.split('/')
+	//alert(destination)
+	if (destination[1] == 'artists') {
+		get_all_artists(destination[2]);
+	}
+	else if (destination[1] == 'albums') {
+		get_all_albums(destination[2]);
+	}
+	else if (destination[1] == 'albums_by_artist') {
+		get_albums_by_artist(destination[2]);
+	}
+	else if (destination[1] == 'album_show') {
+		get_album_show(destination[2]);
+	}
+}
 function add_music() {
 	var answer = confirm( "Are you sure you want to Add Music?")
 	if (answer){
@@ -46,19 +63,19 @@ function show_artists(jsonArtists) {
 		$('#artists').append('<div class="artist_albums artist_albums_'+items.pk+'"></div>');
 		$('.artist_albums_'+items.pk).prepend('<div class="album_art_wrapper album_art_wrapper_' + items.pk+ '"></div>');
 		artist_count+=1;
-		deg = 20
+		deg = 15
 		length = items.albums.length - 1;
 		$.each(items.albums, function(g,item){
 			if (length == g){ deg = 0;}
 			$('.album_art_wrapper_'+items.pk).append('<div class="artist_album album_' + item.pk+ '" style="-webkit-transform: rotate('+ deg + 'deg); -moz-transform: rotate('+ deg + 'deg)"></div>');
 			//$('.album_' + item.pk).hover(function(){$(this).css('width',  '125px')}, function(){$(this).css('width',  '44px')});
 			if (item.album_art){
-				$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="get_album_show('+item.pk+')"' + '><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
+				$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/album_show/'+item.pk+'\'"><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
 			else {
-				;$('.album_'+item.pk).prepend( '<div id="img_div"><img src="/static/images/default_album_art.jpg" /></div>' )}
-			deg += 20;
+				$('.album_'+item.pk).prepend( '<div id="img_div"><img src="/static/images/default_album_art.jpg" /></div>' )}
+			deg += 15;
 		})
-		$('.artist_albums_'+items.pk).append('<div class="artist_info artist_info_' + items.pk + '"><h1 onclick="get_albums_by_artist('+items.pk+')" >' + items.name + '</h1></div>');
+		$('.artist_albums_'+items.pk).append('<div class="artist_info artist_info_' + items.pk + '"><h1 onclick="location.href=\'/#/albums_by_artist/'+items.pk+'\'">' + items.name + '</h1></div>');
 		$('.artist_info_' + items.pk).append('<h2>'+items.album_count+' Albums<h2>');
 		$('.artist_info_' + items.pk).append('<h2>'+items.song_count+' Songs<h2>');
 		
@@ -86,30 +103,30 @@ function show_albums(jsonAlbums) {
 	$.each(albums, function(i,item){
 		album_count+=1;
 		$('#albums').append('<div class="album album_' + item.pk+ '"><h1 class="album_name">' + item.album + '</h1>' + '</div>');
-		$('.album_' + item.pk).append('<h2 onclick="get_albums_by_artist('+item.artist_id+')">' + item.artist + '</h2>')
+		$('.album_' + item.pk).append('<h2 onclick="location.href=\'/#/albums_by_artist/'+item.artist_id+'\'">' + item.artist + '</h2>')
 		$('.album_' + item.pk).append('<h3>' + item.year + ' | ' + item.song_count + ' SONGS | ' + item.album_size + '</h3>')
 		if (item.album_art){
-			cover_count += 1;
-			$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="get_album_show('+item.pk+')"' + '><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
+			//cover_count += 1;
+			$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/album_show/'+item.pk+'\'"' + '><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
 		else {
-			missing_cover_count += 1
-			;$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="get_album_show('+item.pk+')"' + '><img src="/static/images/default_album_art.jpg" /></div>' )
+			//missing_cover_count += 1
+			$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/album_show/'+item.pk+'\'"' + '><img src="/static/images/default_album_art.jpg" /></div>' )
 		}
 	})
 	$('#albums').prepend('<p class="nav_header">' + album_count + ' Albums</p>');
-	alert('Cover Count = ' + cover_count);
-	alert('Missing Cover Count = ' + missing_cover_count);
+	//alert('Cover Count = ' + cover_count);
+	//alert('Missing Cover Count = ' + missing_cover_count);
 }
 
 function get_albums_by_artist(artist_id) {
-	$.get("/albums/" + artist_id + "/", function(jsonAlbums) {
+	$.get("/albums_by_artist/" + artist_id + "/", function(jsonAlbums) {
 	        show_albums(jsonAlbums);
 	});
 };
 
 function get_album_show(album_id) {
 	jQuery.ajax({
-		url: "/album/" + album_id + "/", 
+		url: "/album_show/" + album_id + "/", 
 		success: function(jsonAlbum) {show_album(jsonAlbum, 1);},
 		async	: false
 	});
@@ -118,14 +135,14 @@ function get_album_show(album_id) {
 function delete_album(album_id) {
 	jQuery.ajax({
 		url: "/album/delete/" + album_id + "/", 
-		success: function(message) {alert(message); get_all_albums('all');},
+		success: function(message) {get_all_albums('all');},
 		async	: false
 	});
 };
 
 function get_album_play(album_id) {
 	jQuery.ajax({
-		url: "/album/" + album_id + "/", 
+		url: "/album_show/" + album_id + "/", 
 		success: function(jsonAlbum) {play_album(jsonAlbum, 2);},
 		async	: false
 	});
@@ -153,7 +170,7 @@ function show_album(jsonAlbum, show_or_play) {
 		if (album.album_art){$('.current_album').append( '<div id="curr_album_img_div"><img src="/static/music/' +album.letter+ '/' + album.folder + '/Folder.jpg' + '" /></div>' )}
 		else {$('.current_album').append( '<div id="curr_album_img_div"><img src="/static/images/default_album_art.jpg" /></div>' )}
 		$('.current_album').append( '<button id="play_album_button" onclick="get_album_play('+album.pk+')">PLAY ALBUM</button>')
-		$('.current_album').append( '<h2 onclick="get_albums_by_artist('+album.artist_id+')">'+ album.artist+'</h2>')
+		$('.current_album').append( '<h2 onclick="location.href=\'/#/albums_by_artist/'+album.artist_id+'\'">'+ album.artist+'</h2>')
 		$('.current_album').append( '<h3>'+ album.year+' | '+album.song_count+' SONGS | ' + album.album_size + '</h3>')
 		
 		CURRENT_ALBUM = ''

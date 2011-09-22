@@ -372,7 +372,7 @@ def album(request, album_id):
 @login_required
 def delete_album(request, album_id):
     album = Music_Album.objects.get(id=album_id)
-    shutil.rmtree(settings.MUSIC_DIRECTORY+album.letter+'/'+album.folder)
+    shutil.move(settings.MUSIC_DIRECTORY+album.letter+'/'+album.folder, settings.MUSIC_DIRECTORY+'DELETED/')
     album.delete()      
     if request.is_ajax():
         mimetype = 'application/javascript'
