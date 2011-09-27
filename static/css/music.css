@@ -137,12 +137,16 @@
     margin-right	: 10px
 }
 .current_album	{
-	width	: 200px;
-	margin-top	: 20px;
-	float		: left;
+	width: 20%;
+	display: inline-block;
+	vertical-align: top;
+	margin-top: 30px;
+	text-align	: center;
 }
 #curr_album_img_div {
 	box-shadow: 0 0 10px #999999;
+	width: 200px;
+	margin: auto;
 }
 		
 #img_div {
@@ -175,9 +179,13 @@
 
 
 #album table {
-	width			: 600px;
-	border-spacing	: 0;
-	margin-left: 235px;
+	width: 70%;
+	border-spacing: 0;
+	border: 1px solid #DDD;
+	box-shadow: 0 0 20px #ddd;
+	padding: 20px;
+	display: inline-table;
+	margin-top: 30px;
 }
 
 #album table th {
@@ -193,8 +201,12 @@
 #album table tr.songs{
 	padding		: 5px;
 	cursor		: pointer;
-	color		: #555555;
-	background	: #f7f7f7;
+	color		: #888888;
+}
+
+#album table tr.songs:hover {
+	background	: #DDDDDD;
+	color		: #333333;
 }
 
 td#rating_td {
@@ -202,16 +214,12 @@ td#rating_td {
 }
 
 #album table tr.now_playing{
-	padding		: 5px;
-	cursor		: pointer;
-	color		: #FFFFFF;
-	background	: #555555;
+	padding: 5px;
+	cursor: pointer;
+	color: black;
+	background: #DDD;
 }
 
-#album table tr.songs:hover {
-	background	: #555555;
-	color		: #FFFFFF;
-}
 
 #playlist_button_wrapper {
 	margin: auto;

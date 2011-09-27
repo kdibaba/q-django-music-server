@@ -172,37 +172,37 @@ def catalog_drive_music(type):
                         song_length = 0
                         song_rating = 0
                         file_size = ''
-#                        try:
-                        id3 = ID3(directory+str(file_object)+'/'+song)
-                        property = MP3(directory+str(file_object)+'/'+song)
-                        song_length = property.info.length
-                        album_length += song_length
-                        result = time.strftime('%M:%S', time.gmtime(song_length))
-                        #print directory+str(file_object)+'/'+song
-                        file_size=os.path.getsize(directory+str(file_object)+'/'+song)
-                        album_size += file_size
-                        title=''
-                        try:title=id3.getall('TIT2')[0].text[0]
-                        except:title=filename
-                        if not album_year:
-                            try:album_year=id3.getall('TDRC')[0].text[0]
+                        try:
+                            id3 = ID3(directory+str(file_object)+'/'+song)
+                            property = MP3(directory+str(file_object)+'/'+song)
+                            song_length = property.info.length
+                            album_length += song_length
+                            result = time.strftime('%M:%S', time.gmtime(song_length))
+                            #print directory+str(file_object)+'/'+song
+                            file_size=os.path.getsize(directory+str(file_object)+'/'+song)
+                            album_size += file_size
+                            title=''
+                            try:title=id3.getall('TIT2')[0].text[0]
+                            except:title=filename
+                            if not album_year:
+                                try:album_year=id3.getall('TDRC')[0].text[0]
+                                except:pass
+                            try:song_rating=get_rating(id3.getall('POPM')[0].rating)
                             except:pass
-                        try:song_rating=get_rating(id3.getall('POPM')[0].rating)
-                        except:pass
-                        Music_Song.objects.create(artist=artist, 
-                                                  album=album, 
-                                                  filename=song, 
-                                                  type=song.rsplit('.')[-1],
-                                                  path=str(file_object),
-                                                  title=title,
-                                                  length=str(result),
-                                                  letter=letter,
-                                                  rating=song_rating,
-                                                  file_size=str(file_size)
-                                                  )
-                        song_count += 1
-#                        except:
-#                            problems.append(str(file_object))
+                            Music_Song.objects.create(artist=artist, 
+                                                      album=album, 
+                                                      filename=song, 
+                                                      type=song.rsplit('.')[-1],
+                                                      path=str(file_object),
+                                                      title=title,
+                                                      length=str(result),
+                                                      letter=letter,
+                                                      rating=song_rating,
+                                                      file_size=str(file_size)
+                                                      )
+                            song_count += 1
+                        except:
+                            print str(file_object)
                 album.length = time.strftime('%M:%S', time.gmtime(album_length))
                 album.song_count = song_count
                 album.album_size = str(album_size)
@@ -214,7 +214,7 @@ def catalog_drive_music(type):
                 
             else:
                 problems.append(str(file_object))
-                print "skipping " +str(file_object)
+                #print "skipping " +str(file_object)
     return cataloged, problems
 
 def get_rating(rating):

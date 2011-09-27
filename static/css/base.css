@@ -4,16 +4,16 @@ body {
 	font-size:12px; 
 	font-family:Volkhov; 
 	color:black;
-	background: #F7F7F7;
+	background: #FFFFFF;
 	}
 
 	
 #site_header_wrapper { 
-    background: url("/static/images/site_header.jpg") repeat scroll 0 0 #DDDDDD;
-    height: 80px;
-    margin: 0;
-    width: 100%;
-    border-bottom	: 1px solid #CCCCCC;
+	background: url("/static/images/site_header.jpg") repeat scroll 0 0 #DDD;
+	height: 80px;
+	margin: 0;
+	width: 100%;
+	border-bottom: 1px solid #CCCCCC;
 }
 
 #site_header {
@@ -135,6 +135,12 @@ body {
 	text-shadow: 0 0 2px #777777;
 }
 
+#welcome {
+	font-size: 350px;
+	font-family: 'Kelly Slab';
+	color: #FFFFFF;
+	text-shadow: 0 0 12px black;
+}
 
 #page_header {
     color: #10448C;
@@ -228,16 +234,21 @@ body {
 }
 
 #login_form {
-	padding: 150px 0px;
 	width: 100%;
-	color: #777777;
-	height: 500px;
+	color: #F2F2F2;
+	height: 480px;
+	padding-top: 100px;
+	border-top: 1px solid white;
 }
 
 #login_form form{
 	text-align: center;
 	width: 500px;
 	margin: auto;
+	padding: 164px 200px;
+	border: 1px solid #999;
+	background: url('/static/images/bg_bw.jpg');
+	box-shadow: 0 0 10px #FFF inset;
 }
 
 #login_form label {

@@ -20,6 +20,9 @@ function handle_hash(){
 	else if (destination[1] == 'album_show') {
 		get_album_show(destination[2]);
 	}
+	else if (destination[1] == 'album_delete') {
+		delete_album(destination[2]);
+	}
 }
 function add_music() {
 	var answer = confirm( "Are you sure you want to Add Music?")
@@ -47,7 +50,7 @@ function get_all_artists(letter) {
 	jQuery.ajax({
 		url: "/artists/"+letter+"/", 
 		success: function(jsonArtists) {show_artists(jsonArtists)},
-		async	: false
+		async	: true
 	});
 };
 
@@ -134,7 +137,7 @@ function get_album_show(album_id) {
 
 function delete_album(album_id) {
 	jQuery.ajax({
-		url: "/album/delete/" + album_id + "/", 
+		url: "/album_delete/" + album_id + "/", 
 		success: function(message) {get_all_albums('all');},
 		async	: false
 	});
@@ -163,8 +166,8 @@ function show_album(jsonAlbum, show_or_play) {
 	$('#content').append('<div id="album"></div>');
 	//get_album_info(all_album.pk);
 	
-	$('#album').append('<h1>'+ all_album[0].album +'</h1><div class="current_album">')
-	$('#album').append( '<button id="delete_album_button" style="float:right;" onclick="delete_album('+all_album[0].pk+')">DELETE ALBUM</button>')
+	$('#album').append('<h1>'+ all_album[0].album +'</h1><div class="current_album"></div>')
+	//$('#album').append( '<button id="delete_album_button" style="float:right;" onclick="delete_album('+all_album[0].pk+')">DELETE ALBUM</button>')
 	
 	$.each(all_album, function(i,album){
 		if (album.album_art){$('.current_album').append( '<div id="curr_album_img_div"><img src="/static/music/' +album.letter+ '/' + album.folder + '/Folder.jpg' + '" /></div>' )}

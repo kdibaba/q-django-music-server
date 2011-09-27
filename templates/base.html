@@ -4,6 +4,7 @@
 	<head>
 	    <title>{% block title %}Music{% endblock %}</title>
 	    <link href='http://fonts.googleapis.com/css?family=Volkhov' rel='stylesheet' type='text/css'>
+	    <link href='http://fonts.googleapis.com/css?family=Kelly+Slab' rel='stylesheet' type='text/css'>
 	    <link rel="stylesheet" type="text/css" href="/static/css/base.css" />
 	    <link rel="stylesheet" type="text/css" href="/static/css/music.css" />
 	    <link type="text/css" href="/static/css/jplayer.blue.monday.css" rel="stylesheet" />
@@ -13,8 +14,19 @@
 	    <script src="/static/javascript/music.js" type="text/javascript" charset="utf-8"></script>
 	    <script type="text/javascript">
 	    $(document).ready(function(){
+
+		    //HANDLE url changes
 		    $(window).bind( 'hashchange', function(){handle_hash()});
 		    handle_hash();
+
+		    //HANDLE jPlayer size
+			//var new_width = $(window).width() - 316
+			//$('.jp-mute').css('margin-left', new_width+'px')
+		    //$(window).resize(function() {
+			//  var new_width = $(window).width() - 316  
+			//  $('.jp-mute').css('margin-left', new_width+'px')
+			//});
+			
 		    $('#menu_albums').bind('click', function(){$('.nav_button_albums').toggle()});
 		    $('#menu_artists').bind('click', function(){$('.nav_button_artists').toggle()});
 		    
@@ -82,6 +94,7 @@
 				{% endfor %}
 			</div>
 			<div id=content>
+				<center><text id="welcome">Q</text></center>
 				{% block content %}{% endblock %}
 			</div>
 			</div>
