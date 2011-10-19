@@ -24,17 +24,13 @@ function handle_hash(){
 		delete_album(destination[2]);
 	}
 }
-function add_music() {
-	var answer = confirm( "Are you sure you want to Add Music?")
-	if (answer){
-		var type = prompt("What kind of add?")
-		jQuery.ajax({
-			url: "/add_music/"+type+"/", 
-			success: function() {get_all_albums('all')},
-			async	: false
-		});
-	}
-return false;  
+function add_music(type) {
+	jQuery.ajax({
+		url: "/add_music/"+type+"/", 
+		success: function() {get_all_albums('all')},
+		async	: false
+	});
+	return false;  
 }
 
 function get_song(song_id) {
@@ -138,7 +134,7 @@ function get_album_show(album_id) {
 function delete_album(album_id) {
 	jQuery.ajax({
 		url: "/album_delete/" + album_id + "/", 
-		success: function(message) {get_all_albums('all');},
+		success: function(message) {get_albums_by_artist(message);},
 		async	: false
 	});
 };

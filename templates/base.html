@@ -29,9 +29,11 @@
 			
 		    $('#menu_albums').bind('click', function(){$('.nav_button_albums').toggle()});
 		    $('#menu_artists').bind('click', function(){$('.nav_button_artists').toggle()});
+		    $('#menu_add_music').bind('click', function(){$('.nav_button_add').toggle()});
 		    
 		    $('.nav_button_artists').hover(function(){}, function(){$('.nav_button_artists').toggle()});
 		    $('.nav_button_albums').hover(function(){}, function(){$('.nav_button_albums').toggle()});
+		    $('.nav_button_add').hover(function(){}, function(){$('.nav_button_add').toggle()});
 				    
 	    	PLAYLIST = new jPlayerPlaylist({
 	    		jPlayer: "#jquery_jplayer_1",
@@ -79,7 +81,7 @@
 		<div id="site_body">
 			<div class=nav_button>
 				<a href="/" >Home</a>
-				<atext onclick="add_music(); return false">Add Music</atext>
+				<atext id="menu_add_music">Add Music</atext>
 				<atext ondblclick="location.href='#/artists/all'" id="menu_artists">Artists</atext>
 				<atext ondblclick="location.href='#/albums/all'" id="menu_albums">Albums</atext>
 			</div>
@@ -93,10 +95,16 @@
 					<atext onclick="location.href='/#/artists/{{letter}}'">{{letter}}</atext>
 				{% endfor %}
 			</div>
+			<div class="nav_button_add" style="display:none;">
+				<atext onclick="add_music('add')">Add New</atext>
+				<atext onclick="add_music('rebuild')">Rebuild DB</atext>
+				<atext onclick="location.href='/add_music/upload/'">Upload</atext>
+			</div>
+			{% block content %}
 			<div id=content>
 				<center><text id="welcome">Q</text></center>
-				{% block content %}{% endblock %}
 			</div>
+			{% endblock %}
 			</div>
 			<div id="footer_wrapper">
 				<div id="footer">

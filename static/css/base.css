@@ -108,7 +108,8 @@ body {
 
 
 .nav_button_albums,
-.nav_button_artists {
+.nav_button_artists,
+.nav_button_add {
 	height: 100%;
 	margin: auto;
 	width: 811px;
@@ -116,7 +117,8 @@ body {
 }
 
 .nav_button_albums atext,
-.nav_button_artists atext{
+.nav_button_artists atext,
+.nav_button_add atext{
 	background: url('/static/images/main_menu_bg.jpg') white;
 	border: 1px solid #CCC;
 	color: #666666;
@@ -131,7 +133,8 @@ body {
 }
 
 .nav_button_albums atext:hover,
-.nav_button_artists atext:hover{  
+.nav_button_artists atext:hover,
+.nav_button_add atext:hover{  
 	text-shadow: 0 0 2px #777777;
 }
 

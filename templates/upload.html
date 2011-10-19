@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+	<div id=upload_content>
+		<div id="page_header"> Upload Music </div>
+		<form method="post" action="" enctype="multipart/form-data">
+			{% for fields in form %}
+				<div>{{fields}}</div>
+			{% endfor %}
+			<input style="padding: 5px 50px 5px 50px; margin-top: 20px" type="submit" value="Submit" />
+		</form>
+	</div>
+	
+{% endblock %}

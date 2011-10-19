@@ -15,6 +15,7 @@ urlpatterns = patterns('',
 #    
     (r'^add_music/rebuild/$',                   'media.music.views.rebuild_music_db'),
     (r'^add_music/add/$',                       'media.music.views.add_to_music_db'),
+    (r'^add_music/upload/$',                    'media.music.views.upload_music'),
       
     (r'^album_info/(?P<album_id>\d+)/$',        'media.music.views.album_info'),
     (r'^album_show/(?P<album_id>\d+)/$',             'media.music.views.album'),

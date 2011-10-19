@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core import serializers
 from django.utils import simplejson
@@ -372,11 +372,15 @@ def album(request, album_id):
 @login_required
 def delete_album(request, album_id):
     album = Music_Album.objects.get(id=album_id)
+    message = album.artist.id
+    songs = Music_Song.objects.filter(album=album)
     shutil.move(settings.MUSIC_DIRECTORY+album.letter+'/'+album.folder, settings.MUSIC_DIRECTORY+'DELETED/')
+    for song in songs:
+        song.delete()
     album.delete()      
     if request.is_ajax():
         mimetype = 'application/javascript'
-    return HttpResponse('', mimetype)
+    return HttpResponse(message, mimetype)
 
 @login_required
 def get_song(request, song_id):
@@ -484,3 +488,17 @@ def search_music(request):
                                                       'search'          : search})
     
         
+        
+def upload_music(request):
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            handle_uploaded_file(request.FILES)
+            return HttpResponseRedirect('/')
+    else:
+        form = UploadFileForm()
+    return render_to_response('upload.html', {'form': form})     
+
+def handle_uploaded_file(file):
+    print file
+    return 
