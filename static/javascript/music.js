@@ -23,11 +23,26 @@ function handle_hash(){
 	else if (destination[1] == 'album_delete') {
 		delete_album(destination[2]);
 	}
+	else if (destination[1] == 'albums_by_year') {
+		get_albums_by_year(destination[2]);
+	}
+	else if (destination[1] == 'rebuild') {
+		rebuild(destination[2]);
+	}
 }
 function add_music(type) {
 	jQuery.ajax({
 		url: "/add_music/"+type+"/", 
 		success: function() {get_all_albums('all')},
+		async	: false
+	});
+	return false;  
+}
+
+function rebuild(letter) {
+	jQuery.ajax({
+		url: "/rebuild/"+letter+"/", 
+		success: function() {get_all_artists(letter)},
 		async	: false
 	});
 	return false;  
@@ -45,12 +60,12 @@ function get_song(song_id) {
 function get_all_artists(letter) {
 	jQuery.ajax({
 		url: "/artists/"+letter+"/", 
-		success: function(jsonArtists) {show_artists(jsonArtists)},
+		success: function(jsonArtists) {show_artists(jsonArtists, letter)},
 		async	: true
 	});
 };
 
-function show_artists(jsonArtists) {
+function show_artists(jsonArtists, letter) {
 	var artists = jQuery.parseJSON(jsonArtists);
 	var artist_count = 0
 	var deg = 0
@@ -80,7 +95,9 @@ function show_artists(jsonArtists) {
 		
 	})
 	$('#artists').append('</ul>');
-	$('#artists').prepend('<p class="nav_header">' + artist_count + ' Artists</p>');
+	$('#artists').prepend('');
+	$('#artists').prepend('');
+	$('#artists').prepend('<p class="nav_header">' + artist_count + ' Artists with the letter "'+ letter + '<button id="rebuild_button" onclick="location.href=\'/#/rebuild/'+letter+'\'">Rebuild '+letter+'</button> </p>');
 }
 
 function get_all_albums(letter) {
@@ -103,7 +120,7 @@ function show_albums(jsonAlbums) {
 		album_count+=1;
 		$('#albums').append('<div class="album album_' + item.pk+ '"><h1 class="album_name">' + item.album + '</h1>' + '</div>');
 		$('.album_' + item.pk).append('<h2 onclick="location.href=\'/#/albums_by_artist/'+item.artist_id+'\'">' + item.artist + '</h2>')
-		$('.album_' + item.pk).append('<h3>' + item.year + ' | ' + item.song_count + ' SONGS | ' + item.album_size + '</h3>')
+		$('.album_' + item.pk).append('<h3> <item class="year" onclick="location.href=\'/#/albums_by_year/'+item.year+'\'">' + item.year + '</item> | ' + item.song_count + ' SONGS | ' + item.album_size + '</h3>')
 		if (item.album_art){
 			//cover_count += 1;
 			$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/album_show/'+item.pk+'\'"' + '><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
@@ -119,6 +136,13 @@ function show_albums(jsonAlbums) {
 
 function get_albums_by_artist(artist_id) {
 	$.get("/albums_by_artist/" + artist_id + "/", function(jsonAlbums) {
+	        show_albums(jsonAlbums);
+	});
+};
+
+
+function get_albums_by_year(year_id) {
+	$.get("/albums_by_year/" + year_id + "/", function(jsonAlbums) {
 	        show_albums(jsonAlbums);
 	});
 };
@@ -170,7 +194,7 @@ function show_album(jsonAlbum, show_or_play) {
 		else {$('.current_album').append( '<div id="curr_album_img_div"><img src="/static/images/default_album_art.jpg" /></div>' )}
 		$('.current_album').append( '<button id="play_album_button" onclick="get_album_play('+album.pk+')">PLAY ALBUM</button>')
 		$('.current_album').append( '<h2 onclick="location.href=\'/#/albums_by_artist/'+album.artist_id+'\'">'+ album.artist+'</h2>')
-		$('.current_album').append( '<h3>'+ album.year+' | '+album.song_count+' SONGS | ' + album.album_size + '</h3>')
+		$('.current_album').append( '<h3> <item class="year" onclick="location.href=\'/#/albums_by_year/'+album.year+'\'">' + album.year + '</item> | '+album.song_count+' SONGS | ' + album.album_size + '</h3>')
 		
 		CURRENT_ALBUM = ''
 		$('#album').append('<table id="song_table"><tr><th></th><th>Title</th><th>Length</th><th>File Size</th><th>Rating</th></tr></table>')
@@ -306,6 +330,7 @@ function recreate_playlist(){
 	$('#footer').prepend('<div id="playlist_button_wrapper"></div>')
 	$('#playlist_button_wrapper').append('<button id="playlist_button" onclick="show_playlist()">Show Playlist</button>')
 	$('#playlist_button_wrapper').append('<button id="playlist_button" onclick="hide_playlist()">Hide Playlist</button>')
+	$('#playlist_button_wrapper').append('<button id="close_button" onclick="destroy_playlist()">X</button>')
 }
 
 function show_playlist(){
@@ -315,4 +340,11 @@ function show_playlist(){
 
 function hide_playlist(){
 	$("#footer_wrapper").animate({height: '112px'})
+}
+
+function destroy_playlist(){
+	if (PLAYLIST){delete(PLAYLIST)}
+	$('#jplayer_div').remove()
+	$('#playlist_button_wrapper').remove()
+	PLAYLIST = ''
 }

@@ -27,14 +27,22 @@
 			//  $('.jp-mute').css('margin-left', new_width+'px')
 			//});
 			
-		    $('#menu_albums').bind('click', function(){$('.nav_button_albums').toggle()});
-		    $('#menu_artists').bind('click', function(){$('.nav_button_artists').toggle()});
-		    $('#menu_add_music').bind('click', function(){$('.nav_button_add').toggle()});
+		    $('#menu_albums').hover( function(){
+			    $('.nav_button_albums').slideDown(); 
+			    $('.nav_button_add').slideUp(); $('.nav_button_artists').slideUp();
+			    });
+		    $('#menu_artists').hover( function(){
+			    $('.nav_button_artists').slideDown(); 
+			    $('.nav_button_add').slideUp(); $('.nav_button_albums').slideUp();
+			    });
+		    $('#menu_add_music').hover( function(){
+			    $('.nav_button_add').slideDown(); 
+			    $('.nav_button_albums').slideUp(); $('.nav_button_artists').slideUp();
+			    });
 		    
-		    $('.nav_button_artists').hover(function(){}, function(){$('.nav_button_artists').toggle()});
-		    $('.nav_button_albums').hover(function(){}, function(){$('.nav_button_albums').toggle()});
-		    $('.nav_button_add').hover(function(){}, function(){$('.nav_button_add').toggle()});
-				    
+
+		   $(window).click(function(){$('.nav_button_add').slideUp(); $('.nav_button_artists').slideUp(); $('.nav_button_albums').slideUp()} )
+			  
 	    	PLAYLIST = new jPlayerPlaylist({
 	    		jPlayer: "#jquery_jplayer_1",
 	    		cssSelectorAncestor: "#jp_container_1"
@@ -79,26 +87,28 @@
 		    </div>
 		</div>
 		<div id="site_body">
-			<div class=nav_button>
-				<a href="/" >Home</a>
-				<atext id="menu_add_music">Add Music</atext>
-				<atext ondblclick="location.href='#/artists/all'" id="menu_artists">Artists</atext>
-				<atext ondblclick="location.href='#/albums/all'" id="menu_albums">Albums</atext>
-			</div>
-			<div class="nav_button_albums" style="display:none;">
-				{% for letter in letter_list %}
-					<atext onclick="location.href='/#/albums/{{letter}}'">{{letter}}</atext>
-				{% endfor %}
-			</div>
-			<div class="nav_button_artists" style="display:none;">
-				{% for letter in letter_list %}
-					<atext onclick="location.href='/#/artists/{{letter}}'">{{letter}}</atext>
-				{% endfor %}
-			</div>
-			<div class="nav_button_add" style="display:none;">
-				<atext onclick="add_music('add')">Add New</atext>
-				<atext onclick="add_music('rebuild')">Rebuild DB</atext>
-				<atext onclick="location.href='/add_music/upload/'">Upload</atext>
+			<div id="navigation">
+				<div class=nav_button>
+					<a href="/" >Home</a>
+					<atext id="menu_add_music">Add Music</atext>
+					<atext ondblclick="location.href='#/artists/all'" id="menu_artists">Artists</atext>
+					<atext ondblclick="location.href='#/albums/all'" id="menu_albums">Albums</atext>
+				</div>
+				<div class="nav_button_albums" style="display:none;">
+					{% for letter in letter_list %}
+						<atext onclick="location.href='/#/albums/{{letter}}'">{{letter}}</atext>
+					{% endfor %}
+				</div>
+				<div class="nav_button_artists" style="display:none;">
+					{% for letter in letter_list %}
+						<atext onclick="location.href='/#/artists/{{letter}}'">{{letter}}</atext>
+					{% endfor %}
+				</div>
+				<div class="nav_button_add" style="display:none;">
+					<btext onclick="add_music('add')">Add New</btext>
+					<btext onclick="add_music('rebuild')">Rebuild DB</btext>
+					<btext onclick="location.href='/add_music/upload/'">Upload</btext>
+				</div>
 			</div>
 			{% block content %}
 			<div id=content>
@@ -108,57 +118,6 @@
 			</div>
 			<div id="footer_wrapper">
 				<div id="footer">
-				<div id="playlist_button_wrapper">')
-					<button id="playlist_button" onclick="show_playlist()">Show Playlist</button>'
-					<button id="playlist_button" onclick="hide_playlist()">Hide Playlist</button>'
-				</div>
-				<div id="jplayer_div">
-				<div id="jquery_jplayer_1" class="jp-jplayer"></div>
-				
-						<div id="jp_container_1" class="jp-audio">
-							<div class="jp-type-playlist">
-								<div class="jp-gui jp-interface">
-									<ul class="jp-controls">
-										<li><a href="javascript:;" class="jp-previous" tabindex="1">previous</a></li>
-										<li><a href="javascript:;" class="jp-play" tabindex="1">play</a></li>
-										<li><a href="javascript:;" class="jp-pause" tabindex="1">pause</a></li>
-										<li><a href="javascript:;" class="jp-next" tabindex="1">next</a></li>
-										<li><a href="javascript:;" class="jp-stop" tabindex="1">stop</a></li>
-										<li><a href="javascript:;" class="jp-mute" tabindex="1" title="mute">mute</a></li>
-										<li><a href="javascript:;" class="jp-unmute" tabindex="1" title="unmute">unmute</a></li>
-										<li><a href="javascript:;" class="jp-volume-max" tabindex="1" title="max volume">max volume</a></li>
-									</ul>
-									<div class="jp-progress">
-										<div class="jp-seek-bar">
-											<div class="jp-play-bar"></div>
-										</div>
-									</div>
-									<div class="jp-volume-bar">
-										<div class="jp-volume-bar-value"></div>
-									</div>
-									<div class="jp-time-holder">
-										<div class="jp-current-time"></div>
-										<div class="jp-duration"></div>
-									</div>
-									<ul class="jp-toggles">
-										<li><a href="javascript:;" class="jp-shuffle" tabindex="1" title="shuffle">shuffle</a></li>
-										<li><a href="javascript:;" class="jp-shuffle-off" tabindex="1" title="shuffle off">shuffle off</a></li>
-										<li><a href="javascript:;" class="jp-repeat" tabindex="1" title="repeat">repeat</a></li>
-										<li><a href="javascript:;" class="jp-repeat-off" tabindex="1" title="repeat off">repeat off</a></li>
-									</ul>
-								</div>
-								<div class="jp-playlist">
-									<ul>
-										<li></li>
-									</ul>
-								</div>
-								<div class="jp-no-solution">
-									<span>Update Required</span>
-									To play the media you will need to either update your browser to a recent version or update your <a href="http://get.adobe.com/flashplayer/" target="_blank">Flash plugin</a>.
-								</div>
-							</div>
-						</div>
-					</div>
 				</div>
 			</div>
 	</body>

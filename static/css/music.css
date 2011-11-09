@@ -66,7 +66,11 @@
     white-space: nowrap;
 }
 
-	
+.year:hover {
+	text-decoration	: underline;
+	cursor		:pointer;
+	}
+		
 .artist_album {
     display: inline-block;
     font-size: 10px;
@@ -225,11 +229,15 @@ td#rating_td {
 	margin: auto;
 	width: 1440px;
 	background: white;
+	border-right: 1px solid #F2F2F2;
+	border-top: 1px solid #F2F2F2;
+	border-left: 1px solid #F2F2F2;
+	box-shadow: 0px -1px 5px #DDDDDD;
 }
 
 #playlist_button {
-	background: url('/static/images/main_menu_bg.jpg') white;
-	border: 1px solid #cccccc;
+	background: white;
+	border: 1px solid #f2f2f2;
 	padding: 4px;
 	width: 200px;
 	cursor: pointer;
@@ -238,20 +246,57 @@ td#rating_td {
 	margin	: 2px 6px;
 }
 
+#playlist_button:hover {
+	box-shadow : 0 0 4px #999999;
+}
+
+#close_button {
+	background: white;
+	border: 1px solid #f2f2f2;
+	padding: 4px;
+	cursor: pointer;
+	color: #666666;
+	font-size: 14px;
+	margin	: 2px 6px;
+	float	: right;
+}
+
+#close_button:hover {
+	color		: #ffffff;
+	background	: #999999;
+}
+
 #play_album_button,
 #delete_album_button {
-	background: url('/static/images/main_menu_bg.jpg') white;
-	border: 1px solid #cccccc;
+	background: white;
+	border: 1px solid #f2f2f2;
 	padding: 4px;
 	width: 200px;
 	cursor: pointer;
 	color: #666666;
 	font-size: 14px;
+	box-shadow: 0 0 2px #999999;
 }
 
 #play_album_button:hover,
 #delete_album_button:hover  {
-	box-shadow: 0 0 2px #555555;
+	box-shadow: 0 0 10px #999999;
+}
+
+#rebuild_button {
+	background: white;
+	border: 1px solid #f2f2f2;
+	padding: 4px;
+	width: 200px;
+	cursor: pointer;
+	color: #666666;
+	font-size: 14px;
+	margin	: 2px 6px;
+	float	:right;
+}
+
+#rebuild_button:hover {
+	box-shadow : 0 0 4px #999999;
 }
 
 .ratings {

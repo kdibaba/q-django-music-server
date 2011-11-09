@@ -78,9 +78,15 @@ div.jp-interface {
 
 div.jp-audio div.jp-type-single div.jp-interface {
 	height:80px;
+	border-right: 1px solid #F2F2F2;
+	border-left: 1px solid #F2F2F2;
+	box-shadow: 0px 3px 5px #DDDDDD;
 }
 div.jp-audio div.jp-type-playlist div.jp-interface {
 	height:80px;
+	border-right: 1px solid #F2F2F2;
+	border-left: 1px solid #F2F2F2;
+	box-shadow: 0px 3px 5px #DDDDDD;
 }
 
 div.jp-video div.jp-interface {
@@ -361,7 +367,7 @@ div.jp-title {
 div.jp-title,
 div.jp-playlist {
 	width:100%;
-	background-color:#ccc;
+	background-color:#FFFFFF;
 }
 div.jp-type-single div.jp-title,
 div.jp-type-playlist div.jp-title,
