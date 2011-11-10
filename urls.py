@@ -26,7 +26,8 @@ urlpatterns = patterns('',
     
     (r'^rating/(?P<song_id>\d+)/(?P<rating>\d+)/$',           'media.music.views.set_rating'),
     
-    (r'^search_music/$',                        'media.music.views.search_music'),
+    (r'^search_music_artists/$',                        'media.music.views.search_music_artists'),
+    (r'^search_music_albums/$',                        'media.music.views.search_music_albums'),
     (r'^artists/0/$',                           'media.music.views.artists', {'letter': '0'}),
     (r'^artists/A/$',                           'media.music.views.artists', {'letter': 'A'}),
     (r'^artists/B/$',                           'media.music.views.artists', {'letter': 'B'}),

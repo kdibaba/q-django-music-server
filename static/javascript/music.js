@@ -7,14 +7,16 @@ NOW_PLAYING = false
 function handle_hash(){
 	var destination = location.hash.replace('#', '')
 	destination = destination.split('/')
-	//alert(destination)
 	if (destination[1] == 'artists') {
+		display_message('Retrieving Artists....');
 		get_all_artists(destination[2]);
 	}
 	else if (destination[1] == 'albums') {
+		display_message('Retrieving Albums....');
 		get_all_albums(destination[2]);
 	}
 	else if (destination[1] == 'albums_by_artist') {
+		display_message('Retrieving Albums by '+destination[2] +'....');
 		get_albums_by_artist(destination[2]);
 	}
 	else if (destination[1] == 'album_show') {
@@ -24,12 +26,51 @@ function handle_hash(){
 		delete_album(destination[2]);
 	}
 	else if (destination[1] == 'albums_by_year') {
+		display_message('Retrieving Albums from '+destination[2] +'....');
 		get_albums_by_year(destination[2]);
 	}
 	else if (destination[1] == 'rebuild') {
+		display_message('Rebuilding Database....');
 		rebuild(destination[2]);
 	}
+	else if (destination[1] == 'search') {
+		display_message('Searching Database....');
+		search(destination[2]);
+	}
 }
+
+function display_message(message) {
+	$('#content').replaceWith('<div id="content"></div>')
+	$('#content').append('<div id="message"></div>');
+	var opts = {
+			  lines: 14, // The number of lines to draw
+			  length: 23, // The length of each line
+			  width: 8, // The line thickness
+			  radius: 26, // The radius of the inner circle
+			  color: '#000', // #rgb or #rrggbb
+			  speed: 1, // Rounds per second
+			  trail: 60, // Afterglow percentage
+			  shadow: false // Whether to render a shadow
+			};
+	var target = document.getElementById('message');
+	var spinner = new Spinner(opts).spin(target);
+			
+	$('#message').append('<div style="margin-top: 75px;">' + message + '</div>');
+}
+
+function show_artist_results() {
+	$('.nav_header_albums').removeClass('selected');
+	$('#albums').hide();
+	$('#artists').show();
+	$('.nav_header_artists').addClass('selected');
+}
+function show_album_results() {
+	$('.nav_header_artists').removeClass('selected');
+	$('#artists').hide()
+	$('#albums').show()
+	$('.nav_header_albums').addClass('selected');
+}
+
 function add_music(type) {
 	jQuery.ajax({
 		url: "/add_music/"+type+"/", 
@@ -39,6 +80,73 @@ function add_music(type) {
 	return false;  
 }
 
+function search(text) {
+	jQuery.ajax({
+		url: "/search_music_artists/?query="+text, 
+		success: function(jsonArtists) {show_results_artists(jsonArtists, text)},
+		async	: false
+	});
+	jQuery.ajax({
+		url: "/search_music_albums/?query="+text, 
+		success: function(jsonArtists) {show_results_albums(jsonArtists, text)},
+		async	: false
+	});
+	return false;  
+}
+
+
+function show_results_artists(jsonArtists, letter) {
+	var artists = jQuery.parseJSON(jsonArtists);
+	var artist_count = 0
+	var deg = 0
+	var length = 0
+	
+	$('#content').replaceWith('<div id="content"></div>')
+	$('#content').append('<div id="artists"></div>');
+	$.each(artists, function(i,items){
+		$('#artists').append('<div class="artist_albums artist_albums_'+items.pk+'"></div>');
+		$('.artist_albums_'+items.pk).prepend('<div class="album_art_wrapper album_art_wrapper_' + items.pk+ '"></div>');
+		artist_count+=1;
+		deg = 15
+		length = items.albums.length - 1;
+		$.each(items.albums, function(g,item){
+			if (length == g){ deg = 0;}
+			$('.album_art_wrapper_'+items.pk).append('<div class="artist_album album_' + item.pk+ '" style="-webkit-transform: rotate('+ deg + 'deg); -moz-transform: rotate('+ deg + 'deg)"></div>');
+			//$('.album_' + item.pk).hover(function(){$(this).css('width',  '125px')}, function(){$(this).css('width',  '44px')});
+			if (item.album_art){
+				$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/album_show/'+item.pk+'\'"><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
+			else {
+				$('.album_'+item.pk).prepend( '<div id="img_div"><img src="/static/images/default_album_art.jpg" /></div>' )}
+			deg += 15;
+		})
+		$('.artist_albums_'+items.pk).append('<div class="artist_info artist_info_' + items.pk + '"><h1 onclick="location.href=\'/#/albums_by_artist/'+items.pk+'\'">' + items.name + '</h1></div>');
+		$('.artist_info_' + items.pk).append('<h2>'+items.album_count+' Albums<h2>');
+		$('.artist_info_' + items.pk).append('<h2>'+items.song_count+' Songs<h2>');
+		
+	})
+	$('#artists').append('</ul>');
+	$('#content').prepend('<div id="nav_headers"></div>')
+	$('#nav_headers').prepend('<a class="nav_header_artists selected"  onclick="show_artist_results()">Artist (' + artist_count + ')</a>');
+}
+
+function show_results_albums(jsonAlbums) {
+	var albums = jQuery.parseJSON(jsonAlbums);
+	var album_count = 0
+	
+	$('#content').append('<div id="albums" style="display:none"></div>');
+	$.each(albums, function(i,item){
+		album_count+=1;
+		$('#albums').append('<div class="album album_' + item.pk+ '"><h1 class="album_name">' + item.album + '</h1>' + '</div>');
+		$('.album_' + item.pk).append('<h2 onclick="location.href=\'/#/albums_by_artist/'+item.artist_id+'\'">' + item.artist + '</h2>')
+		$('.album_' + item.pk).append('<h3> <item class="year" onclick="location.href=\'/#/albums_by_year/'+item.year+'\'">' + item.year + '</item> | ' + item.song_count + ' SONGS | ' + item.album_size + '</h3>')
+		if (item.album_art){
+			$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/album_show/'+item.pk+'\'"' + '><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
+		else {
+			$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/album_show/'+item.pk+'\'"' + '><img src="/static/images/default_album_art.jpg" /></div>' )
+		}
+	})
+	$('#nav_headers').append('<a class="nav_header_albums" onclick="show_album_results()">Album (' + album_count + ')</a>');
+}
 function rebuild(letter) {
 	jQuery.ajax({
 		url: "/rebuild/"+letter+"/", 
@@ -97,14 +205,14 @@ function show_artists(jsonArtists, letter) {
 	$('#artists').append('</ul>');
 	$('#artists').prepend('');
 	$('#artists').prepend('');
-	$('#artists').prepend('<p class="nav_header">' + artist_count + ' Artists with the letter "'+ letter + '<button id="rebuild_button" onclick="location.href=\'/#/rebuild/'+letter+'\'">Rebuild '+letter+'</button> </p>');
+	$('#artists').prepend('<p class="nav_header">' + artist_count + ' Artist(s) found. <button id="rebuild_button" onclick="location.href=\'/#/rebuild/'+letter+'\'">Rebuild '+letter+'</button> </p>');
 }
 
 function get_all_albums(letter) {
 	jQuery.ajax({
 		url: "/albums/"+letter+"/", 
 		success: function(jsonAlbums) {show_albums(jsonAlbums)},
-		async	: false
+		async	: true
 	});
 };
 

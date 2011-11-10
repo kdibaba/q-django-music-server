@@ -11,6 +11,7 @@
 	    <script src="/static/javascript/lib/jquery.min.js" type="text/javascript" charset="utf-8"></script>
 	    <script src="/static/javascript/lib/jquery.jplayer.min.js" type="text/javascript" charset="utf-8"></script>
 	    <script src="/static/javascript/lib/jplayer.playlist.min.js" type="text/javascript" charset="utf-8"></script>
+	    <script src="/static/javascript/lib/spin.min.js" type="text/javascript" charset="utf-8"></script>
 	    <script src="/static/javascript/music.js" type="text/javascript" charset="utf-8"></script>
 	    <script type="text/javascript">
 	    $(document).ready(function(){
@@ -29,19 +30,32 @@
 			
 		    $('#menu_albums').hover( function(){
 			    $('.nav_button_albums').slideDown(); 
-			    $('.nav_button_add').slideUp(); $('.nav_button_artists').slideUp();
+			    $('.nav_button_add').slideUp(); $('.nav_button_artists').slideUp(); $('.nav_button_search').slideUp();
 			    });
 		    $('#menu_artists').hover( function(){
 			    $('.nav_button_artists').slideDown(); 
-			    $('.nav_button_add').slideUp(); $('.nav_button_albums').slideUp();
+			    $('.nav_button_add').slideUp(); $('.nav_button_albums').slideUp(); $('.nav_button_search').slideUp();
 			    });
 		    $('#menu_add_music').hover( function(){
 			    $('.nav_button_add').slideDown(); 
-			    $('.nav_button_albums').slideUp(); $('.nav_button_artists').slideUp();
+			    $('.nav_button_albums').slideUp(); $('.nav_button_artists').slideUp(); $('.nav_button_search').slideUp();
+			    });
+		    $('#menu_search').hover( function(){
+			    $('.nav_button_search').slideDown(); 
+			    $('.nav_button_albums').slideUp(); $('.nav_button_artists').slideUp(); $('.nav_button_add').slideUp();
 			    });
 		    
+		    $("#searchBox").keyup(function(){
+			    if (event.keyCode == 13){
+			    	location.href='/#/search/'+$("#searchBox").val();
+			    }
+		        });
 
-		   $(window).click(function(){$('.nav_button_add').slideUp(); $('.nav_button_artists').slideUp(); $('.nav_button_albums').slideUp()} )
+			   
+		    $('.nav_button_add').hover( function(){$('.nav_button_add').slideDown(); }, function(){$('.nav_button_add').slideUp(); });
+		    $('.nav_button_artists').hover( function(){$('.nav_button_artists').slideDown(); }, function(){$('.nav_button_artists').slideUp(); });
+		    $('.nav_button_albums').hover( function(){$('.nav_button_albums').slideDown(); }, function(){$('.nav_button_albums').slideUp(); });
+		    $('.nav_button_search').hover( function(){$('.nav_button_search').slideDown(); }, function(){$('.nav_button_search').slideUp(); });
 			  
 	    	PLAYLIST = new jPlayerPlaylist({
 	    		jPlayer: "#jquery_jplayer_1",
@@ -93,6 +107,7 @@
 					<atext id="menu_add_music">Add Music</atext>
 					<atext ondblclick="location.href='#/artists/all'" id="menu_artists">Artists</atext>
 					<atext ondblclick="location.href='#/albums/all'" id="menu_albums">Albums</atext>
+					<atext id="menu_search">Search</atext>
 				</div>
 				<div class="nav_button_albums" style="display:none;">
 					{% for letter in letter_list %}
@@ -108,6 +123,9 @@
 					<btext onclick="add_music('add')">Add New</btext>
 					<btext onclick="add_music('rebuild')">Rebuild DB</btext>
 					<btext onclick="location.href='/add_music/upload/'">Upload</btext>
+				</div>
+				<div class="nav_button_search" style="display:none;">
+					<input type="text" id="searchBox" placeholder="Search My Library">
 				</div>
 			</div>
 			{% block content %}

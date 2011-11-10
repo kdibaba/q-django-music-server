@@ -66,19 +66,28 @@ body a{
 }
 #navigation {
 	margin: auto;
-	width: 811px;
+	width: 1024px;
 }
 
 #menu_albums:hover,
 #menu_artists:hover,
-#menu_add_music:hover {
+#menu_add_music:hover,
+#menu_search:hover {
 	background		: #f7f7f7;
 }
-		    	
+	
+#searchBox {
+	margin-top: 6px;
+	width: 215px;
+	padding-left: 5px;
+	color: #888;
+	border: 1px solid #DDD;
+	height: 19px;
+}
 .nav_button {
 	height: 100%;
 	margin: auto;
-	width: 811px;
+	width: 1024px;
 	text-align	: center;
 	font-size: 14px;
 }
@@ -109,24 +118,26 @@ body a{
 
 .nav_button_albums,
 .nav_button_artists,
-.nav_button_add {
+.nav_button_add,
+.nav_button_search  {
 	background	: #f7f7f7;
 	margin		: -1px auto;
 	height		: 35px;
-	width		: 811px;
+	width		: 1024px;
 	text-align	: center;
 	font-size	: 14px;
 	position	: fixed;
 }
 
 .nav_button_albums atext,
-.nav_button_artists atext{
+.nav_button_artists atext,
+.nav_button_search atext{
 	display: inline-block;
 	margin: -1px -2px;
 	text-decoration: none;
 	text-align: center;
 	text-shadow: 0 0 1px #999999;
-	padding: 9px 9px;
+	padding: 12px 9px;
 	cursor		: pointer;-webkit-user-select: none;
 	-khtml-user-select: none;
 	-moz-user-select: none;
@@ -135,7 +146,8 @@ body a{
 }
 
 .nav_button_albums atext:hover,
-.nav_button_artists atext:hover{  
+.nav_button_artists atext:hover,
+.nav_button_search atext:hover{  
 	text-shadow: 0 0 2px #777777;
 }
 
@@ -166,6 +178,15 @@ body a{
 	text-shadow: 0 0 12px black;
 }
 
+#message {
+	width: 700px;
+	margin: auto;
+	text-align: center;
+	font-size: 30px;
+	padding: 165px;
+	background: #F2f2f2;
+}
+
 #page_header {
     color: #10448C;
     font-size: 30px;
@@ -180,10 +201,28 @@ body a{
     padding-bottom: 130px;
 }
 
-.nav_header {
-	font-size	: 18px;
-	color		: #555555;
+#nav_headers {
+	margin-top: 60px;
+	padding: 10px;
+	border-bottom: 1px solid #EEE;
+	}
+	
+.nav_header_albums,
+.nav_header_artists {
+	font-size: 13px;
+	padding: 10px 50px;
+	background: #F7F7F7;
+	margin: 10px;
+	border-top	: 1px solid #EEEEEE;
+	border-right	: 1px solid #EEEEEE;
+	border-left	: 1px solid #EEEEEE;
 }
+
+.nav_header_albums.selected,
+.nav_header_artists.selected {
+	background: #FFFFFF;
+	border-bottom: 1px solid white;
+	}
 
 .header_button {
     height: 100%;

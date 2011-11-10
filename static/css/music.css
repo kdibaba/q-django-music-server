@@ -2,6 +2,10 @@
 #artists{
 }
 
+#albums{
+	margin-top	: 30px;
+}
+
 #albums a,
 #artists a {
     color: #1E5AA8;
@@ -76,14 +80,14 @@
     font-size: 10px;
     height: 100px;
     width: 0px;
-    -webkit-transform-origin-x: 66px;
-	-webkit-transform-origin-y: 67px;
-    -moz-transform-origin: 66px 67px;
+    -webkit-transform-origin-x: 49px;
+	-webkit-transform-origin-y: 49px;
+    -moz-transform-origin: 49px 49px;
 }
 
 .artist_album img {
-	width: 125px;
-	height: 125px;
+	width: 100px;
+	height: 100px;
 	margin: -1px;
 }
 
@@ -126,16 +130,16 @@
 }
 
 .album_art_wrapper {
-	height: 124px;
+	height: 100px;
 	margin: 28px;
-	width: 125px;
+	width: 100px;
 	display: inline-block;
 }
 	
 .artist_albums {
-	width		: 333px;
+	width		: 265px;
 	white-space: nowrap;	
-	height		: 200px;
+	height		: 160px;
 	display		: inline-block;
     overflow: hidden;
     margin-right	: 10px
@@ -154,12 +158,19 @@
 }
 		
 #img_div {
+	width: 98px;
+	height: 98px;
+	overflow: hidden;
+	box-shadow: 0 0 10px #999;
+}
+
+.album #img_div {
 	width: 123px;
 	height: 123px;
 	overflow: hidden;
 	box-shadow: 0 0 10px #999;
 }
-	
+
 #img_div:hover {
 	box-shadow: 0 0 10px #555;
 	cursor		: pointer;

@@ -311,6 +311,8 @@ def albums(request, letter):
                 elif all_album_full.album[0] == 'T':
                     if all_album_full.album[1] == 'H' and all_album_full.album[2] == 'E' and all_album_full.album[4] == letter :
                         all_albums.append(all_album_full)
+#                else:
+#                    all_albums.append(all_album_full)
             except:
                 pass 
     dictionary_albums = []
@@ -482,6 +484,7 @@ def artists(request, letter):
         artists = simplejson.dumps(artists)
     return HttpResponse(artists, mimetype)   
     
+    
 @login_required
 def rebuild(request, letter):
     Music_Artist.objects.filter(letter=letter).delete()
@@ -509,24 +512,71 @@ def set_rating(request, song_id, rating):
     return HttpResponse(mimetype)
     
 @login_required    
-def search_music(request):
-    results = []
-    num_of_results = 0
-    search = ''
-    if request.method == 'POST':
-        if request.POST['search']:
-            search = request.POST['search'].lower()
-            artists = Music_Artist.objects.all().order_by('artist')
-            for artist in artists:
-                if search in artist.artist.lower():
-                    results.append( artist )
-            num_of_results = results.__len__()
-        
-    return render_to_response('search_music.html', {  'results'         : results,
-                                                      'num_of_results'  : num_of_results,
-                                                      'search'          : search})
+def search_music_artists(request):
+    all_artists = Music_Artist.objects.all()
+    get_artists = []
+    for items in all_artists:
+        if request.GET['query'].upper() in items.artist:
+            get_artists.append(items)
+            
+    artists = []
+    for get_artist in get_artists:
+        try:
+            artist = {}
+            artist['pk'] = get_artist.id
+            artist['name'] = get_artist.artist
+            artist['song_count'] = 0
+            artist['album_count'] = 0
+            artist['albums'] = []
+            get_albums = Music_Album.objects.filter(artist=get_artist.id).order_by('id')
+            for get_album in get_albums:
+                album = {}
+                album['letter'] = get_album.letter
+                album['folder'] = get_album.folder
+                album['album_art'] = get_album.album_art
+                album['pk'] = get_album.id
+                
+                artist['song_count'] += get_album.song_count
+                artist['album_count'] += 1
+                artist['albums'].append(album)
+            artists.append(artist)
+        except:
+            print 'excepted'
+
+    if request.is_ajax():
+        mimetype = 'application/javascript'
+        artists = simplejson.dumps(artists)
+    return HttpResponse(artists, mimetype)
     
         
+@login_required
+def search_music_albums(request):
+    
+    get_albums = Music_Album.objects.all()
+    all_albums = []
+    for items in get_albums:
+        if request.GET['query'].upper() in items.album:
+            all_albums.append(items)
+                        
+    dictionary_albums = []
+    for album in all_albums:
+        album_info = {}
+        album_info['artist'] = album.artist.artist
+        album_info['artist_id'] = album.artist.id
+        album_info['pk'] = album.id
+        album_info['album'] = album.album
+        album_info['song_count'] = album.song_count
+        album_info['letter'] = album.letter
+        album_info['folder'] = album.folder
+        album_info['album_art'] = album.album_art
+        album_info['year'] = album.year
+        album_info['album_size'] = album.get_album_size()
+        dictionary_albums.append(album_info)
+        
+    if request.is_ajax():
+        mimetype = 'application/javascript'
+        albums = simplejson.dumps(dictionary_albums)
+    return HttpResponse(albums, mimetype)
         
 def upload_music(request):
     if request.method == 'POST':
