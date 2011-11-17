@@ -247,7 +247,11 @@ td#rating_td {
 }
 
 #playlist_button {
-	background: white;
+	background-image: linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background-image: -o-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background-image: -moz-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background-image: -webkit-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background-image: -ms-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
 	border: 1px solid #f2f2f2;
 	padding: 4px;
 	width: 200px;
@@ -279,7 +283,11 @@ td#rating_td {
 
 #play_album_button,
 #delete_album_button {
-	background: white;
+	background-image: linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
+	background-image: -o-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
+	background-image: -moz-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
+	background-image: -webkit-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
+	background-image: -ms-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
 	border: 1px solid #f2f2f2;
 	padding: 4px;
 	width: 200px;
@@ -295,7 +303,11 @@ td#rating_td {
 }
 
 #rebuild_button {
-	background: white;
+	background-image: linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
+	background-image: -o-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
+	background-image: -moz-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
+	background-image: -webkit-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
+	background-image: -ms-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
 	border: 1px solid #f2f2f2;
 	padding: 4px;
 	width: 200px;
