@@ -20,16 +20,18 @@
     </div>
 </div>
 	<div id="login_form">
-		{% if message %}
-			<p>{{ message }}</p>
-		{% endif %}
 		<form method="post" action=""  autocomplete="off">
+		
+			{% if message %}
+				<p>{{ message }}</p>
+			{% endif %}
 			<table>
 				<tr><td><label>Username </label></td><td>{{ form.username }}</td></tr>
 				<tr><td><label>Password </label></td><td>{{ form.password }}</td></tr>
 			</table>
 		<input type="hidden" name="home" value="home" />
 		<input style="padding: 5px 50px 5px 50px; margin-top: 20px" type="submit" value="Login" />
+		<a id="general_a_button" href="/register">Register</a>
 		</form>
 			</div>
 	</body>

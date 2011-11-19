@@ -15,7 +15,7 @@ from mutagen.mp3 import MP3
 import mutagen.id3
 
 
-LETTERS = ['0', 'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
+LETTERS = ['0', 'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','VA', 'W','X','Y','Z']
 SET_RATING = {'1': 32, '2': 64, '3': 128,'4':196, '5':255}
 
 @login_required
@@ -41,41 +41,41 @@ def rebuild_music_db(request):
         result = 1
     return HttpResponse(result, mimetype)
         
-def handle_music_drive(request):
-    msg = ''
-    directory = ''
-    directories = []
-    string_file_list = []
-    copies = []
-    renamed_files = []
-    file_list = []
-    cataloged = []
-    problems = []
-    num_of_copies = 0
-    duplicates = []
-    if request.method == 'POST':
-        form = Drive_form(request.POST)
-        if 'catalog_drive' in request.POST:
-            cataloged, problems = catalog_drive_music ()
-        elif 'filter_nzbs' in request.POST:
-            if request.POST['nzbs']:
-                num_of_copies, copies  = filter_nzbs_music (file_list, request.POST['nzbs'])
-            else: problems.append('You forgot to give me the location of the nzbs!')
-        elif 'fix_albums' in request.POST:
-            if request.POST['directory']:
-                duplicates  = fix_albums (request.POST['directory'])
-            else: problems.append('You forgot to give me the location of the nzbs!')
-                
-    else:
-        form = Drive_form()
-    return render_to_response('handle_music_drive.html', {  'form'              : form, 
-                                                            'cataloged'         : cataloged,
-                                                            'file_list'         : file_list,
-                                                            'problems'          : problems,
-                                                            'copies'            : copies,
-                                                            'num_of_copies'     : num_of_copies,
-                                                            'duplicates'        : duplicates,
-                                                            'msg'               : msg, } )    
+#def handle_music_drive(request):
+#    msg = ''
+#    directory = ''
+#    directories = []
+#    string_file_list = []
+#    copies = []
+#    renamed_files = []
+#    file_list = []
+#    cataloged = []
+#    problems = []
+#    num_of_copies = 0
+#    duplicates = []
+#    if request.method == 'POST':
+#        form = Drive_form(request.POST)
+#        if 'catalog_drive' in request.POST:
+#            catalog_drive_music()
+#        elif 'filter_nzbs' in request.POST:
+#            if request.POST['nzbs']:
+#                num_of_copies, copies  = filter_nzbs_music (file_list, request.POST['nzbs'])
+#            else: problems.append('You forgot to give me the location of the nzbs!')
+#        elif 'fix_albums' in request.POST:
+#            if request.POST['directory']:
+#                duplicates  = fix_albums (request.POST['directory'])
+#            else: problems.append('You forgot to give me the location of the nzbs!')
+#                
+#    else:
+#        form = Drive_form()
+#    return render_to_response('handle_music_drive.html', {  'form'              : form, 
+#                                                            'cataloged'         : cataloged,
+#                                                            'file_list'         : file_list,
+#                                                            'problems'          : problems,
+#                                                            'copies'            : copies,
+#                                                            'num_of_copies'     : num_of_copies,
+#                                                            'duplicates'        : duplicates,
+#                                                            'msg'               : msg, } )    
     
 def get_folder_names (directory):
     folder_names = []
@@ -132,8 +132,6 @@ def catalog_drive_music(type):
     for letter in LETTERS: 
         directory = settings.MUSIC_DIRECTORY + letter + "/"
         files = get_folder_names(directory)
-        cataloged = []
-        problems = []
         
         #Delete all records for this drive
         #Music_Drive.objects.filter(drive=drive).delete()
@@ -149,7 +147,6 @@ def catalog_drive_music(type):
                     album_length = 0
                     album_year = 0
                     album_size = 0
-                    cataloged.append(str(file_object))
                     try: songs = os.listdir(directory+str(file_object))
                     except: songs = []
                     artist_name = file[0].replace('.', ' ')
@@ -203,7 +200,7 @@ def catalog_drive_music(type):
                                                           )
                                 song_count += 1
                             except:
-                                print str(file_object)
+                                pass#print str(file_object)
                     album.length = time.strftime('%M:%S', time.gmtime(album_length))
                     album.song_count = song_count
                     album.album_size = str(album_size)
@@ -218,11 +215,10 @@ def catalog_drive_music(type):
                     album.save()
                     
                 else:
-                    problems.append(str(file_object))
-                    print "skipping " +str(file_object)
+                    pass
             except:
-                print 'Excepted on ' + file_object
-    return cataloged, problems
+                pass#print 'Excepted on ' + file_object
+    return
 
 def get_rating(rating):
     if rating == 255:
@@ -233,65 +229,142 @@ def get_rating(rating):
         return 3
     return 0
 
-def filter_nzbs_music (files, nzb_location):
+def filter_nzbs(request):
+    path_to_nzbs = 'D:/QmA/NZB/Music/Albums/Download/new/ready/'
+    os.chdir(path_to_nzbs)
+    all_nzbs = os.listdir('.')
     
-    os.chdir(nzb_location)
     try:
-        os.makedirs(nzb_location+'duplicate')
+        os.makedirs('exact_duplicate')
+        os.makedirs('partial_duplicate')
     except:
         pass
-    all_nzbs = os.listdir('.')
+        
     counter = 0
     progress_counter = 0
     copies = []
     string2 = ''
-    all_albums = Music_Album.objects.all()
-    all_folders = []
-    for album in all_albums:
-        all_folders.append(str(album.folder))
-        #all_folders.append(str(album.artist.artist)+'-'+str(album.album))
-    
-    #all_albums = os.listdir('C:\QmA\NZB\Music\Albums\Collection')
-    #for album in all_albums:
-        #all_folders.append(str(album).replace('.nzb', ''))    
-    
+    albums_in_DB = Music_Album.objects.all()
+    albums_in_collection_folder = os.listdir('D:\QmA\NZB\Music\Albums\Collection/')
     remove = ['-CDS-','.CDS.','-PROMO-','.CDS.','BOOTLEG','(CDS)','(BOOTLEG)']
+    
+    for albums in albums_in_DB:
+        counter += 1
+        for nzbs in all_nzbs:
+            if albums.folder == nzbs.rsplit('.NZB')[0]:
+                #print 'Found Match: \n', albums.folder, '\n',  nzbs.rsplit('.NZB')[0]
+                try:
+                    os.rename(path_to_nzbs+nzbs, path_to_nzbs+'exact_duplicate/'+nzbs)
+                except:
+                    print 'Failed to move the duplicate file.'
+            else:
+#                try:
+#                    safe = albums.folder[15]
+#                    if safe:
+#                        if albums.folder in nzbs.rsplit('.NZB')[0]:
+#                            try:
+#                                os.rename(path_to_nzbs+nzbs, path_to_nzbs+'partial_duplicate/'+nzbs)
+#                            except:
+#                                print 'Failed to move the duplicate file.'
+#                except:
+#                    pass#print albums.folder, 'was not safe\n'
+
+                #More aggressive elimination of albums
+                try:
+                    name = albums.artist.artist.replace(' ','.')+'-'+albums.album.replace(' ','.')
+                    safe = name[14]
+                    if name in nzbs.rsplit('.NZB')[0]:
+                        try:
+                            os.rename(path_to_nzbs+nzbs, path_to_nzbs+'partial_duplicate/'+nzbs)
+                            print '----------------------found----------------------------'
+                        except:
+                            print 'Failed to move the duplicate file.', nzbs
+                except:
+                    #print name
+                    pass#print albums.folder, 'was not safe\n'
+                                
+        if counter % 1000 == 0:
+            print counter
+    return render_to_response('base.html', locals())
+
+def rename_nzbs(request):
+    path_to_nzbs = 'L:/media/static/music/0/'
+    os.chdir(path_to_nzbs)
+    all_nzbs = os.listdir('.')
+    try:
+        os.makedirs('failed')
+    except:
+        print 'Failed to create the failed directory\n'        
+    
+    #Rename all the nzbs
     for nzbs in all_nzbs:
         string = str(nzbs)
         string2 = string.replace('[', '.')
+        
+        string2 = string2.upper()
         string2 = string2.replace(']', '.')
         string2 = string2.replace('.NZB.nzb', '.nzb')
+        string2 = string2.replace('_', '.')
+        string2 = string2.replace(']', '.')
+        string2 = string2.replace('(', '.')
+        string2 = string2.replace(')', '.')
+        string2 = string2.replace('.bt.', '.')
+        string2 = string2.replace('.BT.', '.')
+        string2 = string2.replace('JAY-Z', 'JAY.Z')
+        string2 = string2.replace('Z-RO', 'Z.RO')
+        string2 = string2.replace('Q-TIP', 'Q.TIP')
+        string2 = string2.replace('NE-YO', 'NE.YO')
+        string2 = string2.replace('AC-DC', 'ACDC')
+        string2 = string2.replace('AC.DC', 'ACDC')
+        string2 = string2.replace('\'', '.')
+        string2 = string2.replace(',', '.')
+        string2 = string2.replace('{', '.')
+        string2 = string2.replace('}', '.')
+        string2 = string2.replace(' ', '.')
+        string2 = string2.replace('_', '.')
+        string2 = string2.replace('.-.', '-')
+        string2 = string2.replace('--', '-')
+        string2 = string2.replace('-.', '-')
+        string2 = string2.replace('.-', '-')
         string2 = string2.replace('..', '.')
-        string2 = string2.replace('..', '.')
-        string2 = string2.replace('..', '.')
+        if string2[0] == '.':
+            string2 = string2.lstrip('.')
+        if string[0] == '-':
+            string2 = string2.lstrip('-')
+            
         if string != string2:
             try:
-                print nzb_location+nzbs, ' renamed to ', nzb_location+string2
-                os.rename(nzb_location+nzbs, nzb_location+string2)
+                win32file.MoveFile(path_to_nzbs+nzbs, path_to_nzbs+string2)
+                #os.rename(path_to_nzbs+nzbs, path_to_nzbs+string2)
+                #print 'Renaming of ', nzbs , ' to \n', string2, ' completed' 
             except:
-                print "Renaming the nzb failed\n"
-    
-    for folders in all_folders:
-        for nzbs in all_nzbs:
-            progress_counter = progress_counter + 1
-            if folders == str(nzbs).rsplit('.', 1)[0] or folders == str(nzbs).rsplit('.', 2)[0]:
                 try:
-                    os.rename(nzb_location+nzbs, nzb_location+'duplicate/'+nzbs)
-                    copies.append(str(nzbs))
-                    counter = counter + 1
-                except: print nzbs, ' duplicate file failed for\n', nzb_location+nzbs
-            else:
-                for items in remove: 
-                    if items in nzbs:
-                        try:
-                            os.rename(nzb_location+nzbs, nzb_location+'duplicate/'+nzbs)
-                            copies.append(str(nzbs))
-                            counter = counter + 1
-                        except: print nzbs, ' duplicate remove failed\n', nzb_location+nzbs
-            if progress_counter % 1000000 == 0:
-                print 'progress at ', progress_counter
+                    win32file.MoveFile(path_to_nzbs+nzbs, path_to_nzbs+'failed/'+string2)
+                except:
+                    print 'Moving a file that failed to rename also Failed. WOW.'
+    
+    return render_to_response('base.html', locals())
+#    for folders in all_folders:
+#        for nzbs in all_nzbs:
+#            progress_counter = progress_counter + 1
+#            if folders == str(nzbs).rsplit('.', 1)[0] or folders == str(nzbs).rsplit('.', 2)[0]:
+#                try:
+#                    os.rename(nzb_location+nzbs, nzb_location+'duplicate/'+nzbs)
+#                    copies.append(str(nzbs))
+#                    counter = counter + 1
+#                except: print nzbs, ' duplicate file failed for\n', nzb_location+nzbs
+#            else:
+#                for items in remove: 
+#                    if items in nzbs:
+#                        try:
+#                            os.rename(nzb_location+nzbs, nzb_location+'duplicate/'+nzbs)
+#                            copies.append(str(nzbs))
+#                            counter = counter + 1
+#                        except: print nzbs, ' duplicate remove failed\n', nzb_location+nzbs
+#            if progress_counter % 1000000 == 0:
+#                print 'progress at ', progress_counter
         
-    return counter, copies
+    return render_to_response('base.html', locals())
 
 @login_required
 def albums(request, letter):
@@ -488,28 +561,32 @@ def artists(request, letter):
 @login_required
 def rebuild(request, letter):
     Music_Artist.objects.filter(letter=letter).delete()
-    return catalog_drive_music('none')
+    catalog_drive_music('none')
+    return HttpResponseRedirect('/#/artists/'+letter)
     
 @login_required
 def set_rating(request, song_id, rating):
-    song = Music_Song.objects.get(id=song_id)
-    path_to_song = settings.MUSIC_DIRECTORY + song.letter +"/"+song.path+"/"+song.filename
-    audio = ID3(path_to_song)
-    key_found = False
-    for key in audio.keys():
-        if 'POPM' in key:
-            key_found = True
-            audio.getall('POPM')[0].rating=SET_RATING[str(rating)]
-            audio.save()    
-    if not key_found:
-        print 'Creating the key'
-        audio.add(mutagen.id3.POPM(email=u'Windows Media Player 9 Series', rating=SET_RATING[str(rating)]))
-        audio.save()
-    song.rating = rating
-    song.save()
+    message = 0
+    if request.user.is_superuser:
+        song = Music_Song.objects.get(id=song_id)
+        path_to_song = settings.MUSIC_DIRECTORY + song.letter +"/"+song.path+"/"+song.filename
+        audio = ID3(path_to_song)
+        key_found = False
+        for key in audio.keys():
+            if 'POPM' in key:
+                key_found = True
+                audio.getall('POPM')[0].rating=SET_RATING[str(rating)]
+                audio.save()    
+        if not key_found:
+            print 'Creating the key'
+            audio.add(mutagen.id3.POPM(email=u'Windows Media Player 9 Series', rating=SET_RATING[str(rating)]))
+            audio.save()
+        song.rating = rating
+        song.save()
+        message = 1
     if request.is_ajax():
         mimetype = 'application/javascript'
-    return HttpResponse(mimetype)
+    return HttpResponse(message, mimetype)
     
 @login_required    
 def search_music_artists(request):

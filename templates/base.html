@@ -9,6 +9,7 @@
 	    <link rel="stylesheet" type="text/css" href="/static/css/music.css" />
 	    <link type="text/css" href="/static/css/jplayer.blue.monday.css" rel="stylesheet" />
 	    <script src="/static/javascript/lib/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+	    <script src="/static/javascript/lib/jquery.hoverIntent.minified.js" type="text/javascript" charset="utf-8"></script>
 	    <script src="/static/javascript/lib/jquery.jplayer.min.js" type="text/javascript" charset="utf-8"></script>
 	    <script src="/static/javascript/lib/jplayer.playlist.min.js" type="text/javascript" charset="utf-8"></script>
 	    <script src="/static/javascript/lib/spin.min.js" type="text/javascript" charset="utf-8"></script>
@@ -28,23 +29,39 @@
 			//  $('.jp-mute').css('margin-left', new_width+'px')
 			//});
 			
-		    $('#menu_albums').hover( function(){
-			    $('.nav_button_albums').slideDown(); 
-			    $('.nav_button_add').slideUp(); $('.nav_button_artists').slideUp(); $('.nav_button_search').slideUp();
-			    });
-		    $('#menu_artists').hover( function(){
-			    $('.nav_button_artists').slideDown(); 
-			    $('.nav_button_add').slideUp(); $('.nav_button_albums').slideUp(); $('.nav_button_search').slideUp();
-			    });
-		    $('#menu_add_music').hover( function(){
-			    $('.nav_button_add').slideDown(); 
-			    $('.nav_button_albums').slideUp(); $('.nav_button_artists').slideUp(); $('.nav_button_search').slideUp();
-			    });
-		    $('#menu_search').hover( function(){
-			    $('.nav_button_search').slideDown(); 
-			    $('.nav_button_albums').slideUp(); $('.nav_button_artists').slideUp(); $('.nav_button_add').slideUp();
-			    });
-		    
+			$("#menu_albums").hoverIntent({
+				over: show_menu_albums,
+				timeout: 500,
+				out: hide_menu_albums
+			});
+			
+			$("#menu_artists").hoverIntent({
+				over: show_menu_artists,
+				timeout: 500,
+				out: hide_menu_artists
+			});
+			
+			$("#menu_add_music").hoverIntent({
+				over: show_menu_add,
+				timeout: 500,
+				out: hide_menu_add
+			});
+			
+			$("#menu_search").hoverIntent({
+				over: show_menu_search,
+				timeout: 500,
+				out: hide_menu_search
+			});
+
+			function show_menu_albums(){$('.nav_button_albums').slideDown();}
+			function hide_menu_albums(){ $('.nav_button_albums').slideUp()}
+			function show_menu_artists(){$('.nav_button_artists').slideDown()}
+			function hide_menu_artists(){$('.nav_button_artists').slideUp()}
+			function show_menu_add(){$('.nav_button_add').slideDown()}
+			function hide_menu_add(){$('.nav_button_add').slideUp()}
+			function show_menu_search(){$('.nav_button_search').slideDown()}
+			function hide_menu_search(){$('.nav_button_search').slideUp()}
+
 		    $("#searchBox").keyup(function(){
 			    if (event.keyCode == 13){
 			    	location.href='/#/search/'+$("#searchBox").val();
@@ -52,10 +69,10 @@
 		        });
 
 			   
-		    $('.nav_button_add').hover( function(){$('.nav_button_add').slideDown(); }, function(){$('.nav_button_add').slideUp(); });
-		    $('.nav_button_artists').hover( function(){$('.nav_button_artists').slideDown(); }, function(){$('.nav_button_artists').slideUp(); });
-		    $('.nav_button_albums').hover( function(){$('.nav_button_albums').slideDown(); }, function(){$('.nav_button_albums').slideUp(); });
-		    $('.nav_button_search').hover( function(){$('.nav_button_search').slideDown(); }, function(){$('.nav_button_search').slideUp(); });
+		    //$('.nav_button_add').hover( function(){$('.nav_button_add').show(); }, function(){$('.nav_button_add').hide(); });
+		    //$('.nav_button_artists').hover( function(){$('.nav_button_artists').show(); }, function(){$('.nav_button_artists').hide(); });
+		    //$('.nav_button_albums').hover( function(){$('.nav_button_albums').show(); }, function(){$('.nav_button_albums').hide(); });
+		    //$('.nav_button_search').hover( function(){$('.nav_button_search').show(); }, function(){$('.nav_button_search').hide(); });
 			  
 	    	PLAYLIST = new jPlayerPlaylist({
 	    		jPlayer: "#jquery_jplayer_1",
@@ -103,32 +120,41 @@
 		<div id="site_body">
 			<div id="navigation">
 				<div class=nav_button>
-					<a href="/" >Home</a>
-					<atext id="menu_add_music">Add Music</atext>
-					<atext ondblclick="location.href='#/artists/all'" id="menu_artists">Artists</atext>
-					<atext ondblclick="location.href='#/albums/all'" id="menu_albums">Albums</atext>
-					<atext id="menu_search">Search</atext>
-				</div>
-				<div class="nav_button_albums" style="display:none;">
-					{% for letter in letter_list %}
-						<atext onclick="location.href='/#/albums/{{letter}}'">{{letter}}</atext>
-					{% endfor %}
-				</div>
-				<div class="nav_button_artists" style="display:none;">
-					{% for letter in letter_list %}
-						<atext onclick="location.href='/#/artists/{{letter}}'">{{letter}}</atext>
-					{% endfor %}
-				</div>
-				<div class="nav_button_add" style="display:none;">
-					<btext onclick="add_music('add')">Add New</btext>
-					<btext onclick="add_music('rebuild')">Rebuild DB</btext>
-					<btext onclick="location.href='/add_music/upload/'">Upload</btext>
-				</div>
-				<div class="nav_button_search" style="display:none;">
-					<input type="text" id="searchBox" placeholder="Search My Library">
+					<div id="menu_home" onclick="location.href='/'" ><p>Home</p></div>
+					<div ondblclick="location.href='#/artists/all'" id="menu_artists">
+						<p>Artists</p>
+						<div class="nav_button_artists" style="display:none;">
+							{% for letter in letter_list %}
+								<div class="sub_menu_link" onclick="location.href='/#/artists/{{letter}}'">{{letter}}</div>
+							{% endfor %}
+						</div>
+						</div>
+					<div ondblclick="location.href='#/albums/all'" id="menu_albums">
+						<p>Albums</p>
+						<div class="nav_button_albums" style="display:none;">
+							{% for letter in letter_list %}
+								<div class="sub_menu_link" onclick="location.href='/#/albums/{{letter}}'">{{letter}}</div>
+							{% endfor %}
+						</div>
+						</div>
+					<div id="menu_search">
+						<p>Search</p>
+						<div class="nav_button_search" style="display:none;">
+							<input class="" type="text" id="searchBox" placeholder="Search My Library">
+						</div>
+					</div>
+					<div id="menu_add_music">
+						<p>Add Music</p>
+						<div class="nav_button_add" style="display:none;">
+							{% if request.user.is_superuser  %}<div class="sub_menu_link" onclick="add_music('add')">Add New</div>{% endif %}
+							{% if request.user.is_superuser  %}<div class="sub_menu_link" onclick="add_music('rebuild')">Rebuild DB</div>{% endif %}
+							<div class="sub_menu_link" onclick="location.href='/add_music/upload/'">Upload</div>
+						</div>
+						</div>
 				</div>
 			</div>
 			{% block content %}
+			<div id="status_message" style="display:none;"></div>
 			<div id=content>
 				<center><text id="welcome">Q</text></center>
 			</div>

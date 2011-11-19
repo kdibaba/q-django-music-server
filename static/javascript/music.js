@@ -58,6 +58,17 @@ function display_message(message) {
 	$('#message').append('<div style="margin-top: 75px;">' + message + '</div>');
 }
 
+function display_message_alert(message, status) {
+	var status_message = $('#status_message')
+	status_message = status_message.html(message);
+	
+	if (status) { status_message.addClass('good'); }
+	else { status_message.addClass('bad'); }
+	
+	status_message.slideDown();
+	setTimeout("$('#status_message').slideUp(500, function(){$('#status_message').removeClass('good');$('#status_message').removeClass('bad');})", 4000)
+	
+}
 function show_artist_results() {
 	$('.nav_header_albums').removeClass('selected');
 	$('#albums').hide();
@@ -178,6 +189,8 @@ function show_artists(jsonArtists, letter) {
 	var artist_count = 0
 	var deg = 0
 	var length = 0
+	var cover_count = 0;
+	var missing_cover_count = 0;
 	
 	$('#content').replaceWith('<div id="content"></div>')
 	$('#content').append('<div id="artists"></div>');
@@ -192,8 +205,10 @@ function show_artists(jsonArtists, letter) {
 			$('.album_art_wrapper_'+items.pk).append('<div class="artist_album album_' + item.pk+ '" style="-webkit-transform: rotate('+ deg + 'deg); -moz-transform: rotate('+ deg + 'deg)"></div>');
 			//$('.album_' + item.pk).hover(function(){$(this).css('width',  '125px')}, function(){$(this).css('width',  '44px')});
 			if (item.album_art){
-				$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/album_show/'+item.pk+'\'"><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
+				//cover_count += 1;
+				$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/albums_by_artist/'+items.pk+'\'"><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
 			else {
+				//missing_cover_count += 1
 				$('.album_'+item.pk).prepend( '<div id="img_div"><img src="/static/images/default_album_art.jpg" /></div>' )}
 			deg += 15;
 		})
@@ -203,9 +218,21 @@ function show_artists(jsonArtists, letter) {
 		
 	})
 	$('#artists').append('</ul>');
-	$('#artists').prepend('');
-	$('#artists').prepend('');
-	$('#artists').prepend('<p class="nav_header">' + artist_count + ' Artist(s) found. <button id="rebuild_button" onclick="location.href=\'/#/rebuild/'+letter+'\'">Rebuild '+letter+'</button> </p>');
+	if (user_is_admin()) {
+		$('#artists').prepend('<p class="nav_header">' + artist_count + ' Artist(s) found. <button id="rebuild_button" onclick="location.href=\'/#/rebuild/'+letter+'\'">Rebuild '+letter+'</button> </p>');
+	}
+	//alert('Cover Count = ' + cover_count);
+	//alert('Missing Cover Count = ' + missing_cover_count);
+}
+
+function user_is_admin() {
+	var admin = false
+	jQuery.ajax({
+		url: "/is_admin/", 
+		success: function(status) { if (status == 1){ admin = true}},
+		async	: false
+	});	
+	return admin
 }
 
 function get_all_albums(letter) {
@@ -334,7 +361,9 @@ function get_rating_html(rating, song_id){
 function set_rating(rating, song_id){
 	jQuery.ajax({
 		url: "/rating/" + song_id + "/" + rating + "/",
-		success: function(success){	update_rating(rating, song_id)},
+		success: function(message){	
+					if (message == 0){display_message_alert('You do not have sufficient previleges to rate music.', false)}
+					else if (message == 1) {display_message_alert('Rating successfully applied.', true); update_rating(rating, song_id)}},
 		async:   false
 	});
 }
