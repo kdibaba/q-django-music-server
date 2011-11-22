@@ -220,6 +220,32 @@ def catalog_drive_music(type):
                 pass#print 'Excepted on ' + file_object
     return
 
+def update_album_art(request):
+    letter_list = LETTERS
+    existing_album_art = 0
+    new_album_art = 0
+    missing_album_art = 0
+    for letter in LETTERS: 
+        print 'Working on ', letter
+        directory = settings.MUSIC_DIRECTORY + letter + "/"
+        files = get_folder_names(directory)
+        for file_object in files:
+            try: 
+                songs = os.listdir(directory+str(file_object))
+                album = Music_Album.objects.get(folder=str(file_object))
+                if album.album_art:
+                    existing_album_art += 1
+                elif 'Folder.jpg' in songs:
+                    new_album_art += 1
+                    album.album_art = True
+                    album.save()
+                else:
+                    missing_album_art += 1
+            except: pass
+    
+    message = 'Album Art Updated<br/> Existing = ' + str(existing_album_art) + '<br />New = ' + str(new_album_art) + '<br />Missing = ' + str(missing_album_art)
+    return render_to_response('confirmation.html', locals()) 
+
 def get_rating(rating):
     if rating == 255:
         return 5
@@ -288,83 +314,86 @@ def filter_nzbs(request):
     return render_to_response('base.html', locals())
 
 def rename_nzbs(request):
-    path_to_nzbs = 'L:/media/static/music/0/'
-    os.chdir(path_to_nzbs)
-    all_nzbs = os.listdir('.')
-    try:
-        os.makedirs('failed')
-    except:
-        print 'Failed to create the failed directory\n'        
-    
-    #Rename all the nzbs
-    for nzbs in all_nzbs:
-        string = str(nzbs)
-        string2 = string.replace('[', '.')
+    for letter in LETTERS:
+        print 'processing '+ 'L:/media/static/music/'+letter+'/'
+        path_to_nzbs = 'L:/media/static/music/'+letter+'/'
+        os.chdir(path_to_nzbs)
+        all_nzbs = os.listdir('.')
+        try:
+            os.makedirs('failed')
+        except:
+            print 'Failed to create the failed directory\n'        
         
-        string2 = string2.upper()
-        string2 = string2.replace(']', '.')
-        string2 = string2.replace('.NZB.nzb', '.nzb')
-        string2 = string2.replace('_', '.')
-        string2 = string2.replace(']', '.')
-        string2 = string2.replace('(', '.')
-        string2 = string2.replace(')', '.')
-        string2 = string2.replace('.bt.', '.')
-        string2 = string2.replace('.BT.', '.')
-        string2 = string2.replace('JAY-Z', 'JAY.Z')
-        string2 = string2.replace('Z-RO', 'Z.RO')
-        string2 = string2.replace('Q-TIP', 'Q.TIP')
-        string2 = string2.replace('NE-YO', 'NE.YO')
-        string2 = string2.replace('AC-DC', 'ACDC')
-        string2 = string2.replace('AC.DC', 'ACDC')
-        string2 = string2.replace('\'', '.')
-        string2 = string2.replace(',', '.')
-        string2 = string2.replace('{', '.')
-        string2 = string2.replace('}', '.')
-        string2 = string2.replace(' ', '.')
-        string2 = string2.replace('_', '.')
-        string2 = string2.replace('.-.', '-')
-        string2 = string2.replace('--', '-')
-        string2 = string2.replace('-.', '-')
-        string2 = string2.replace('.-', '-')
-        string2 = string2.replace('..', '.')
-        if string2[0] == '.':
-            string2 = string2.lstrip('.')
-        if string[0] == '-':
-            string2 = string2.lstrip('-')
+        #Rename all the nzbs
+        for nzbs in all_nzbs:
+            string = str(nzbs)
+            string2 = string.replace('[', '.')
             
-        if string != string2:
-            try:
-                win32file.MoveFile(path_to_nzbs+nzbs, path_to_nzbs+string2)
-                #os.rename(path_to_nzbs+nzbs, path_to_nzbs+string2)
-                #print 'Renaming of ', nzbs , ' to \n', string2, ' completed' 
-            except:
+            string2 = string2.upper()
+            string2 = string2.replace(']', '.')
+            string2 = string2.replace('.NZB.nzb', '.nzb')
+            string2 = string2.replace('_', '.')
+            string2 = string2.replace(']', '.')
+            string2 = string2.replace('(', '.')
+            string2 = string2.replace(')', '.')
+            string2 = string2.replace('.bt.', '.')
+            string2 = string2.replace('.BT.', '.')
+            string2 = string2.replace('JAY-Z', 'JAY.Z')
+            string2 = string2.replace('Z-RO', 'Z.RO')
+            string2 = string2.replace('Q-TIP', 'Q.TIP')
+            string2 = string2.replace('NE-YO', 'NE.YO')
+            string2 = string2.replace('AC-DC', 'ACDC')
+            string2 = string2.replace('AC.DC', 'ACDC')
+            string2 = string2.replace('\'', '.')
+            string2 = string2.replace(',', '.')
+            string2 = string2.replace('{', '.')
+            string2 = string2.replace('}', '.')
+            string2 = string2.replace(' ', '.')
+            string2 = string2.replace('_', '.')
+            string2 = string2.replace('.-.', '-')
+            string2 = string2.replace('--', '-')
+            string2 = string2.replace('-.', '-')
+            string2 = string2.replace('.-', '-')
+            string2 = string2.replace('..', '.')
+            if string2[0] == '.':
+                string2 = string2.lstrip('.')
+            if string[0] == '-':
+                string2 = string2.lstrip('-')
+                
+            if string != string2:
                 try:
-                    win32file.MoveFile(path_to_nzbs+nzbs, path_to_nzbs+'failed/'+string2)
+                    win32file.MoveFile(path_to_nzbs+nzbs, path_to_nzbs+string2)
+                    #os.rename(path_to_nzbs+nzbs, path_to_nzbs+string2)
+                    #print 'Renaming of ', nzbs , ' to \n', string2, ' completed' 
                 except:
-                    print 'Moving a file that failed to rename also Failed. WOW.'
-    
-    return render_to_response('base.html', locals())
-#    for folders in all_folders:
-#        for nzbs in all_nzbs:
-#            progress_counter = progress_counter + 1
-#            if folders == str(nzbs).rsplit('.', 1)[0] or folders == str(nzbs).rsplit('.', 2)[0]:
-#                try:
-#                    os.rename(nzb_location+nzbs, nzb_location+'duplicate/'+nzbs)
-#                    copies.append(str(nzbs))
-#                    counter = counter + 1
-#                except: print nzbs, ' duplicate file failed for\n', nzb_location+nzbs
-#            else:
-#                for items in remove: 
-#                    if items in nzbs:
-#                        try:
-#                            os.rename(nzb_location+nzbs, nzb_location+'duplicate/'+nzbs)
-#                            copies.append(str(nzbs))
-#                            counter = counter + 1
-#                        except: print nzbs, ' duplicate remove failed\n', nzb_location+nzbs
-#            if progress_counter % 1000000 == 0:
-#                print 'progress at ', progress_counter
+                    print 'Renaming of ', nzbs , ' to \n', string2, ' failed' 
+                    try:
+                        win32file.MoveFile(path_to_nzbs+nzbs, path_to_nzbs+'failed/'+string2)
+                    except:
+                        print 'Moving a file that failed to rename also Failed. WOW.'
         
     return render_to_response('base.html', locals())
+    #    for folders in all_folders:
+    #        for nzbs in all_nzbs:
+    #            progress_counter = progress_counter + 1
+    #            if folders == str(nzbs).rsplit('.', 1)[0] or folders == str(nzbs).rsplit('.', 2)[0]:
+    #                try:
+    #                    os.rename(nzb_location+nzbs, nzb_location+'duplicate/'+nzbs)
+    #                    copies.append(str(nzbs))
+    #                    counter = counter + 1
+    #                except: print nzbs, ' duplicate file failed for\n', nzb_location+nzbs
+    #            else:
+    #                for items in remove: 
+    #                    if items in nzbs:
+    #                        try:
+    #                            os.rename(nzb_location+nzbs, nzb_location+'duplicate/'+nzbs)
+    #                            copies.append(str(nzbs))
+    #                            counter = counter + 1
+    #                        except: print nzbs, ' duplicate remove failed\n', nzb_location+nzbs
+    #            if progress_counter % 1000000 == 0:
+    #                print 'progress at ', progress_counter
+        
+    #return render_to_response('base.html', locals())
 
 @login_required
 def albums(request, letter):
@@ -375,19 +404,26 @@ def albums(request, letter):
     else:
         all_albums = []
         for all_album_full in all_albums_full:
+            added = False
             try: 
                 if all_album_full.album[0] == letter and letter != 'T':
+                    added = True
                     all_albums.append(all_album_full) 
                 elif all_album_full.album[0] == 'T' and letter == 'T':
+                    added = True
                     if all_album_full.album[1] != 'H':
                         all_albums.append(all_album_full)
                 elif all_album_full.album[0] == 'T':
+                    added = True
                     if all_album_full.album[1] == 'H' and all_album_full.album[2] == 'E' and all_album_full.album[4] == letter :
                         all_albums.append(all_album_full)
+                elif letter == '0' and added == False:
+                    all_albums.append(all_album_full)
 #                else:
 #                    all_albums.append(all_album_full)
             except:
-                pass 
+                pass
+                
     dictionary_albums = []
     for album in all_albums:
         album_info = {}
@@ -656,6 +692,7 @@ def search_music_albums(request):
     return HttpResponse(albums, mimetype)
         
 def upload_music(request):
+    letter_list = LETTERS
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():

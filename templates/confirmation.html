@@ -4,7 +4,7 @@
 
 
 <div class="confirmation">
-   	<center><p>{%if message%}{{message}}{%else%} There is no message to display. {% endif %}</p></center>
+   	<center><p>{%if message%}{{message|safe}}{%else%} There is no message to display. {% endif %}</p></center>
 </div>
 			
 			

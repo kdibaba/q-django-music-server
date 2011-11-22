@@ -30,6 +30,7 @@ function handle_hash(){
 		get_albums_by_year(destination[2]);
 	}
 	else if (destination[1] == 'rebuild') {
+		//alert('here')
 		display_message('Rebuilding Database....');
 		rebuild(destination[2]);
 	}
@@ -221,6 +222,9 @@ function show_artists(jsonArtists, letter) {
 	if (user_is_admin()) {
 		$('#artists').prepend('<p class="nav_header">' + artist_count + ' Artist(s) found. <button id="rebuild_button" onclick="location.href=\'/#/rebuild/'+letter+'\'">Rebuild '+letter+'</button> </p>');
 	}
+	else {
+		$('#artists').prepend('<p class="nav_header">' + artist_count + ' Artist(s) found.')
+	}
 	//alert('Cover Count = ' + cover_count);
 	//alert('Missing Cover Count = ' + missing_cover_count);
 }
@@ -248,7 +252,6 @@ function show_albums(jsonAlbums) {
 	var album_count = 0
 	var cover_count = 0;
 	var missing_cover_count = 0;
-	
 	$('#content').replaceWith('<div id="content"></div>')
 	$('#content').append('<div id="albums"></div>');
 	$.each(albums, function(i,item){

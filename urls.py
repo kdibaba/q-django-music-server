@@ -29,7 +29,8 @@ urlpatterns = patterns('',
     (r'^rating/(?P<song_id>\d+)/(?P<rating>\d+)/$', 'media.music.views.set_rating'),
     
     (r'^rename_nzbs/$',                             'media.music.views.rename_nzbs' ),
-    (r'^filter_nzbs/$',                             'media.music.views.filter_nzbs' ),   
+    (r'^filter_nzbs/$',                             'media.music.views.filter_nzbs' ),  
+    (r'^update_album_art/$',                        'media.music.views.update_album_art' ),  
     
     (r'^search_music_artists/$',                    'media.music.views.search_music_artists'),
     (r'^search_music_albums/$',                     'media.music.views.search_music_albums'),

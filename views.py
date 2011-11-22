@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, logout, login
 from django.contrib.auth.decorators import login_required
+from music.views import LETTERS
 
 
 from media.forms import *
@@ -26,6 +27,7 @@ def user_login(request):
     return render_to_response('login.html', locals())
 
 def register_user (request):
+    letter_list = LETTERS
     form = RegistrationForm()
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
