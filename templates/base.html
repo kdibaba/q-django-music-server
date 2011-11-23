@@ -13,94 +13,8 @@
 	    <script src="/static/javascript/lib/jquery.jplayer.min.js" type="text/javascript" charset="utf-8"></script>
 	    <script src="/static/javascript/lib/jplayer.playlist.min.js" type="text/javascript" charset="utf-8"></script>
 	    <script src="/static/javascript/lib/spin.min.js" type="text/javascript" charset="utf-8"></script>
+	    <script src="/static/javascript/base.js" type="text/javascript" charset="utf-8"></script>
 	    <script src="/static/javascript/music.js" type="text/javascript" charset="utf-8"></script>
-	    <script type="text/javascript">
-	    $(document).ready(function(){
-
-		    //HANDLE url changes
-		    $(window).bind( 'hashchange', function(){handle_hash()});
-		    handle_hash();
-
-		    //HANDLE jPlayer size
-			//var new_width = $(window).width() - 316
-			//$('.jp-mute').css('margin-left', new_width+'px')
-		    //$(window).resize(function() {
-			//  var new_width = $(window).width() - 316  
-			//  $('.jp-mute').css('margin-left', new_width+'px')
-			//});
-			
-			$("#menu_albums").hoverIntent({
-				over: show_menu_albums,
-				timeout: 500,
-				out: hide_menu_albums
-			});
-			
-			$("#menu_artists").hoverIntent({
-				over: show_menu_artists,
-				timeout: 500,
-				out: hide_menu_artists
-			});
-			
-			$("#menu_add_music").hoverIntent({
-				over: show_menu_add,
-				timeout: 500,
-				out: hide_menu_add
-			});
-			
-			$("#menu_search").hoverIntent({
-				over: show_menu_search,
-				timeout: 500,
-				out: hide_menu_search
-			});
-
-			function show_menu_albums(){$('.nav_button_albums').slideDown();}
-			function hide_menu_albums(){ $('.nav_button_albums').slideUp()}
-			function show_menu_artists(){$('.nav_button_artists').slideDown()}
-			function hide_menu_artists(){$('.nav_button_artists').slideUp()}
-			function show_menu_add(){$('.nav_button_add').slideDown()}
-			function hide_menu_add(){$('.nav_button_add').slideUp()}
-			function show_menu_search(){$('.nav_button_search').slideDown()}
-			function hide_menu_search(){$('.nav_button_search').slideUp()}
-
-		    $("#searchBox").keyup(function(){
-			    if (event.keyCode == 13){
-			    	location.href='/#/search/'+$("#searchBox").val();
-			    }
-		        });
-
-			   
-		    //$('.nav_button_add').hover( function(){$('.nav_button_add').show(); }, function(){$('.nav_button_add').hide(); });
-		    //$('.nav_button_artists').hover( function(){$('.nav_button_artists').show(); }, function(){$('.nav_button_artists').hide(); });
-		    //$('.nav_button_albums').hover( function(){$('.nav_button_albums').show(); }, function(){$('.nav_button_albums').hide(); });
-		    //$('.nav_button_search').hover( function(){$('.nav_button_search').show(); }, function(){$('.nav_button_search').hide(); });
-			  
-	    	PLAYLIST = new jPlayerPlaylist({
-	    		jPlayer: "#jquery_jplayer_1",
-	    		cssSelectorAncestor: "#jp_container_1"
-	    	},  [], {
-	    		swfPath: "/static/javascript/",
-	    		supplied: "oga, mp3",
-	    		solution: "flash, html"
-	    	});
-	    	$(document.documentElement).keyup(function (event) {
-	    		if (event.keyCode == 32) {
-		    		if(NOW_PLAYING){
-		    		    PLAYLIST.pause();
-		    			NOW_PLAYING = false
-		    		}
-		    		else{
-			    		PLAYLIST.play();
-			    		NOW_PLAYING = true
-	    		  	}
-	    		}
-	    		else if (event.keyCode == 78) {
-		    		if(PLAYLIST){
-		    		    PLAYLIST.next();
-		    		}
-	    		}
-	    		});
-	    });
-	    </script>
 	    {% block head %}{% endblock %}
 	    {% block extrahead %}{% endblock %}
 	    
@@ -111,7 +25,10 @@
 				<qtext id="site_title">Q Music</qtext>
 		   		{% if request.user.is_authenticated  %}
 		   		<div id="logout">
-		   			<text>Logged In : {{request.user.username.upper}}</text>
+		   			<text>Logged In : {{request.user.username.title}} 
+		   			[{% if request.user.is_superuser %}SuperUser
+		   			{% else %}{% if request.user.is_staff %}Member
+		   			{% else %}{% if not request.user.is_staff or not request.user.is_superuser %}Guest{% endif %}{% endif %}{% endif %}]</text>
 		   			<a href="/logout">Logout</a>
 		   		</div>
 		    	{% endif %}</text>
@@ -157,6 +74,14 @@
 			<div id="status_message" style="display:none;"></div>
 			<div id=content>
 				<center><text id="welcome">Q</text></center>
+				<div id="welcome_message">
+					<p class="hello_msg">Hello {{ request.user.first_name }}!</p>
+				{% if not request.user.is_staff and not request.user.is_superuser %}
+					<p class="warning_msg">As a guest user functionality on the site will be limited.<br/>
+					Please contact the system admin for access to the complete site. <br/><br/>
+					If you dont know how to reach him then you do not belong here.</p>
+					{% endif %}
+				</div>
 			</div>
 			{% endblock %}
 			</div>

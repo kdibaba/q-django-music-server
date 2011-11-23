@@ -187,46 +187,85 @@ function get_all_artists(letter) {
 
 function show_artists(jsonArtists, letter) {
 	var artists = jQuery.parseJSON(jsonArtists);
+	ARTISTS_CONTENT = artists;
+	ARTISTS_PREV = ''
+	ARTISTS_CURR = ''
+	ARTISTS_NEXT = ''
+	ARTISTS_PAGE = 0
+	ARTISTS_LETTER = letter
+
+	$('#content').replaceWith('<div id="content"></div>')
+	$('#content').append('<div id="artists"></div>');
+	$('#content').append('<button id="next_page" onclick="next_artist_page();" style="width: 31px; right: 0px; top: 71px; padding-bottom: 0px; "><img src="/static/images/next.png" /></button>')
+	build_artist_page()
+		
+}
+
+function next_artist_page() {
+	ARTISTS_PAGE += 1
+
+	//ARTISTS_PREV = ARTISTS_CURR
+	$('#artists').css({"margin-left" : "auto"}).animate({"margin-left" : "-1500px"}, 500, function(){
+		$('#artists').html('')
+		build_artist_page();
+		$('#artists').css({"margin" : "auto"}).show(1000);
+	})
+}
+
+function previous_artist_page() {
+	ARTISTS_PAGE -= 1
+
+	//ARTISTS_NEXT = ARTISTS_CURR
+	$('#artists').html('')
+	build_artist_page()
+}
+
+function build_artist_page() {
+
 	var artist_count = 0
 	var deg = 0
 	var length = 0
 	var cover_count = 0;
 	var missing_cover_count = 0;
+	var iterator = ARTISTS_PAGE * ARTISTS_COUNT
+	if (ARTISTS_PAGE == 0){$('#prev_page').remove()}
+	else {$('#content').append('<button id="prev_page" onclick="previous_artist_page();" style="width: 31px; left: 0px; top: 71px; padding-bottom: 0px; "><img src="/static/images/prev.png" /></button>')}
 	
-	$('#content').replaceWith('<div id="content"></div>')
-	$('#content').append('<div id="artists"></div>');
-	$.each(artists, function(i,items){
-		$('#artists').append('<div class="artist_albums artist_albums_'+items.pk+'"></div>');
-		$('.artist_albums_'+items.pk).prepend('<div class="album_art_wrapper album_art_wrapper_' + items.pk+ '"></div>');
-		artist_count+=1;
-		deg = 15
-		length = items.albums.length - 1;
-		$.each(items.albums, function(g,item){
-			if (length == g){ deg = 0;}
-			$('.album_art_wrapper_'+items.pk).append('<div class="artist_album album_' + item.pk+ '" style="-webkit-transform: rotate('+ deg + 'deg); -moz-transform: rotate('+ deg + 'deg)"></div>');
-			//$('.album_' + item.pk).hover(function(){$(this).css('width',  '125px')}, function(){$(this).css('width',  '44px')});
-			if (item.album_art){
-				//cover_count += 1;
-				$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/albums_by_artist/'+items.pk+'\'"><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
-			else {
-				//missing_cover_count += 1
-				$('.album_'+item.pk).prepend( '<div id="img_div"><img src="/static/images/default_album_art.jpg" /></div>' )}
-			deg += 15;
-		})
-		$('.artist_albums_'+items.pk).append('<div class="artist_info artist_info_' + items.pk + '"><h1 onclick="location.href=\'/#/albums_by_artist/'+items.pk+'\'">' + items.name + '</h1></div>');
-		$('.artist_info_' + items.pk).append('<h2>'+items.album_count+' Albums<h2>');
-		$('.artist_info_' + items.pk).append('<h2>'+items.song_count+' Songs<h2>');
-		
+	$.each(ARTISTS_CONTENT, function(i,items){
+		if (i >= iterator && i < iterator + ARTISTS_COUNT ) {
+			$('#artists').append('<div class="artist_albums artist_albums_'+items.pk+'"></div>');
+			$('.artist_albums_'+items.pk).prepend('<div class="album_art_wrapper album_art_wrapper_' + items.pk+ '"></div>');
+			artist_count+=1;
+			deg = 15
+			length = items.albums.length - 1;
+			$.each(items.albums, function(g,item){
+				if (length == g){ deg = 0;}
+				$('.album_art_wrapper_'+items.pk).append('<div class="artist_album album_' + item.pk+ '" style="-webkit-transform: rotate('+ deg + 'deg); -moz-transform: rotate('+ deg + 'deg)"></div>');
+				//$('.album_' + item.pk).hover(function(){$(this).css('width',  '125px')}, function(){$(this).css('width',  '44px')});
+				if (item.album_art){
+					//cover_count += 1;
+					$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/albums_by_artist/'+items.pk+'\'"><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
+				else {
+					//missing_cover_count += 1
+					$('.album_'+item.pk).prepend( '<div id="img_div"><img src="/static/images/default_album_art.jpg" /></div>' )}
+				deg += 15;
+			})
+			$('.artist_albums_'+items.pk).append('<div class="artist_info artist_info_' + items.pk + '"><h1 onclick="location.href=\'/#/albums_by_artist/'+items.pk+'\'">' + items.name + '</h1></div>');
+			$('.artist_info_' + items.pk).append('<h2>'+items.album_count+' Albums<h2>');
+			$('.artist_info_' + items.pk).append('<h2>'+items.song_count+' Songs<h2>');
+		}
 	})
 	$('#artists').append('</ul>');
 	if (user_is_admin()) {
-		$('#artists').prepend('<p class="nav_header">' + artist_count + ' Artist(s) found. <button id="rebuild_button" onclick="location.href=\'/#/rebuild/'+letter+'\'">Rebuild '+letter+'</button> </p>');
+		//$('#artists').prepend('<p class="nav_header">' + ARTISTS_CONTENT.length + ' Artist(s) found. <button id="rebuild_button" onclick="location.href=\'/#/rebuild/'+ARTISTS_LETTER+'\'">Rebuild '+ARTISTS_LETTER+'</button> </p>');
 	}
 	else {
-		$('#artists').prepend('<p class="nav_header">' + artist_count + ' Artist(s) found.')
+		$('#artists').prepend('<p class="nav_header">' + ARTISTS_CONTENT.length + ' Artist(s) found.')
 	}
 	//alert('Cover Count = ' + cover_count);
 	//alert('Missing Cover Count = ' + missing_cover_count);
+	ARTISTS_CURR = $('#artists');
+	$('#artists').css('width', ARTISTS_HOR*275+'px')
 }
 
 function user_is_admin() {

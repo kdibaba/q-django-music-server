@@ -28,7 +28,7 @@ body a{
 }
 
 #site_header text{
-    color: #555555;
+    color: #9E0800;
     text-shadow: 3px 0 8px white;
     font-size	: 14px;
 }
@@ -47,6 +47,24 @@ body a{
 
 #site_header a:hover{
     box-shadow	: 0 0 5px #999999;
+}
+
+#welcome_message {
+	width: 1024px;
+	margin: auto;
+	padding: 30px;
+	font-size: 14px;
+	}
+	
+.hello_msg {
+	font-size	: 26px;
+	text-align	: center;
+}
+
+.warning_msg {
+	font-size	: 14px;
+	color: #999999;
+	text-align	: center;
 }
 
 #logout {
@@ -73,11 +91,14 @@ body a{
 }
 
 #menu_home:hover,
-#menu_albums:hover,
 #menu_artists:hover,
 #menu_add_music:hover,
 #menu_search:hover {
-	background		: #f7f7f7;
+	background		: #DDDDDD;
+}
+
+#menu_albums:hover {
+	background		: #CCCCCC;
 }
 	
 #searchBox {
@@ -85,7 +106,7 @@ body a{
 	width: 215px;
 	padding-left: 5px;
 	color: #888;
-	border: 1px solid #DDD;
+	border: 1px solid #DDDDDD;
 	height: 19px;
 }
 .nav_button {
@@ -117,11 +138,11 @@ body a{
 }
 
 .nav_button a:hover {  
-	text-shadow: 0 0 1px #777777;
+	text-shadow: 0 0 1px #FFFFFF;
 }
 
 .nav_button_albums  {
-	background	: #f7f7f7;
+	background	: #CCCCCC;
 	margin		: -1px auto;
 	width		: 1024px;
 	text-align	: center;
@@ -132,7 +153,7 @@ body a{
 
 
 .nav_button_artists  {
-	background	: #f7f7f7;
+	background	: #DDDDDD;
 	margin		: -1px auto;
 	width		: 1024px;
 	text-align	: center;
@@ -143,7 +164,7 @@ body a{
 
 .nav_button_add,
 .nav_button_search  {
-	background	: #f7f7f7;
+	background	: #DDDDDD;
 	margin		: -1px auto;
 	width		: 400px;
 	text-align	: center;
@@ -151,6 +172,7 @@ body a{
 	position	: fixed;
 	height		: 40px;
 }
+
 
 .sub_menu_link{
 	display: inline-block;

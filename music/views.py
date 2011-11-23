@@ -17,6 +17,7 @@ import mutagen.id3
 
 LETTERS = ['0', 'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','VA', 'W','X','Y','Z']
 SET_RATING = {'1': 32, '2': 64, '3': 128,'4':196, '5':255}
+GUEST_ACCESS = 50
 
 @login_required
 def music(request):
@@ -166,7 +167,7 @@ def catalog_drive_music(type):
                     song_count = 0
                     for song in songs:
                         #print file, ' ----- ', song
-                        if song.rsplit('.')[-1] == 'mp3':
+                        if song.rsplit('.')[-1] == 'mp3' or song.rsplit('.')[-1] == 'MP3':
                             song_length = 0
                             song_rating = 0
                             file_size = ''
@@ -249,9 +250,9 @@ def update_album_art(request):
 def get_rating(rating):
     if rating == 255:
         return 5
-    elif rating < 255 and rating >=196:
+    elif rating < 255 and rating >= 196:
         return 4
-    elif rating < 196 and rating >=128:
+    elif rating < 196 and rating >= 128:
         return 3
     return 0
 
@@ -418,12 +419,16 @@ def albums(request, letter):
                     if all_album_full.album[1] == 'H' and all_album_full.album[2] == 'E' and all_album_full.album[4] == letter :
                         all_albums.append(all_album_full)
                 elif letter == '0' and added == False:
+                    print all_album_full.album, '\n'
                     all_albums.append(all_album_full)
 #                else:
 #                    all_albums.append(all_album_full)
             except:
                 pass
-                
+            
+            if not (request.user.is_superuser or request.user.is_staff) and len(all_albums) >= GUEST_ACCESS:
+                break
+            
     dictionary_albums = []
     for album in all_albums:
         album_info = {}
@@ -514,7 +519,10 @@ def get_song(request, song_id):
 @login_required
 def albums_by_artist(request, artist_id):
     artist = Music_Artist.objects.get(id=artist_id)
-    all_albums = Music_Album.objects.filter(artist=artist)
+    if request.user.is_superuser or request.user.is_staff:
+        all_albums = Music_Album.objects.filter(artist=artist)
+    else:
+        all_albums = Music_Album.objects.filter(artist=artist)[:GUEST_ACCESS]
     dictionary_albums = []
     for album in all_albums:
         album_info = {}
@@ -537,7 +545,10 @@ def albums_by_artist(request, artist_id):
 
 @login_required
 def albums_by_year(request, year_id):
-    all_albums = Music_Album.objects.filter(year=year_id)
+    if request.user.is_superuser or request.user.is_staff:
+        all_albums = Music_Album.objects.filter(year=year_id)
+    else:
+        all_albums = Music_Album.objects.filter(year=year_id)[:GUEST_ACCESS]
     dictionary_albums = []
     for album in all_albums:
         album_info = {}
@@ -560,10 +571,13 @@ def albums_by_year(request, year_id):
 
 @login_required
 def artists(request, letter):
-    if letter == 'all':
-        get_artists = Music_Artist.objects.all().order_by('artist')
+    if request.user.is_superuser or request.user.is_staff:
+        if letter == 'all': get_artists = Music_Artist.objects.all().order_by('artist')
+        else: get_artists = Music_Artist.objects.filter(letter=letter).order_by('artist')
     else:
-        get_artists = Music_Artist.objects.filter(letter=letter).order_by('artist')
+        if letter == 'all': get_artists = Music_Artist.objects.all().order_by('artist')[:GUEST_ACCESS]
+        else: get_artists = Music_Artist.objects.filter(letter=letter).order_by('artist')[:GUEST_ACCESS]
+        
     artists = []
     for get_artist in get_artists:
         try:

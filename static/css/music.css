@@ -1,5 +1,22 @@
+#next_page,
+#prev_page {
+	background-color: #F7F7F7;
+	border: none;
+	bottom: 0;
+	font-size: 40px;
+	padding: 0;
+	position: absolute;
+	margin: 0;
+	max-width: 150px;
+	min-width: 90px;
+	top: 0;
+	z-index: 5;
+	-webkit-transition: width 150ms, right 150ms, background-color 150ms;
+}
+
 #albums, 
 #artists{
+	margin	: auto;
 }
 
 #albums{
