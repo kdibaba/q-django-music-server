@@ -42,7 +42,7 @@
 						<p>Artists</p>
 						<div class="nav_button_artists" style="display:none;">
 							{% for letter in letter_list %}
-								<div class="sub_menu_link" onclick="location.href='/#/artists/{{letter}}'">{{letter}}</div>
+								<div class="sub_menu_link" onclick="location.href='/#/artists/{{letter}}/0/'">{{letter}}</div>
 							{% endfor %}
 						</div>
 						</div>
@@ -50,7 +50,7 @@
 						<p>Albums</p>
 						<div class="nav_button_albums" style="display:none;">
 							{% for letter in letter_list %}
-								<div class="sub_menu_link" onclick="location.href='/#/albums/{{letter}}'">{{letter}}</div>
+								<div class="sub_menu_link" onclick="location.href='/#/albums/{{letter}}/0/'">{{letter}}</div>
 							{% endfor %}
 						</div>
 						</div>
@@ -71,7 +71,7 @@
 				</div>
 			</div>
 			{% block content %}
-			<div id="status_message" style="display:none;"></div>
+			<div id="message_wrapper"><div id="status_message" style="display:none;"></div></div>
 			<div id=content>
 				<center><text id="welcome">Q</text></center>
 				<div id="welcome_message">

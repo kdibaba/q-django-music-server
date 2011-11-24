@@ -1,5 +1,33 @@
 $(document).ready(function(){
 
+	ARTISTS_HOR = parseInt($(window).width()/300);
+	ARTISTS_VERT = parseInt($(window).height()/230);
+	ARTISTS_COUNT = ARTISTS_HOR * ARTISTS_VERT;
+	ARTISTS_CONTENT = ''
+	ARTISTS_LETTER = ''
+	ARTISTS_PAGE = ''
+
+	ALBUMS_HOR = parseInt($(window).width()/220);
+	ALBUMS_VERT = parseInt($(window).height()/250);
+	ALBUMS_COUNT = ALBUMS_HOR * ALBUMS_VERT;
+	ALBUMS_CONTENT = ''
+	ALBUMS_LETTER = ''
+	ALBUMS_YEAR = ''
+	ALBUMS_PAGE = ''
+		
+	$(window).resize(function() {
+		ARTISTS_HOR = parseInt($(window).width()/300);
+		ARTISTS_VERT = parseInt($(window).height()/230);
+		ARTISTS_COUNT = ARTISTS_HOR * ARTISTS_VERT;
+		$('#artists').css('width', ARTISTS_HOR*275+'px')
+		
+		
+		ALBUMS_HOR = parseInt($(window).width()/220);
+		ALBUMS_VERT = parseInt($(window).height()/250);
+		ALBUMS_COUNT = ALBUMS_HOR * ALBUMS_VERT;
+		$('#albums').css('width', ALBUMS_HOR*170+'px')
+		});
+	
     //HANDLE url changes
     $(window).bind( 'hashchange', function(){handle_hash()});
     handle_hash();
@@ -82,17 +110,5 @@ $(document).ready(function(){
     		}
 		}
 		});
-	
-	ARTISTS_HOR = parseInt($(window).width()/300);
-	ARTISTS_VERT = parseInt($(window).height()/230);
-	ARTISTS_COUNT = ARTISTS_HOR * ARTISTS_VERT;
-	ARTISTS_CONTENT = ''
-	ARTISTS_LETTER = ''
-	
-	$(window).resize(function() {
-		ARTISTS_HOR = parseInt($(window).width()/300);
-		ARTISTS_VERT = parseInt($(window).height()/230);
-		ARTISTS_COUNT = ARTISTS_HOR * ARTISTS_VERT;
-		$('#artists').css('width', ARTISTS_HOR*275+'px')
-		});
+
 });

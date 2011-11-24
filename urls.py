@@ -14,6 +14,7 @@ urlpatterns = patterns('',
     (r'^logout/$',                                  'media.views.user_logout' ),
     (r'^register/$',                                'media.views.register_user' ),
     (r'^is_admin/$',                                'media.views.is_admin' ),
+    (r'^check_session/$',                            'media.views.check_session' ),
 #    
     (r'^add_music/rebuild/$',                       'media.music.views.rebuild_music_db'),
     (r'^add_music/add/$',                           'media.music.views.add_to_music_db'),

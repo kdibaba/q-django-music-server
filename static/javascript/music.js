@@ -7,36 +7,71 @@ NOW_PLAYING = false
 function handle_hash(){
 	var destination = location.hash.replace('#', '')
 	destination = destination.split('/')
-	if (destination[1] == 'artists') {
-		display_message('Retrieving Artists....');
-		get_all_artists(destination[2]);
+	if (check_session_status()){
+		if (destination[1] == 'artists') {
+			if (parseInt(destination[3]) == 0){
+				display_message('Retrieving Artists....');
+				get_all_artists(destination[2], parseInt(destination[3]));
+			}
+			else if (!ARTISTS_CONTENT){
+				display_message('Retrieving Artists....');
+				get_all_artists(destination[2], parseInt(destination[3]));			
+			}
+			else if (ARTISTS_PAGE != destination[3]){
+				display_message('Retrieving Artists....');
+				get_all_artists(destination[2], parseInt(destination[3]));			
+			}
+		}
+		else if (destination[1] == 'albums') {
+			if (parseInt(destination[3]) == 0){
+				display_message('Retrieving Albums....');
+				get_all_albums(destination[2], parseInt(destination[3]));
+			}
+			else if (!ALBUMS_CONTENT){
+				display_message('Retrieving Albums....');
+				get_all_albums(destination[2], parseInt(destination[3]));			
+			}
+			else if (ALBUMS_PAGE != destination[3]){
+				display_message('Retrieving Albums....');
+				get_all_albums(destination[2], parseInt(destination[3]));			
+			}
+		}
+		else if (destination[1] == 'albums_by_artist') {
+			display_message('Retrieving Albums by '+destination[2] +'....');
+			get_albums_by_artist(destination[2]);
+		}
+		else if (destination[1] == 'album_show') {
+			get_album_show(destination[2]);
+		}
+		else if (destination[1] == 'album_delete') {
+			delete_album(destination[2]);
+		}
+		else if (destination[1] == 'albums_by_year') {
+			if (parseInt(destination[3]) == 0){
+				display_message('Retrieving Albums from '+destination[2] +'....');
+				get_albums_by_year(destination[2], parseInt(destination[3]));
+			}
+			else if (!ALBUMS_CONTENT){
+				display_message('Retrieving Albums from '+destination[2] +'....');
+				get_albums_by_year(destination[2], parseInt(destination[3]));			
+			}
+			else if (ALBUMS_PAGE != destination[3]){
+				display_message('Retrieving Albums from '+destination[2] +'....');
+				get_albums_by_year(destination[2], parseInt(destination[3]));
+			}
+		}
+		else if (destination[1] == 'rebuild') {
+			//alert('here')
+			display_message('Rebuilding Database....');
+			rebuild(destination[2]);
+		}
+		else if (destination[1] == 'search') {
+			display_message('Searching Database....');
+			search(destination[2]);
+		}
 	}
-	else if (destination[1] == 'albums') {
-		display_message('Retrieving Albums....');
-		get_all_albums(destination[2]);
-	}
-	else if (destination[1] == 'albums_by_artist') {
-		display_message('Retrieving Albums by '+destination[2] +'....');
-		get_albums_by_artist(destination[2]);
-	}
-	else if (destination[1] == 'album_show') {
-		get_album_show(destination[2]);
-	}
-	else if (destination[1] == 'album_delete') {
-		delete_album(destination[2]);
-	}
-	else if (destination[1] == 'albums_by_year') {
-		display_message('Retrieving Albums from '+destination[2] +'....');
-		get_albums_by_year(destination[2]);
-	}
-	else if (destination[1] == 'rebuild') {
-		//alert('here')
-		display_message('Rebuilding Database....');
-		rebuild(destination[2]);
-	}
-	else if (destination[1] == 'search') {
-		display_message('Searching Database....');
-		search(destination[2]);
+	else {
+		window.location='http://www.music.kiumma.com'
 	}
 }
 
@@ -76,6 +111,7 @@ function show_artist_results() {
 	$('#artists').show();
 	$('.nav_header_artists').addClass('selected');
 }
+
 function show_album_results() {
 	$('.nav_header_artists').removeClass('selected');
 	$('#artists').hide()
@@ -86,10 +122,20 @@ function show_album_results() {
 function add_music(type) {
 	jQuery.ajax({
 		url: "/add_music/"+type+"/", 
-		success: function() {get_all_albums('all')},
+		success: function() {get_all_albums('all', 0)},
 		async	: false
 	});
 	return false;  
+}
+
+function check_session_status(){
+	var logged_in = true
+	jQuery.ajax({
+		url: "/check_session/", 
+		success: function(status) {if (status == 0){logged_in = false}},
+		async	: false
+	});
+	return logged_in;  
 }
 
 function search(text) {
@@ -126,7 +172,7 @@ function show_results_artists(jsonArtists, letter) {
 			$('.album_art_wrapper_'+items.pk).append('<div class="artist_album album_' + item.pk+ '" style="-webkit-transform: rotate('+ deg + 'deg); -moz-transform: rotate('+ deg + 'deg)"></div>');
 			//$('.album_' + item.pk).hover(function(){$(this).css('width',  '125px')}, function(){$(this).css('width',  '44px')});
 			if (item.album_art){
-				$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/album_show/'+item.pk+'\'"><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
+				$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/albums_by_artist/'+items.pk+'\'"><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
 			else {
 				$('.album_'+item.pk).prepend( '<div id="img_div"><img src="/static/images/default_album_art.jpg" /></div>' )}
 			deg += 15;
@@ -177,26 +223,26 @@ function get_song(song_id) {
 	return "/song/"+song_id+"/" ;
 };
 
-function get_all_artists(letter) {
+function get_all_artists(letter, page) {
 	jQuery.ajax({
 		url: "/artists/"+letter+"/", 
-		success: function(jsonArtists) {show_artists(jsonArtists, letter)},
+		success: function(jsonArtists) {show_artists(jsonArtists, letter, page)},
 		async	: true
 	});
 };
 
-function show_artists(jsonArtists, letter) {
+function show_artists(jsonArtists, letter, page) {
 	var artists = jQuery.parseJSON(jsonArtists);
 	ARTISTS_CONTENT = artists;
 	ARTISTS_PREV = ''
 	ARTISTS_CURR = ''
 	ARTISTS_NEXT = ''
-	ARTISTS_PAGE = 0
+	ARTISTS_PAGE = page
 	ARTISTS_LETTER = letter
 
 	$('#content').replaceWith('<div id="content"></div>')
 	$('#content').append('<div id="artists"></div>');
-	$('#content').append('<button id="next_page" onclick="next_artist_page();" style="width: 31px; right: 0px; top: 71px; padding-bottom: 0px; "><img src="/static/images/next.png" /></button>')
+	
 	build_artist_page()
 		
 }
@@ -205,19 +251,24 @@ function next_artist_page() {
 	ARTISTS_PAGE += 1
 
 	//ARTISTS_PREV = ARTISTS_CURR
-	$('#artists').css({"margin-left" : "auto"}).animate({"margin-left" : "-1500px"}, 500, function(){
+	$('#artists').css({"margin-left" : "0px"}).animate({"margin-left" : "-2000px"}, 500, function(){
 		$('#artists').html('')
 		build_artist_page();
-		$('#artists').css({"margin" : "auto"}).show(1000);
+		$('#artists').css({"margin" : "auto"}).show(200);
 	})
+	location.hash = '/artists/'+ARTISTS_LETTER+'/'+ARTISTS_PAGE+'/'
 }
 
 function previous_artist_page() {
 	ARTISTS_PAGE -= 1
 
 	//ARTISTS_NEXT = ARTISTS_CURR
-	$('#artists').html('')
-	build_artist_page()
+	$('#artists').css({"margin-right" : "0px"}).animate({"margin-right" : "-2000px"}, 500, function(){
+		$('#artists').html('')
+		build_artist_page();
+		$('#artists').css({"margin" : "auto"}).show(200);
+	})
+	location.hash = '/artists/'+ARTISTS_LETTER+'/'+ARTISTS_PAGE+'/'
 }
 
 function build_artist_page() {
@@ -227,9 +278,14 @@ function build_artist_page() {
 	var length = 0
 	var cover_count = 0;
 	var missing_cover_count = 0;
+	
 	var iterator = ARTISTS_PAGE * ARTISTS_COUNT
+	
 	if (ARTISTS_PAGE == 0){$('#prev_page').remove()}
-	else {$('#content').append('<button id="prev_page" onclick="previous_artist_page();" style="width: 31px; left: 0px; top: 71px; padding-bottom: 0px; "><img src="/static/images/prev.png" /></button>')}
+	else if(!$('#prev_page').html()){$('#content').append('<button id="prev_page" onclick="previous_artist_page();" style="width: 31px; left: 0px; top: 71px; padding-bottom: 0px; "><img src="/static/images/prev.png" /></button>')}
+	
+	if (ARTISTS_CONTENT.length - iterator < ARTISTS_COUNT){$('#next_page').remove()}
+	else if(!$('#next_page').html()){$('#content').append('<button id="next_page" onclick="next_artist_page();" style="width: 31px; right: 0px; top: 71px; padding-bottom: 0px; "><img src="/static/images/next.png" /></button>')}
 	
 	$.each(ARTISTS_CONTENT, function(i,items){
 		if (i >= iterator && i < iterator + ARTISTS_COUNT ) {
@@ -243,10 +299,10 @@ function build_artist_page() {
 				$('.album_art_wrapper_'+items.pk).append('<div class="artist_album album_' + item.pk+ '" style="-webkit-transform: rotate('+ deg + 'deg); -moz-transform: rotate('+ deg + 'deg)"></div>');
 				//$('.album_' + item.pk).hover(function(){$(this).css('width',  '125px')}, function(){$(this).css('width',  '44px')});
 				if (item.album_art){
-					//cover_count += 1;
+					cover_count += 1;
 					$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/albums_by_artist/'+items.pk+'\'"><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
 				else {
-					//missing_cover_count += 1
+					missing_cover_count += 1
 					$('.album_'+item.pk).prepend( '<div id="img_div"><img src="/static/images/default_album_art.jpg" /></div>' )}
 				deg += 15;
 			})
@@ -258,6 +314,7 @@ function build_artist_page() {
 	$('#artists').append('</ul>');
 	if (user_is_admin()) {
 		//$('#artists').prepend('<p class="nav_header">' + ARTISTS_CONTENT.length + ' Artist(s) found. <button id="rebuild_button" onclick="location.href=\'/#/rebuild/'+ARTISTS_LETTER+'\'">Rebuild '+ARTISTS_LETTER+'</button> </p>');
+		$('#artists').prepend('<p class="nav_header">' + ARTISTS_CONTENT.length + ' Artist(s) found.')
 	}
 	else {
 		$('#artists').prepend('<p class="nav_header">' + ARTISTS_CONTENT.length + ' Artist(s) found.')
@@ -278,49 +335,117 @@ function user_is_admin() {
 	return admin
 }
 
-function get_all_albums(letter) {
+function get_all_albums(letter, page) {
 	jQuery.ajax({
 		url: "/albums/"+letter+"/", 
-		success: function(jsonAlbums) {show_albums(jsonAlbums)},
+		success: function(jsonAlbums) {show_albums(jsonAlbums, letter, '' , page)},
 		async	: true
 	});
 };
 
-function show_albums(jsonAlbums) {
+function show_albums(jsonAlbums, letter, year, page) {
 	var albums = jQuery.parseJSON(jsonAlbums);
-	var album_count = 0
-	var cover_count = 0;
-	var missing_cover_count = 0;
+	ALBUMS_CONTENT = albums;
+	ALBUMS_PREV = ''
+	ALBUMS_CURR = ''
+	ALBUMS_NEXT = ''
+	ALBUMS_PAGE = page
+	if(letter){
+		ALBUMS_LETTER = letter
+		ALBUMS_YEAR = ''
+	}
+	else if (year){
+		ALBUMS_YEAR = year
+		ALBUMS_LETTER = ''
+	}
+
 	$('#content').replaceWith('<div id="content"></div>')
 	$('#content').append('<div id="albums"></div>');
-	$.each(albums, function(i,item){
-		album_count+=1;
-		$('#albums').append('<div class="album album_' + item.pk+ '"><h1 class="album_name">' + item.album + '</h1>' + '</div>');
-		$('.album_' + item.pk).append('<h2 onclick="location.href=\'/#/albums_by_artist/'+item.artist_id+'\'">' + item.artist + '</h2>')
-		$('.album_' + item.pk).append('<h3> <item class="year" onclick="location.href=\'/#/albums_by_year/'+item.year+'\'">' + item.year + '</item> | ' + item.song_count + ' SONGS | ' + item.album_size + '</h3>')
-		if (item.album_art){
-			//cover_count += 1;
-			$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/album_show/'+item.pk+'\'"' + '><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
-		else {
-			//missing_cover_count += 1
-			$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/album_show/'+item.pk+'\'"' + '><img src="/static/images/default_album_art.jpg" /></div>' )
+	
+	build_album_page()
+		
+}
+
+
+function next_album_page() {
+	ALBUMS_PAGE += 1
+
+	//ARTISTS_PREV = ARTISTS_CURR
+	$('#albums').css({"margin-left" : "0px"}).animate({"margin-left" : "-2000px"}, 500, function(){
+		$('#albums').html('')
+		build_album_page();
+		$('#albums').css({"margin" : "auto"}).show(200);
+	})
+	if(ALBUMS_LETTER){
+		location.hash = '/albums/'+ALBUMS_LETTER+'/'+ALBUMS_PAGE+'/';
+	}
+	else if(ALBUMS_YEAR){
+		location.hash = '/albums_by_year/'+ALBUMS_YEAR+'/'+ALBUMS_PAGE+'/';
+	}
+}
+
+function previous_album_page() {
+	ALBUMS_PAGE -= 1
+
+	//ARTISTS_NEXT = ARTISTS_CURR
+	$('#albums').css({"margin-right" : "0px"}).animate({"margin-right" : "-2000px"}, 500, function(){
+		$('#albums').html('')
+		build_album_page();
+		$('#albums').css({"margin" : "auto"}).show(200);
+	})
+	if(ALBUMS_LETTER){
+		location.hash = '/albums/'+ALBUMS_LETTER+'/'+ALBUMS_PAGE+'/';
+	}
+	else if(ALBUMS_YEAR){
+		location.hash = '/albums_by_year/'+ALBUMS_YEAR+'/'+ALBUMS_PAGE+'/';
+	}
+}
+
+
+function build_album_page() {
+
+	var cover_count = 0;
+	var missing_cover_count = 0;
+	
+	var iterator = ALBUMS_PAGE * ALBUMS_COUNT
+
+	if (ALBUMS_PAGE == 0){$('#prev_page').remove()}
+	else if(!$('#prev_page').html()){$('#content').append('<button id="prev_page" onclick="previous_album_page();" style="width: 31px; left: 0px; top: 71px; padding-bottom: 0px; "><img src="/static/images/prev.png" /></button>')}
+	
+	if (ALBUMS_CONTENT.length - iterator < ALBUMS_COUNT){$('#next_page').remove()}
+	else if(!$('#next_page').html()){$('#content').append('<button id="next_page" onclick="next_album_page();" style="width: 31px; right: 0px; top: 71px; padding-bottom: 0px; "><img src="/static/images/next.png" /></button>')}
+	
+	$.each(ALBUMS_CONTENT, function(i,item){
+
+		if (i >= iterator && i < iterator + ALBUMS_COUNT ) {
+			$('#albums').append('<div class="album album_' + item.pk+ '"><h1 class="album_name">' + item.album + '</h1>' + '</div>');
+			$('.album_' + item.pk).append('<h2 onclick="location.href=\'/#/albums_by_artist/'+item.artist_id+'\'">' + item.artist + '</h2>')
+			$('.album_' + item.pk).append('<h3> <item class="year" onclick="location.href=\'/#/albums_by_year/'+item.year+'/0/\'">' + item.year + '</item> | ' + item.song_count + ' SONGS | ' + item.album_size + '</h3>')
+			if (item.album_art){
+				//cover_count += 1;
+				$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/album_show/'+item.pk+'\'"' + '><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
+			else {
+				//missing_cover_count += 1
+				$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/album_show/'+item.pk+'\'"' + '><img src="/static/images/default_album_art.jpg" /></div>' )
+			}
 		}
 	})
-	$('#albums').prepend('<p class="nav_header">' + album_count + ' Albums</p>');
+	$('#albums').prepend('<p class="nav_header">' + ALBUMS_CONTENT.length + ' Albums</p>');
 	//alert('Cover Count = ' + cover_count);
 	//alert('Missing Cover Count = ' + missing_cover_count);
+	$('#albums').css('width', ALBUMS_HOR*170+'px')
 }
 
 function get_albums_by_artist(artist_id) {
 	$.get("/albums_by_artist/" + artist_id + "/", function(jsonAlbums) {
-	        show_albums(jsonAlbums);
+	        show_albums(jsonAlbums, '', '', 0);
 	});
 };
 
 
 function get_albums_by_year(year_id) {
 	$.get("/albums_by_year/" + year_id + "/", function(jsonAlbums) {
-	        show_albums(jsonAlbums);
+	        show_albums(jsonAlbums, '', year_id, 0);
 	});
 };
 

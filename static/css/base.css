@@ -12,11 +12,11 @@ body a{
 	}
 	
 #site_header_wrapper { 
-	background-image: linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
-	background-image: -o-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
-	background-image: -moz-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
-	background-image: -webkit-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
-	background-image: -ms-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
+	background: linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
+	background: -o-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
+	background: -moz-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
+	background: -webkit-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
+	background: -ms-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
 	height: 70px;
 	margin: 0;
 	width: 100%;
@@ -93,14 +93,15 @@ body a{
 #menu_home:hover,
 #menu_artists:hover,
 #menu_add_music:hover,
-#menu_search:hover {
-	background		: #DDDDDD;
+#menu_search:hover,
+#menu_albums:hover {
+	background: linear-gradient(bottom, #f7f7f7 7%, #EEEEEE 54%);
+	background: -o-linear-gradient(bottom, #f7f7f7 7%, #EEEEEE 54%);
+	background: -moz-linear-gradient(bottom, #f7f7f7 7%, #EEEEEE 54%);
+	background: -webkit-linear-gradient(bottom, #f7f7f7 7%, #EEEEEE 54%);
+	background: -ms-linear-gradient(bottom, #f7f7f7 7%, #EEEEEE 54%);
 }
 
-#menu_albums:hover {
-	background		: #CCCCCC;
-}
-	
 #searchBox {
 	margin-top: 6px;
 	width: 215px;
@@ -142,7 +143,11 @@ body a{
 }
 
 .nav_button_albums  {
-	background	: #CCCCCC;
+	background: linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -o-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -moz-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -webkit-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -ms-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
 	margin		: -1px auto;
 	width		: 1024px;
 	text-align	: center;
@@ -153,7 +158,11 @@ body a{
 
 
 .nav_button_artists  {
-	background	: #DDDDDD;
+	background: linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -o-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -moz-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -webkit-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -ms-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
 	margin		: -1px auto;
 	width		: 1024px;
 	text-align	: center;
@@ -164,7 +173,11 @@ body a{
 
 .nav_button_add,
 .nav_button_search  {
-	background	: #DDDDDD;
+	background: linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -o-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -moz-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -webkit-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -ms-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
 	margin		: -1px auto;
 	width		: 400px;
 	text-align	: center;
@@ -218,7 +231,7 @@ body a{
 }
 
 #content {
-    margin: 40px 30px 10px;
+    margin: 65px 30px 10px;
     padding-bottom: 130px;
 }
 
@@ -232,11 +245,17 @@ body a{
 .nav_header_artists {
 	font-size: 13px;
 	padding: 10px 50px;
-	background: #F7F7F7;
+	background: #F2F2F2;
 	margin: 10px;
 	border-top	: 1px solid #EEEEEE;
 	border-right	: 1px solid #EEEEEE;
 	border-left	: 1px solid #EEEEEE;
+}
+
+.nav_header_albums:hover,
+.nav_header_artists:hover {
+	cursor	: pointer;
+	background	: #F7F7F7;
 }
 
 .nav_header_albums.selected,
@@ -368,11 +387,11 @@ input:-webkit-autofill {
 }
 
 #general_a_button {
-	background-image: linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
-	background-image: -o-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
-	background-image: -moz-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
-	background-image: -webkit-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
-	background-image: -ms-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -o-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -moz-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -webkit-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -ms-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
 	border: 1px solid #DDD;
 	padding: 4px 60px;
 	width: 200px;
@@ -397,6 +416,11 @@ input:-webkit-autofill {
 	list-style	: none;
 }
 
+#message_wrapper {
+	width	: 1024px;
+	margin	: auto;
+}
+
 #status_message {
 	background: #FFC;
 	width: 1024px;
@@ -408,6 +432,7 @@ input:-webkit-autofill {
 	border-bottom: 1px solid #EEE;
 	margin-top: 20px;
 	padding-top: 5px;
+	position	: absolute;
 }
 
 #status_message.good {
@@ -447,11 +472,11 @@ input:-webkit-autofill {
 }
 
 input[type="button"], input[type="submit"], input[type="reset"], input[type="file"] {
-	background-image: linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
-	background-image: -o-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
-	background-image: -moz-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
-	background-image: -webkit-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
-	background-image: -ms-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -o-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -moz-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -webkit-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -ms-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
 	border: 1px solid #ddd;
 	padding: 4px;
 	width: 200px;
