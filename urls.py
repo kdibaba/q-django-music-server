@@ -6,8 +6,8 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Example:
-    # (r'^Catalog/', include('Catalog.foo.urls')),
+    (r'^admin/(.*)', admin.site.root) ,
+    
     (r'^$',                                         'media.music.views.music'),
     (r'^music/$',                                   'media.music.views.music'),
     (r'^login/$',                                   'media.views.user_login' ),
