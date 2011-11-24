@@ -284,7 +284,7 @@ function build_artist_page() {
 	if (ARTISTS_PAGE == 0){$('#prev_page').remove()}
 	else if(!$('#prev_page').html()){$('#content').append('<button id="prev_page" onclick="previous_artist_page();" style="width: 31px; left: 0px; top: 71px; padding-bottom: 0px; "><img src="/static/images/prev.png" /></button>')}
 	
-	if (ARTISTS_CONTENT.length - iterator < ARTISTS_COUNT){$('#next_page').remove()}
+	if (ARTISTS_CONTENT.length - iterator <= ARTISTS_COUNT){$('#next_page').remove()}
 	else if(!$('#next_page').html()){$('#content').append('<button id="next_page" onclick="next_artist_page();" style="width: 31px; right: 0px; top: 71px; padding-bottom: 0px; "><img src="/static/images/next.png" /></button>')}
 	
 	$.each(ARTISTS_CONTENT, function(i,items){
@@ -412,7 +412,7 @@ function build_album_page() {
 	if (ALBUMS_PAGE == 0){$('#prev_page').remove()}
 	else if(!$('#prev_page').html()){$('#content').append('<button id="prev_page" onclick="previous_album_page();" style="width: 31px; left: 0px; top: 71px; padding-bottom: 0px; "><img src="/static/images/prev.png" /></button>')}
 	
-	if (ALBUMS_CONTENT.length - iterator < ALBUMS_COUNT){$('#next_page').remove()}
+	if (ALBUMS_CONTENT.length - iterator <= ALBUMS_COUNT){$('#next_page').remove()}
 	else if(!$('#next_page').html()){$('#content').append('<button id="next_page" onclick="next_album_page();" style="width: 31px; right: 0px; top: 71px; padding-bottom: 0px; "><img src="/static/images/next.png" /></button>')}
 	
 	$.each(ALBUMS_CONTENT, function(i,item){

@@ -520,9 +520,9 @@ def get_song(request, song_id):
 def albums_by_artist(request, artist_id):
     artist = Music_Artist.objects.get(id=artist_id)
     if request.user.is_superuser or request.user.is_staff:
-        all_albums = Music_Album.objects.filter(artist=artist)
+        all_albums = Music_Album.objects.filter(artist=artist).order_by('album')
     else:
-        all_albums = Music_Album.objects.filter(artist=artist)[:GUEST_ACCESS]
+        all_albums = Music_Album.objects.filter(artist=artist).order_by('album')[:GUEST_ACCESS]
     dictionary_albums = []
     for album in all_albums:
         album_info = {}
@@ -546,9 +546,9 @@ def albums_by_artist(request, artist_id):
 @login_required
 def albums_by_year(request, year_id):
     if request.user.is_superuser or request.user.is_staff:
-        all_albums = Music_Album.objects.filter(year=year_id)
+        all_albums = Music_Album.objects.filter(year=year_id).order_by('album')
     else:
-        all_albums = Music_Album.objects.filter(year=year_id)[:GUEST_ACCESS]
+        all_albums = Music_Album.objects.filter(year=year_id).order_by('album')[:GUEST_ACCESS]
     dictionary_albums = []
     for album in all_albums:
         album_info = {}

@@ -183,6 +183,10 @@
 	margin: auto;
 }
 		
+#curr_album_img_div img{
+	width: 200px;
+	height: 200px;
+}
 #img_div {
 	width: 98px;
 	height: 98px;
