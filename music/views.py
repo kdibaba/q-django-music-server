@@ -15,13 +15,18 @@ from mutagen.mp3 import MP3
 import mutagen.id3
 
 
-LETTERS = ['0', 'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','VA', 'W','X','Y','Z']
+LETTERS = ['0', 'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'VA']
 SET_RATING = {'1': 32, '2': 64, '3': 128,'4':196, '5':255}
 GUEST_ACCESS = 50
 
 @login_required
 def music(request):
     letter_list = LETTERS
+    album_art = len(Music_Album.objects.filter(album_art=True))
+    artists_count = Music_Artist.objects.count()
+    albums_count = Music_Album.objects.count()
+    missing_album_art = int(albums_count) - album_art
+    songs_count = Music_Song.objects.count()
     return render_to_response('base.html', locals())
 
 @login_required
@@ -130,121 +135,114 @@ def catalog_drive_music(type):
         Music_Song.objects.all().delete()
         Music_Artist.objects.all().delete()
         Music_Album.objects.all().delete()
-    for letter in LETTERS: 
-        directory = settings.MUSIC_DIRECTORY + letter + "/"
-        files = get_folder_names(directory)
-        
-        #Delete all records for this drive
-        #Music_Drive.objects.filter(drive=drive).delete()
-        
-        #Save the drive data
-        #drive = Music_Drive.objects.create(drive=drive)
-        
-        for file_object in files:
-            try:
-                file = str(file_object).split('-')
-                album_exists = Music_Album.objects.filter(folder=str(file_object))
-                if file.__len__() > 1 and not album_exists:
-                    album_length = 0
-                    album_year = 0
-                    album_size = 0
-                    try: songs = os.listdir(directory+str(file_object))
-                    except: songs = []
-                    artist_name = file[0].replace('.', ' ')
-                    artist = Music_Artist.objects.filter(artist=artist_name)
-                    if not artist:
-                        artist = Music_Artist.objects.create(artist=artist_name)
-                    else: artist = artist[0]
-                    album_name = file[1].replace('.', ' ')
-                    album_art = True
-                    if 'Folder.jpg' not in songs:
-                        album_art=False
-                    
-                    album = Music_Album.objects.create(artist=artist, album=album_name, folder=str(file_object), album_art=album_art, letter=letter)
-                    artist.letter = letter
-                    artist.save()
-                    id3_info = {}
-                    song_count = 0
-                    for song in songs:
-                        #print file, ' ----- ', song
-                        if song.rsplit('.')[-1] == 'mp3' or song.rsplit('.')[-1] == 'MP3':
-                            song_length = 0
-                            song_rating = 0
-                            file_size = ''
-                            try:
-                                id3 = ID3(directory+str(file_object)+'/'+song)
-                                property = MP3(directory+str(file_object)+'/'+song)
-                                song_length = property.info.length
-                                album_length += song_length
-                                result = time.strftime('%M:%S', time.gmtime(song_length))
-                                #print directory+str(file_object)+'/'+song
-                                file_size=os.path.getsize(directory+str(file_object)+'/'+song)
-                                album_size += file_size
-                                title=''
-                                try:title=id3.getall('TIT2')[0].text[0]
-                                except:title=filename
-                                if not album_year:
-                                    try:album_year=id3.getall('TDRC')[0].text[0]
-                                    except:pass
-                                try:song_rating=get_rating(id3.getall('POPM')[0].rating)
+    #for letter in LETTERS: 
+    letter = 'VA'
+    directory = settings.MUSIC_DIRECTORY + letter + "/"
+    files = get_folder_names(directory)
+    
+    #Delete all records for this drive
+    #Music_Drive.objects.filter(drive=drive).delete()
+    
+    #Save the drive data
+    #drive = Music_Drive.objects.create(drive=drive)
+    
+    for file_object in files:
+        try:
+            file = str(file_object).split('-')
+            album_exists = Music_Album.objects.filter(folder=str(file_object))
+            if file.__len__() > 1 and not album_exists:
+                album_length = 0
+                album_year = 0
+                album_size = 0
+                try: songs = os.listdir(directory+str(file_object))
+                except: songs = []
+                artist_name = file[0].replace('.', ' ')
+                artist = Music_Artist.objects.filter(artist=artist_name)
+                if not artist:
+                    artist = Music_Artist.objects.create(artist=artist_name)
+                else: artist = artist[0]
+                album_name = file[1].replace('.', ' ')
+                album_art = True
+                if 'Folder.jpg' not in songs:
+                    album_art=False
+                
+                album = Music_Album.objects.create(artist=artist, album=album_name, folder=str(file_object), album_art=album_art, letter=letter)
+                artist.letter = letter
+                artist.save()
+                id3_info = {}
+                song_count = 0
+                for song in songs:
+                    #print file, ' ----- ', song
+                    if song.rsplit('.')[-1] == 'mp3' or song.rsplit('.')[-1] == 'MP3':
+                        song_length = 0
+                        song_rating = 0
+                        file_size = ''
+                        try:
+                            id3 = ID3(directory+str(file_object)+'/'+song)
+                            property = MP3(directory+str(file_object)+'/'+song)
+                            song_length = property.info.length
+                            album_length += song_length
+                            result = time.strftime('%M:%S', time.gmtime(song_length))
+                            #print directory+str(file_object)+'/'+song
+                            file_size=os.path.getsize(directory+str(file_object)+'/'+song)
+                            album_size += file_size
+                            title=''
+                            try:title=id3.getall('TIT2')[0].text[0]
+                            except:title=filename
+                            if not album_year:
+                                try:album_year=id3.getall('TDRC')[0].text[0]
                                 except:pass
-                                Music_Song.objects.create(artist=artist, 
-                                                          album=album, 
-                                                          filename=song, 
-                                                          type=song.rsplit('.')[-1],
-                                                          path=str(file_object),
-                                                          title=title,
-                                                          length=str(result),
-                                                          letter=letter,
-                                                          rating=song_rating,
-                                                          file_size=str(file_size)
-                                                          )
-                                song_count += 1
-                            except:
-                                pass#print str(file_object)
-                    album.length = time.strftime('%M:%S', time.gmtime(album_length))
-                    album.song_count = song_count
-                    album.album_size = str(album_size)
-                    if album_year: 
-                        string_album_year = album_year.encode('ascii','ignore')
-                        try: 
-                            album.year = int(string_album_year[0]+string_album_year[1]+string_album_year[2]+string_album_year[3])
-                            if album.year < 1800 or album.year > 2020:
-                                album.year = 0
-                        except: album.year = 0
-                    else: album.year = 0
-                    album.save()
-                    
-                else:
-                    pass
-            except:
-                pass#print 'Excepted on ' + file_object
+                            try:song_rating=get_rating(id3.getall('POPM')[0].rating)
+                            except:pass
+                            Music_Song.objects.create(artist=artist, 
+                                                      album=album, 
+                                                      filename=song, 
+                                                      type=song.rsplit('.')[-1],
+                                                      path=str(file_object),
+                                                      title=title,
+                                                      length=str(result),
+                                                      letter=letter,
+                                                      rating=song_rating,
+                                                      file_size=str(file_size)
+                                                      )
+                            song_count += 1
+                        except:
+                            pass#print str(file_object)
+                album.length = time.strftime('%M:%S', time.gmtime(album_length))
+                album.song_count = song_count
+                album.album_size = str(album_size)
+                if album_year: 
+                    string_album_year = album_year.encode('ascii','ignore')
+                    try: 
+                        album.year = int(string_album_year[0]+string_album_year[1]+string_album_year[2]+string_album_year[3])
+                        if album.year < 1800 or album.year > 2020:
+                            album.year = 0
+                    except: album.year = 0
+                else: album.year = 0
+                album.save()
+                
+            else:
+                pass
+        except:
+            pass#print 'Excepted on ' + file_object
     return
 
 def update_album_art(request):
     letter_list = LETTERS
-    existing_album_art = 0
+    existing_album_art = len(Music_Album.objects.filter(album_art=True))
     new_album_art = 0
-    missing_album_art = 0
-    for letter in LETTERS: 
-        print 'Working on ', letter
-        directory = settings.MUSIC_DIRECTORY + letter + "/"
-        files = get_folder_names(directory)
-        for file_object in files:
-            try: 
-                songs = os.listdir(directory+str(file_object))
-                album = Music_Album.objects.get(folder=str(file_object))
-                if album.album_art:
-                    existing_album_art += 1
-                elif 'Folder.jpg' in songs:
-                    new_album_art += 1
-                    album.album_art = True
-                    album.save()
-                else:
-                    missing_album_art += 1
-            except: pass
+    missing_album_art = Music_Album.objects.filter(album_art=False)
+    for albums in missing_album_art: 
+        try: 
+            songs = os.listdir(settings.MUSIC_DIRECTORY + albums.letter + "/" + albums.folder)
+            if 'Folder.jpg' in songs:
+                new_album_art += 1
+                albums.album_art = True
+                albums.save()
+        except: pass
+        
     
-    message = 'Album Art Updated<br/> Existing = ' + str(existing_album_art) + '<br />New = ' + str(new_album_art) + '<br />Missing = ' + str(missing_album_art)
+    message = 'Album Art Updated<br/> Existing = ' + str(existing_album_art) + '<br />New = ' + str(new_album_art) + '<br />Missing = ' + str(len(missing_album_art))
     return render_to_response('confirmation.html', locals()) 
 
 def get_rating(rating):
@@ -312,68 +310,71 @@ def filter_nzbs(request):
                                 
         if counter % 1000 == 0:
             print counter
-    return render_to_response('base.html', locals())
+    return HttpResponseRedirect('/')
 
 def rename_nzbs(request):
-    for letter in LETTERS:
-        print 'processing '+ 'L:/media/static/music/'+letter+'/'
-        path_to_nzbs = 'L:/media/static/music/'+letter+'/'
-        os.chdir(path_to_nzbs)
-        all_nzbs = os.listdir('.')
-        try:
-            os.makedirs('failed')
-        except:
-            print 'Failed to create the failed directory\n'        
+    message = ''
+#    for letter in LETTERS:
+#        print 'processing '+ 'L:/media/static/music/'+letter+'/'
+#        path_to_nzbs = 'L:/media/static/music/'+letter+'/'
+    path_to_nzbs = 'D:/QmA/NZB/Music/Albums/Download/new/ready/'
+    os.chdir(path_to_nzbs)
+    all_nzbs = os.listdir('.')
+    try:
+        os.makedirs('failed')
+    except:
+        print 'Failed to create the failed directory\n'        
+    
+    #Rename all the nzbs
+    for nzbs in all_nzbs:
+        string = str(nzbs)
+        string2 = string.replace('[', '.')
         
-        #Rename all the nzbs
-        for nzbs in all_nzbs:
-            string = str(nzbs)
-            string2 = string.replace('[', '.')
+        string2 = string2.upper()
+        string2 = string2.replace(']', '.')
+        string2 = string2.replace('.NZB.nzb', '.nzb')
+        string2 = string2.replace('_', '.')
+        string2 = string2.replace(']', '.')
+        string2 = string2.replace('(', '.')
+        string2 = string2.replace(')', '.')
+        string2 = string2.replace('.bt.', '.')
+        string2 = string2.replace('.BT.', '.')
+        string2 = string2.replace('JAY-Z', 'JAY.Z')
+        string2 = string2.replace('Z-RO', 'Z.RO')
+        string2 = string2.replace('Q-TIP', 'Q.TIP')
+        string2 = string2.replace('NE-YO', 'NE.YO')
+        string2 = string2.replace('AC-DC', 'ACDC')
+        string2 = string2.replace('AC.DC', 'ACDC')
+        string2 = string2.replace('\'', '.')
+        string2 = string2.replace(',', '.')
+        string2 = string2.replace('{', '.')
+        string2 = string2.replace('}', '.')
+        string2 = string2.replace(' ', '.')
+        string2 = string2.replace('_', '.')
+        string2 = string2.replace('.-.', '-')
+        string2 = string2.replace('--', '-')
+        string2 = string2.replace('-.', '-')
+        string2 = string2.replace('.-', '-')
+        string2 = string2.replace('..', '.')
+        if string2[0] == '.':
+            string2 = string2.lstrip('.')
+        if string[0] == '-':
+            string2 = string2.lstrip('-')
             
-            string2 = string2.upper()
-            string2 = string2.replace(']', '.')
-            string2 = string2.replace('.NZB.nzb', '.nzb')
-            string2 = string2.replace('_', '.')
-            string2 = string2.replace(']', '.')
-            string2 = string2.replace('(', '.')
-            string2 = string2.replace(')', '.')
-            string2 = string2.replace('.bt.', '.')
-            string2 = string2.replace('.BT.', '.')
-            string2 = string2.replace('JAY-Z', 'JAY.Z')
-            string2 = string2.replace('Z-RO', 'Z.RO')
-            string2 = string2.replace('Q-TIP', 'Q.TIP')
-            string2 = string2.replace('NE-YO', 'NE.YO')
-            string2 = string2.replace('AC-DC', 'ACDC')
-            string2 = string2.replace('AC.DC', 'ACDC')
-            string2 = string2.replace('\'', '.')
-            string2 = string2.replace(',', '.')
-            string2 = string2.replace('{', '.')
-            string2 = string2.replace('}', '.')
-            string2 = string2.replace(' ', '.')
-            string2 = string2.replace('_', '.')
-            string2 = string2.replace('.-.', '-')
-            string2 = string2.replace('--', '-')
-            string2 = string2.replace('-.', '-')
-            string2 = string2.replace('.-', '-')
-            string2 = string2.replace('..', '.')
-            if string2[0] == '.':
-                string2 = string2.lstrip('.')
-            if string[0] == '-':
-                string2 = string2.lstrip('-')
-                
-            if string != string2:
+        if string != string2:
+            try:
+                message += 'Renaming ' + nzbs + ' to ' + string2 + '<br/>' 
+                win32file.MoveFile(path_to_nzbs+nzbs, path_to_nzbs+string2)
+                #os.rename(path_to_nzbs+nzbs, path_to_nzbs+string2)
+                #print 'Renaming of ', nzbs , ' to \n', string2, ' completed' 
+            except:
+                print 'Renaming of ', nzbs , ' to \n', string2, ' failed' 
                 try:
-                    win32file.MoveFile(path_to_nzbs+nzbs, path_to_nzbs+string2)
-                    #os.rename(path_to_nzbs+nzbs, path_to_nzbs+string2)
-                    #print 'Renaming of ', nzbs , ' to \n', string2, ' completed' 
+                    win32file.MoveFile(path_to_nzbs+nzbs, path_to_nzbs+'failed/'+string2)
                 except:
-                    print 'Renaming of ', nzbs , ' to \n', string2, ' failed' 
-                    try:
-                        win32file.MoveFile(path_to_nzbs+nzbs, path_to_nzbs+'failed/'+string2)
-                    except:
-                        print 'Moving a file that failed to rename also Failed. WOW.'
-        
-    return render_to_response('base.html', locals())
+                    print 'Moving a file that failed to rename also Failed. WOW.'
+    
+    return render_to_response('confirmation.html', locals())
     #    for folders in all_folders:
     #        for nzbs in all_nzbs:
     #            progress_counter = progress_counter + 1
@@ -481,6 +482,7 @@ def album(request, album_id):
         song_dict['filename']  =  song.filename
         song_dict['length']  =  song.length
         song_dict['title']  =  song.title
+        song_dict['artist']  =  song.artist.artist
         song_dict['type']  =  song.type
         song_dict['path']  =  song.path
         song_dict['letter']  =  song.letter
@@ -512,6 +514,7 @@ def get_song(request, song_id):
     song['pk'] = original_song.id 
     song['full_path'] = "/static/music/"+original_song.letter+"/"+original_song.path+"/"+original_song.filename
     song['title'] = original_song.title 
+    song['artist'] = original_song.artist.artist 
     if request.is_ajax():
         mimetype = 'application/javascript'
     return HttpResponse(simplejson.dumps(song), mimetype)
@@ -571,6 +574,7 @@ def albums_by_year(request, year_id):
 
 @login_required
 def artists(request, letter):
+    print 'here\n\n'
     if request.user.is_superuser or request.user.is_staff:
         if letter == 'all': get_artists = Music_Artist.objects.all().order_by('artist')
         else: get_artists = Music_Artist.objects.filter(letter=letter).order_by('artist')
@@ -580,6 +584,8 @@ def artists(request, letter):
         
     artists = []
     for get_artist in get_artists:
+        
+        print len(artists)
         try:
             artist = {}
             artist['pk'] = get_artist.id
@@ -601,7 +607,8 @@ def artists(request, letter):
             artists.append(artist)
         except:
             print 'excepted'
-        
+    
+    print len(get_artists)
     if request.is_ajax():
         mimetype = 'application/javascript'
         artists = simplejson.dumps(artists)

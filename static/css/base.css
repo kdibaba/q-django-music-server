@@ -49,10 +49,31 @@ body a{
     box-shadow	: 0 0 5px #999999;
 }
 
+
+#stats {
+	width: 800px;
+	font-size	: 20px;
+	color: #8D2100;
+	border: 1px solid #F2F2F2;
+	margin	: auto;
+	padding		: 20px;
+	background: linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
+	background: -o-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
+	background: -moz-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
+	background: -webkit-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
+	background: -ms-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
+	
+}
+
+#stats label {
+	width		: 200px;
+	text-align	: right;
+	color		: #999999;
+}
+	
 #welcome_message {
 	width: 1024px;
 	margin: auto;
-	padding: 30px;
 	font-size: 14px;
 	}
 	
@@ -129,7 +150,7 @@ body a{
 	text-decoration: none;
 	text-align: center;
 	text-shadow: 0 0 1px #999999;
-	width: 200px;
+	width: 204px;
 	cursor		: pointer;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
@@ -153,7 +174,7 @@ body a{
 	text-align	: center;
 	font-size	: 14px;
 	position	: fixed;
-	margin-left: -420px;
+	margin-left: -412px;
 }
 
 
@@ -168,7 +189,7 @@ body a{
 	text-align	: center;
 	font-size	: 14px;
 	position	: fixed;
-	margin-left: -210px;
+	margin-left : -206px;
 }
 
 .nav_button_add,
@@ -232,7 +253,7 @@ body a{
 
 #content {
     margin: 65px 30px 10px;
-    padding-bottom: 130px;
+    padding-bottom: 75px;
 }
 
 #nav_headers {

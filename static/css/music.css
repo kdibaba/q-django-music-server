@@ -21,7 +21,7 @@
 
 #albums, 
 #artists{
-	margin	: auto;
+	margin-left	: 140px;
 }
 
 #albums{
@@ -119,7 +119,8 @@
 
 .artist_info {
 	display: inline-block;
-	padding-left: 10px;
+	padding-left: 7px;
+	vertical-align	: 20px;
 }
 	
 .artist_info h1 {
@@ -241,6 +242,7 @@
 
 #album table td {
  	text-align		: left;
+	min-width	: 70px;
 }
 
 #album table tr.songs{
@@ -250,7 +252,7 @@
 }
 
 #album table tr.songs:hover {
-	background	: #DDDDDD;
+	background	: #ffffcc;
 	color		: #333333;
 }
 
@@ -270,19 +272,16 @@ td#rating_td {
 	margin: auto;
 	width: 1440px;
 	background: white;
-	border-right: 1px solid #F2F2F2;
-	border-top: 1px solid #F2F2F2;
-	border-left: 1px solid #F2F2F2;
 	box-shadow: 0px -1px 5px #DDDDDD;
 }
 
 #playlist_button {
-	background-image: linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
-	background-image: -o-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
-	background-image: -moz-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
-	background-image: -webkit-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
-	background-image: -ms-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
-	border: 1px solid #f2f2f2;
+	background: linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -o-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -moz-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -webkit-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -ms-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	border: 1px solid #CCCCCC;
 	padding: 4px;
 	width: 200px;
 	cursor: pointer;
@@ -296,8 +295,12 @@ td#rating_td {
 }
 
 #close_button {
-	background: white;
-	border: 1px solid #f2f2f2;
+	background: linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -o-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -moz-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -webkit-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -ms-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	border: 1px solid #CCCCCC;
 	padding: 4px;
 	cursor: pointer;
 	color: #666666;
@@ -309,6 +312,7 @@ td#rating_td {
 #close_button:hover {
 	color		: #ffffff;
 	background	: #999999;
+	box-shadow : 0 0 4px #999999;
 }
 
 #play_album_button,
@@ -318,7 +322,7 @@ td#rating_td {
 	background-image: -moz-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
 	background-image: -webkit-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
 	background-image: -ms-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
-	border: 1px solid #f2f2f2;
+	border: 1px solid #CCCCCC;
 	padding: 4px;
 	width: 200px;
 	cursor: pointer;
@@ -338,7 +342,7 @@ td#rating_td {
 	background-image: -moz-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
 	background-image: -webkit-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
 	background-image: -ms-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
-	border: 1px solid #f2f2f2;
+	border: 1px solid #CCCCCC;
 	padding: 4px;
 	width: 200px;
 	cursor: pointer;
@@ -376,12 +380,28 @@ td#rating_td {
 }
 
 .play_song_button {
-	background	: url('/static/images/play_small_2.png') no-repeat;
-	width		: 40px;
-	opacity		: 0.5;
+	background: url('/static/images/play_small.jpg') no-repeat;
+	width: 30px;
+	opacity: .5;
+	height: 25px;
 }
 
 .play_song_button:hover {
+	opacity		: 1;
+}
+
+.add_song_button {
+	width: 30px;
+	opacity: .5;
+	height: 25px;
+	font-size: 20px;
+	color: black;
+	background-image: url('/static/images/play_small.jpg');
+	background-repeat: no-repeat;
+	background-position: 11px;
+}
+
+.add_song_button:hover {
 	opacity		: 1;
 }
 

@@ -17,7 +17,6 @@
 	    <script src="/static/javascript/music.js" type="text/javascript" charset="utf-8"></script>
 	    {% block head %}{% endblock %}
 	    {% block extrahead %}{% endblock %}
-	    
 	</head>
 	<body>
 		<div id="site_header_wrapper">
@@ -38,7 +37,7 @@
 			<div id="navigation">
 				<div class=nav_button>
 					<div id="menu_home" onclick="location.href='/'" ><p>Home</p></div>
-					<div ondblclick="location.href='#/artists/all'" id="menu_artists">
+					<div ondblclick="location.href='#/artists/all/0/'" id="menu_artists">
 						<p>Artists</p>
 						<div class="nav_button_artists" style="display:none;">
 							{% for letter in letter_list %}
@@ -46,7 +45,7 @@
 							{% endfor %}
 						</div>
 						</div>
-					<div ondblclick="location.href='#/albums/all'" id="menu_albums">
+					<div ondblclick="location.href='#/albums/all/0/'" id="menu_albums">
 						<p>Albums</p>
 						<div class="nav_button_albums" style="display:none;">
 							{% for letter in letter_list %}
@@ -73,7 +72,8 @@
 			{% block content %}
 			<div id="message_wrapper"><div id="status_message" style="display:none;"></div></div>
 			<div id=content>
-				<center><text id="welcome">Q</text></center>
+				<!-- <center><text id="welcome">Q</text></center> -->
+				
 				<div id="welcome_message">
 					<p class="hello_msg">Hello {{ request.user.first_name }}!</p>
 				{% if not request.user.is_staff and not request.user.is_superuser %}
@@ -82,6 +82,17 @@
 					If you dont know how to reach him then you do not belong here.</p>
 					{% endif %}
 				</div>
+				
+				{% if request.user.is_superuser %}
+					<div id="stats"><h1>Status Report</h1>
+						<label>Artists : </label>{{artists_count}}<BR />
+						<label>Albums : </label>{{albums_count}}<BR />
+						<label>Songs : </label>{{songs_count}}<BR />
+						<label>Albums with Art : </label>{{album_art}}<BR />
+						<label>Albums without Art : </label>{{missing_album_art}}<BR />
+					</div>
+			   	{% endif %}
+			   	
 			</div>
 			{% endblock %}
 			</div>

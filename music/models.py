@@ -3,14 +3,14 @@ from django.db import models
 # Create your models here.
 class Music_Artist(models.Model):
     artist      = models.CharField( max_length = 200 )
-    letter      = models.CharField( max_length = 1 ) 
+    letter      = models.CharField( max_length = 2 ) 
     
 class Music_Album(models.Model):
     artist      = models.ForeignKey( Music_Artist )
     album       = models.CharField( max_length = 200 ) 
     folder      = models.CharField( max_length = 200 )
     album_size  = models.CharField( max_length = 200 )
-    letter      = models.CharField( max_length = 1 )
+    letter      = models.CharField( max_length = 2 )
     year        = models.IntegerField(null=True, blank=True)
     song_count  = models.IntegerField(null=True, blank=True)
     length      = models.CharField( max_length = 50, null=True, blank=True)
@@ -30,7 +30,7 @@ class Music_Song(models.Model):
     title       = models.CharField( max_length = 400, null=True, blank=True )
     type        = models.CharField( max_length = 200 ) 
     path        = models.CharField( max_length = 400 )
-    letter      = models.CharField( max_length = 1 ) 
+    letter      = models.CharField( max_length = 2 ) 
     rating      = models.IntegerField(null=True, blank=True)
     
     def get_file_size (self):

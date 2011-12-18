@@ -1,14 +1,14 @@
 $(document).ready(function(){
 
-	ARTISTS_HOR = parseInt($(window).width()/300);
-	ARTISTS_VERT = parseInt($(window).height()/230);
+	ARTISTS_HOR = parseInt($(window).width()/310);
+	ARTISTS_VERT = parseInt(($(window).height()-140)/230);
 	ARTISTS_COUNT = ARTISTS_HOR * ARTISTS_VERT;
 	ARTISTS_CONTENT = ''
 	ARTISTS_LETTER = ''
 	ARTISTS_PAGE = ''
 
 	ALBUMS_HOR = parseInt($(window).width()/220);
-	ALBUMS_VERT = parseInt($(window).height()/250);
+	ALBUMS_VERT = parseInt(($(window).height()-140)/250);
 	ALBUMS_COUNT = ALBUMS_HOR * ALBUMS_VERT;
 	ALBUMS_CONTENT = ''
 	ALBUMS_LETTER = ''
@@ -16,16 +16,18 @@ $(document).ready(function(){
 	ALBUMS_PAGE = ''
 		
 	$(window).resize(function() {
-		ARTISTS_HOR = parseInt($(window).width()/300);
-		ARTISTS_VERT = parseInt($(window).height()/230);
+		ARTISTS_HOR = parseInt($(window).width()/310);
+		ARTISTS_VERT = parseInt(($(window).height()-140)/230);
 		ARTISTS_COUNT = ARTISTS_HOR * ARTISTS_VERT;
 		$('#artists').css('width', ARTISTS_HOR*275+'px')
 		
 		
 		ALBUMS_HOR = parseInt($(window).width()/220);
-		ALBUMS_VERT = parseInt($(window).height()/250);
+		ALBUMS_VERT = parseInt(($(window).height()-140)/250);
 		ALBUMS_COUNT = ALBUMS_HOR * ALBUMS_VERT;
 		$('#albums').css('width', ALBUMS_HOR*170+'px')
+		
+		//window.location.reload();
 		});
 	
     //HANDLE url changes
@@ -112,3 +114,7 @@ $(document).ready(function(){
 		});
 
 });
+
+function show_hide_admin() {
+	$('#admin_pane').toggle('slow')
+}

@@ -64,7 +64,6 @@ def is_admin(request):
 
 
 def check_session(request):
-    print request.user.is_authenticated()
     status = 0
     if request.user.is_authenticated():
         status = 1

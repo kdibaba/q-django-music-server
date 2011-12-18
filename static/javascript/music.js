@@ -159,7 +159,7 @@ function show_results_artists(jsonArtists, letter) {
 	var deg = 0
 	var length = 0
 	
-	$('#content').replaceWith('<div id="content"></div>')
+	$('#content').replaceWith('<div id="content" style="display:none"></div>')
 	$('#content').append('<div id="artists"></div>');
 	$.each(artists, function(i,items){
 		$('#artists').append('<div class="artist_albums artist_albums_'+items.pk+'"></div>');
@@ -185,6 +185,7 @@ function show_results_artists(jsonArtists, letter) {
 	$('#artists').append('</ul>');
 	$('#content').prepend('<div id="nav_headers"></div>')
 	$('#nav_headers').prepend('<a class="nav_header_artists selected"  onclick="show_artist_results()">Artist (' + artist_count + ')</a>');
+	$('#content').slideDown();
 }
 
 function show_results_albums(jsonAlbums) {
@@ -214,10 +215,17 @@ function rebuild(letter) {
 	return false;  
 }
 
-function get_song(song_id) {
+function get_song(song_id, play_or_add) {
 	jQuery.ajax({
 		url: "/song/"+song_id+"/", 
-		success: function(jsonSong) {play_song(jsonSong)},
+		success: function(jsonSong){
+			if(play_or_add == 'play'){
+				play_song(jsonSong);
+				}
+			else if(play_or_add == 'add') {
+				add_song(jsonSong);
+				}
+			},
 		async	: false
 	});
 	return "/song/"+song_id+"/" ;
@@ -251,10 +259,10 @@ function next_artist_page() {
 	ARTISTS_PAGE += 1
 
 	//ARTISTS_PREV = ARTISTS_CURR
-	$('#artists').css({"margin-left" : "0px"}).animate({"margin-left" : "-2000px"}, 500, function(){
+	$('#artists').animate({opacity : 0, "margin-left" : "-1000px"}, 500, function(){
 		$('#artists').html('')
 		build_artist_page();
-		$('#artists').css({"margin" : "auto"}).show(200);
+		$('#artists').css({"margin-left" : "140px", opacity : 1}).show(200);
 	})
 	location.hash = '/artists/'+ARTISTS_LETTER+'/'+ARTISTS_PAGE+'/'
 }
@@ -263,10 +271,10 @@ function previous_artist_page() {
 	ARTISTS_PAGE -= 1
 
 	//ARTISTS_NEXT = ARTISTS_CURR
-	$('#artists').css({"margin-right" : "0px"}).animate({"margin-right" : "-2000px"}, 500, function(){
+	$('#artists').animate({opacity : 0, "margin-left" : "1000px"}, 500, function(){
 		$('#artists').html('')
 		build_artist_page();
-		$('#artists').css({"margin" : "auto"}).show(200);
+		$('#artists').css({"margin-left" : "140px", opacity : 1}).show(200);
 	})
 	location.hash = '/artists/'+ARTISTS_LETTER+'/'+ARTISTS_PAGE+'/'
 }
@@ -299,11 +307,11 @@ function build_artist_page() {
 				$('.album_art_wrapper_'+items.pk).append('<div class="artist_album album_' + item.pk+ '" style="-webkit-transform: rotate('+ deg + 'deg); -moz-transform: rotate('+ deg + 'deg)"></div>');
 				//$('.album_' + item.pk).hover(function(){$(this).css('width',  '125px')}, function(){$(this).css('width',  '44px')});
 				if (item.album_art){
-					cover_count += 1;
+					//cover_count += 1;
 					$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/albums_by_artist/'+items.pk+'\'"><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
 				else {
-					missing_cover_count += 1
-					$('.album_'+item.pk).prepend( '<div id="img_div"><img src="/static/images/default_album_art.jpg" /></div>' )}
+					//missing_cover_count += 1
+					$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/albums_by_artist/'+items.pk+'\'"><img src="/static/images/default_album_art.jpg" /></div>' )}
 				deg += 15;
 			})
 			$('.artist_albums_'+items.pk).append('<div class="artist_info artist_info_' + items.pk + '"><h1 onclick="location.href=\'/#/albums_by_artist/'+items.pk+'\'">' + items.name + '</h1></div>');
@@ -371,10 +379,10 @@ function next_album_page() {
 	ALBUMS_PAGE += 1
 
 	//ARTISTS_PREV = ARTISTS_CURR
-	$('#albums').css({"margin-left" : "0px"}).animate({"margin-left" : "-2000px"}, 500, function(){
+	$('#albums').animate({opacity : 0, "margin-left" : "-1000px"}, 500, function(){
 		$('#albums').html('')
 		build_album_page();
-		$('#albums').css({"margin" : "auto"}).show(200);
+		$('#albums').css({"margin-left" : "140px", opacity : 1}).show(200);
 	})
 	if(ALBUMS_LETTER){
 		location.hash = '/albums/'+ALBUMS_LETTER+'/'+ALBUMS_PAGE+'/';
@@ -388,10 +396,10 @@ function previous_album_page() {
 	ALBUMS_PAGE -= 1
 
 	//ARTISTS_NEXT = ARTISTS_CURR
-	$('#albums').css({"margin-right" : "0px"}).animate({"margin-right" : "-2000px"}, 500, function(){
+	$('#albums').animate({opacity : 0, "margin-left" : "1000px"}, 500, function(){
 		$('#albums').html('')
 		build_album_page();
-		$('#albums').css({"margin" : "auto"}).show(200);
+		$('#albums').css({opacity : 1, "margin-left" : "140px"}).show(200);
 	})
 	if(ALBUMS_LETTER){
 		location.hash = '/albums/'+ALBUMS_LETTER+'/'+ALBUMS_PAGE+'/';
@@ -499,10 +507,14 @@ function show_album(jsonAlbum, show_or_play) {
 		$('.current_album').append( '<h3> <item class="year" onclick="location.href=\'/#/albums_by_year/'+album.year+'\'">' + album.year + '</item> | '+album.song_count+' SONGS | ' + album.album_size + '</h3>')
 		
 		CURRENT_ALBUM = ''
-		$('#album').append('<table id="song_table"><tr><th></th><th>Title</th><th>Length</th><th>File Size</th><th>Rating</th></tr></table>')
+		$('#album').append('<table id="song_table"><tr><th>Title</th><th>Play</th><th>Add</th><th>Length</th><th>File Size</th><th>Rating</th></tr></table>')
 		$.each(album.songs, function(i,item){
 			if (item.type == "mp3"){
-				$('#song_table').append("<tr class='songs' id='song_" + item.pk + "'><td class='play_song_button' onclick=\"get_song(" + item.pk + ")\"></td><td ondblclick=\"get_song(" + item.pk + ")\">" + item.title + "</td><td>" + item.length +  "</td><td>" + item.file_size + "</td><td id='rating_td'>" + get_rating_html(item.rating, item.pk) + "</td>");
+				$('#song_table').append("<tr class='songs' id='song_" + item.pk + "'><td ondblclick=\"get_song(" + item.pk + 
+						", 'play')\">" + item.title + "</td><td title='Click here to play song.' class='play_song_button' onclick=\"get_song(" + 
+						item.pk + ", 'play')\"></td><td title='Click here to add to playlist.' class='add_song_button' onclick=\"get_song(" + item.pk + 
+						", 'add')\">+</td><td>" + item.length +  "</td><td>" + item.file_size + "</td><td id='rating_td'>" + get_rating_html(item.rating, item.pk) + 
+						"</td>");
 				
 			}
 		})
@@ -530,7 +542,8 @@ function set_rating(rating, song_id){
 		url: "/rating/" + song_id + "/" + rating + "/",
 		success: function(message){	
 					if (message == 0){display_message_alert('You do not have sufficient previleges to rate music.', false)}
-					else if (message == 1) {display_message_alert('Rating successfully applied.', true); update_rating(rating, song_id)}},
+					else if (message == 1) {display_message_alert('Rating successfully applied.', true); update_rating(rating, song_id)}
+					else {display_message_alert('Rating was not applied.', false); }},
 		async:   false
 	});
 }
@@ -563,6 +576,7 @@ function play_song(jsonSong) {
 		jPlayer: "#jquery_jplayer_1",
 		cssSelectorAncestor: "#jp_container_1"
 	},  [{	title: song.title,
+			artist: song.artist,
 			'mp3': destiny}],
 		{
 		swfPath: "/static/javascript/",
@@ -572,6 +586,37 @@ function play_song(jsonSong) {
 	NOW_PLAYING = true
 }
 
+
+function add_song(jsonSong) {
+	song = jQuery.parseJSON(jsonSong);
+	$('.songs').removeClass("now_playing")
+	$('#song_' + song.pk).addClass("now_playing")
+	
+	var destiny = song.full_path;
+	if(!jQuery.isEmptyObject(PLAYLIST.playlist)){
+		PLAYLIST.add({
+			title: song.title,
+			artist: song.artist,
+			'mp3': destiny});
+	}
+	else {
+		recreate_playlist();
+		PLAYLIST = new jPlayerPlaylist({
+			jPlayer: "#jquery_jplayer_1",
+			cssSelectorAncestor: "#jp_container_1"
+		},  [{	title: song.title,
+				artist: song.artist,
+				'mp3': destiny}],
+			{
+			swfPath: "/static/javascript/",
+			supplied: "mp3",
+			solution: "flash, html"
+		});	
+		NOW_PLAYING = true
+	}		
+	show_playlist()
+}
+
 function play_album(jsonAlbum){
 	$('.songs').removeClass("now_playing")
 	var album = jQuery.parseJSON(jsonAlbum);
@@ -579,7 +624,7 @@ function play_album(jsonAlbum){
 	var album_songs = []
 	$.each(album[0].songs, function(i,item){
 		if (item.type == 'mp3'){
-			album_songs.push({title: item.title, 'mp3': "/static/music/"+item.letter+"/"+item.path+"/"+item.filename})
+			album_songs.push({title: item.title, artist: item.artist, 'mp3': "/static/music/"+item.letter+"/"+item.path+"/"+item.filename})
 		}
 	})	
 	PLAYLIST = new jPlayerPlaylist({
@@ -638,7 +683,7 @@ function recreate_playlist(){
 }
 
 function show_playlist(){
-	final_height =  $('.jp-playlist').height()+112
+	final_height =  $('.jp-playlist').height()+132
 	$("#footer_wrapper").animate({height: final_height})
 }
 
