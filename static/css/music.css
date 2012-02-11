@@ -49,7 +49,22 @@
     display: inline-block;
     font-size: 10px;
     height: 200px;
-    width: 170px;
+    width: 200px;
+    text-align: center;
+	padding : 5px;
+}
+
+
+.album:hover {	
+	box-shadow: 0 0 5px #ccc;
+background: rgb(255,255,255); /* Old browsers */
+background: -moz-linear-gradient(top,  rgba(255,255,255,1) 0%, rgba(241,241,241,1) 50%, rgba(246,246,246,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(50%,rgba(241,241,241,1)), color-stop(100%,rgba(246,246,246,1))); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* IE10+ */
+background: linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f6f6f6',GradientType=0 ); /* IE6-9 */
 }
 
 .album text {	
@@ -63,7 +78,7 @@
 
 .album h1,
 .current_album h1 {
-    color: #0000000;
+    color: #000000;
     font-size: 11px;
     font-weight: normal;
     margin: 6px 8px 0 0;
@@ -77,7 +92,7 @@
     font-weight: normal;
     margin: 2px 2px 0 0;
     overflow: hidden;
-    white-space: nowrap;
+    white-space: normal;
 }
 
 .album h2:hover,
@@ -93,14 +108,19 @@
     font-weight: normal;
     margin: 4px 2px 0 0;
     overflow: hidden;
-    white-space: nowrap;
+    white-space: normal;
 }
 
 .year:hover {
 	text-decoration	: underline;
 	cursor		:pointer;
 	}
-		
+	
+.genre:hover {
+	text-decoration	: underline;
+	cursor		:pointer;
+	}
+	
 .artist_album {
     display: inline-block;
     font-size: 10px;
@@ -118,18 +138,21 @@
 }
 
 .artist_info {
+	padding-left: 2px;
+	vertical-align: top;
 	display: inline-block;
-	padding-left: 7px;
-	vertical-align	: 20px;
+	white-space: normal;
+	width: 115px;
+	margin-top: 30px;
 }
 	
 .artist_info h1 {
-    color: #0000000;
-    font-size: 13px;
+    color: #000000;
+    font-size: 12px;
     font-weight: normal;
     margin: 6px 8px 0 0;
     overflow: hidden;
-    white-space: nowrap;
+    white-space: normal;
 }
 
 .artist_info h1:hover{
@@ -139,17 +162,17 @@
 }
 
 .artist_info h2 {
-    color: #555555;
-    font-size: 11px;
+    color: #888888;
+    font-size: 10px;
     font-weight: normal;
     margin: 2px 2px 0 0;
-    white-space: nowrap;
+    white-space: normal;
 }
 
 
 .artist_info h3 {
     color: #777777;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: normal;
     margin: 4px 2px 0 0;
     overflow: hidden;
@@ -164,12 +187,24 @@
 }
 	
 .artist_albums {
-	width		: 265px;
-	white-space: nowrap;	
-	height		: 160px;
-	display		: inline-block;
-    overflow: hidden;
-    margin-right	: 10px
+	width: 275px;
+	white-space: normal;
+	height: 160px;
+	display: inline-block;
+	margin-right: 10px;
+}
+
+.artist_albums:hover {
+
+	box-shadow: 0 0 5px #ccc;
+background: rgb(255,255,255); /* Old browsers */
+background: -moz-linear-gradient(top,  rgba(255,255,255,1) 0%, rgba(241,241,241,1) 50%, rgba(246,246,246,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(50%,rgba(241,241,241,1)), color-stop(100%,rgba(246,246,246,1))); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* IE10+ */
+background: linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f6f6f6',GradientType=0 ); /* IE6-9 */
 }
 .current_album	{
 	width: 20%;
@@ -200,6 +235,7 @@
 	height: 123px;
 	overflow: hidden;
 	box-shadow: 0 0 10px #999;
+	margin: auto;
 }
 
 #img_div:hover {
@@ -223,35 +259,40 @@
 	margin: -1px;
 }
 
-
-#album table {
-	width: 70%;
+#current_album_songs {
+	height: 500px;
+	width: 75%;
 	border-spacing: 0;
 	border: 1px solid #DDD;
 	box-shadow: 0 0 20px #ddd;
 	padding: 20px;
-	display: inline-table;
+	display: inline-block;
 	margin-top: 30px;
+	overflow: auto;
+	}
+
+#song_table {
+	width: 100%;
 }
 
-#album table th {
+#current_album_songs table th {
  	text-align		: left;
  	padding			: 10px 0px;
  	color			: #000000;
 }
 
-#album table td {
+#current_album_songs table td {
  	text-align		: left;
 	min-width	: 70px;
 }
 
-#album table tr.songs{
+#current_album_songs table tr.songs{
 	padding		: 5px;
 	cursor		: pointer;
 	color		: #888888;
 }
 
-#album table tr.songs:hover {
+#current_album_songs table tr.songs:hover {
 	background	: #ffffcc;
 	color		: #333333;
 }
@@ -260,7 +301,7 @@ td#rating_td {
 	width : 105px;
 }
 
-#album table tr.now_playing{
+#current_album_songs table tr.now_playing{
 	padding: 5px;
 	cursor: pointer;
 	color: black;

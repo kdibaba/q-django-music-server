@@ -40,6 +40,10 @@ function handle_hash(){
 			display_message('Retrieving Albums by '+destination[2] +'....');
 			get_albums_by_artist(destination[2]);
 		}
+		else if (destination[1] == 'albums_by_genre') {
+			display_message('Retrieving Albums by genre '+destination[2] +'....');
+			get_albums_by_genre(destination[2]);
+		}		
 		else if (destination[1] == 'album_show') {
 			get_album_show(destination[2]);
 		}
@@ -61,7 +65,6 @@ function handle_hash(){
 			}
 		}
 		else if (destination[1] == 'rebuild') {
-			//alert('here')
 			display_message('Rebuilding Database....');
 			rebuild(destination[2]);
 		}
@@ -142,12 +145,12 @@ function search(text) {
 	jQuery.ajax({
 		url: "/search_music_artists/?query="+text, 
 		success: function(jsonArtists) {show_results_artists(jsonArtists, text)},
-		async	: false
+		async	: true
 	});
 	jQuery.ajax({
 		url: "/search_music_albums/?query="+text, 
 		success: function(jsonArtists) {show_results_albums(jsonArtists, text)},
-		async	: false
+		async	: true
 	});
 	return false;  
 }
@@ -170,7 +173,6 @@ function show_results_artists(jsonArtists, letter) {
 		$.each(items.albums, function(g,item){
 			if (length == g){ deg = 0;}
 			$('.album_art_wrapper_'+items.pk).append('<div class="artist_album album_' + item.pk+ '" style="-webkit-transform: rotate('+ deg + 'deg); -moz-transform: rotate('+ deg + 'deg)"></div>');
-			//$('.album_' + item.pk).hover(function(){$(this).css('width',  '125px')}, function(){$(this).css('width',  '44px')});
 			if (item.album_art){
 				$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/albums_by_artist/'+items.pk+'\'"><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
 			else {
@@ -195,13 +197,13 @@ function show_results_albums(jsonAlbums) {
 	$('#content').append('<div id="albums" style="display:none"></div>');
 	$.each(albums, function(i,item){
 		album_count+=1;
-		$('#albums').append('<div class="album album_' + item.pk+ '"><h1 class="album_name">' + item.album + '</h1>' + '</div>');
-		$('.album_' + item.pk).append('<h2 onclick="location.href=\'/#/albums_by_artist/'+item.artist_id+'\'">' + item.artist + '</h2>')
-		$('.album_' + item.pk).append('<h3> <item class="year" onclick="location.href=\'/#/albums_by_year/'+item.year+'\'">' + item.year + '</item> | ' + item.song_count + ' SONGS | ' + item.album_size + '</h3>')
+		$('#albums').append('<div class="album album2_' + item.pk+ '"><h1 class="album_name">' + item.album + '</h1>' + '</div>');
+		$('.album2_' + item.pk).append('<h2 onclick="location.href=\'/#/albums_by_artist/'+item.artist_id+'\'">' + item.artist + '</h2>')
+		$('.album2_' + item.pk).append('<h3> <item class="year" onclick="location.href=\'/#/albums_by_year/'+item.year+'\'">' + item.year + '</item> | ' + item.song_count + ' SONGS | ' + item.album_size + '</h3>')
 		if (item.album_art){
-			$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/album_show/'+item.pk+'\'"' + '><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
+			$('.album2_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/album_show/'+item.pk+'\'"' + '><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
 		else {
-			$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/album_show/'+item.pk+'\'"' + '><img src="/static/images/default_album_art.jpg" /></div>' )
+			$('.album2_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/album_show/'+item.pk+'\'"' + '><img src="/static/images/default_album_art.jpg" /></div>' )
 		}
 	})
 	$('#nav_headers').append('<a class="nav_header_albums" onclick="show_album_results()">Album (' + album_count + ')</a>');
@@ -330,7 +332,7 @@ function build_artist_page() {
 	//alert('Cover Count = ' + cover_count);
 	//alert('Missing Cover Count = ' + missing_cover_count);
 	ARTISTS_CURR = $('#artists');
-	$('#artists').css('width', ARTISTS_HOR*275+'px')
+	$('#artists').css('width', ARTISTS_HOR*320+'px')
 }
 
 function user_is_admin() {
@@ -428,7 +430,8 @@ function build_album_page() {
 		if (i >= iterator && i < iterator + ALBUMS_COUNT ) {
 			$('#albums').append('<div class="album album_' + item.pk+ '"><h1 class="album_name">' + item.album + '</h1>' + '</div>');
 			$('.album_' + item.pk).append('<h2 onclick="location.href=\'/#/albums_by_artist/'+item.artist_id+'\'">' + item.artist + '</h2>')
-			$('.album_' + item.pk).append('<h3> <item class="year" onclick="location.href=\'/#/albums_by_year/'+item.year+'/0/\'">' + item.year + '</item> | ' + item.song_count + ' SONGS | ' + item.album_size + '</h3>')
+			$('.album_' + item.pk).append('<h3> <item class="year" onclick="location.href=\'/#/albums_by_year/'+item.year+'/0/\'">' + item.year + '</item> | ' + item.song_count + 
+					' SONGS | ' + item.album_size + ' | <item class="genre" onclick="location.href=\'/#/albums_by_genre/'+item.genre_id+'/0/\'">' + item.genre + '</h3>')
 			if (item.album_art){
 				//cover_count += 1;
 				$('.album_'+item.pk).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/album_show/'+item.pk+'\'"' + '><img src="/static/music/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
@@ -441,11 +444,18 @@ function build_album_page() {
 	$('#albums').prepend('<p class="nav_header">' + ALBUMS_CONTENT.length + ' Albums</p>');
 	//alert('Cover Count = ' + cover_count);
 	//alert('Missing Cover Count = ' + missing_cover_count);
-	$('#albums').css('width', ALBUMS_HOR*170+'px')
+	$('#albums').css('width', ALBUMS_HOR*220+'px')
 }
 
 function get_albums_by_artist(artist_id) {
 	$.get("/albums_by_artist/" + artist_id + "/", function(jsonAlbums) {
+	        show_albums(jsonAlbums, '', '', 0);
+	});
+};
+
+
+function get_albums_by_genre(genre_id) {
+	$.get("/albums_by_genre/" + genre_id + "/", function(jsonAlbums) {
 	        show_albums(jsonAlbums, '', '', 0);
 	});
 };
@@ -498,7 +508,7 @@ function show_album(jsonAlbum, show_or_play) {
 	
 	$('#album').append('<h1>'+ all_album[0].album +'</h1><div class="current_album"></div>')
 	//$('#album').append( '<button id="delete_album_button" style="float:right;" onclick="delete_album('+all_album[0].pk+')">DELETE ALBUM</button>')
-	
+	$('#album').append('<div id="current_album_songs"></div>')
 	$.each(all_album, function(i,album){
 		if (album.album_art){$('.current_album').append( '<div id="curr_album_img_div"><img src="/static/music/' +album.letter+ '/' + album.folder + '/Folder.jpg' + '" /></div>' )}
 		else {$('.current_album').append( '<div id="curr_album_img_div"><img src="/static/images/default_album_art.jpg" /></div>' )}
@@ -507,11 +517,11 @@ function show_album(jsonAlbum, show_or_play) {
 		$('.current_album').append( '<h3> <item class="year" onclick="location.href=\'/#/albums_by_year/'+album.year+'\'">' + album.year + '</item> | '+album.song_count+' SONGS | ' + album.album_size + '</h3>')
 		
 		CURRENT_ALBUM = ''
-		$('#album').append('<table id="song_table"><tr><th>Title</th><th>Play</th><th>Add</th><th>Length</th><th>File Size</th><th>Rating</th></tr></table>')
+		$('#current_album_songs').append('<table id="song_table"><tr><th>Title</th><th>Artist</th><th>Genre</th><th>Play</th><th>Add</th><th>Length</th><th>File Size</th><th>Rating</th></tr></table>')
 		$.each(album.songs, function(i,item){
 			if (item.type == "mp3"){
 				$('#song_table').append("<tr class='songs' id='song_" + item.pk + "'><td ondblclick=\"get_song(" + item.pk + 
-						", 'play')\">" + item.title + "</td><td title='Click here to play song.' class='play_song_button' onclick=\"get_song(" + 
+						", 'play')\">" + item.title + "</td><td>" + item.artist + "</td><td>" + item.genre + "</td><td title='Click here to play song.' class='play_song_button' onclick=\"get_song(" + 
 						item.pk + ", 'play')\"></td><td title='Click here to add to playlist.' class='add_song_button' onclick=\"get_song(" + item.pk + 
 						", 'add')\">+</td><td>" + item.length +  "</td><td>" + item.file_size + "</td><td id='rating_td'>" + get_rating_html(item.rating, item.pk) + 
 						"</td>");
@@ -521,6 +531,12 @@ function show_album(jsonAlbum, show_or_play) {
 	
 	})	
 	if (show_or_play == 2){play_album(jsonAlbum)}
+	else {
+		var table_height = $("table").height()
+		var content_height = $('#content').height()-100
+		if (content_height > table_height) { $('#current_album_songs').css('height', table_height+'px');}
+		else {$('#current_album_songs').css('height', content_height+'px');}
+	}
 }
 
 function get_rating_html(rating, song_id){

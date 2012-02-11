@@ -21,7 +21,7 @@
 	<body>
 		<div id="site_header_wrapper">
 			<div id="site_header">
-				<qtext id="site_title">Q Music</qtext>
+				<div id="site_title">Q Music</div>
 		   		{% if request.user.is_authenticated  %}
 		   		<div id="logout">
 		   			<text>Logged In : {{request.user.username.title}} 
@@ -32,9 +32,7 @@
 		   		</div>
 		    	{% endif %}</text>
 		    </div>
-		</div>
-		<div id="site_body">
-			<div id="navigation">
+		    <div id="navigation">
 				<div class=nav_button>
 					<div id="menu_home" onclick="location.href='/'" ><p>Home</p></div>
 					<div ondblclick="location.href='#/artists/all/0/'" id="menu_artists">
@@ -69,6 +67,9 @@
 						</div>
 				</div>
 			</div>
+		</div>
+		<div id="site_body">
+			
 			{% block content %}
 			<div id="message_wrapper"><div id="status_message" style="display:none;"></div></div>
 			<div id=content>

@@ -24,6 +24,7 @@ urlpatterns = patterns('',
     (r'^album_show/(?P<album_id>\d+)/$',            'media.music.views.album'),
     (r'^album_delete/(?P<album_id>\d+)/$',          'media.music.views.delete_album'),
     (r'^albums_by_artist/(?P<artist_id>\d+)/$',     'media.music.views.albums_by_artist'),
+    (r'^albums_by_genre/(?P<genre_id>\d+)/$',       'media.music.views.albums_by_genre'),
     (r'^albums_by_year/(?P<year_id>\d+)/$',         'media.music.views.albums_by_year'),
     (r'^song/(?P<song_id>\d+)/$',                   'media.music.views.get_song'),
     
