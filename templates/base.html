@@ -2,7 +2,8 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 	<head>
-	    <title>{% block title %}Music{% endblock %}</title>
+	    <title>{% block title %}Q Music{% endblock %}</title>
+	    <LINK REL="SHORTCUT ICON" HREF="/static/images/logo_icon.jpg">
 	    <link href='http://fonts.googleapis.com/css?family=Volkhov' rel='stylesheet' type='text/css'>
 	    <link href='http://fonts.googleapis.com/css?family=Kelly+Slab' rel='stylesheet' type='text/css'>
 	    <link rel="stylesheet" type="text/css" href="/static/css/base.css" />
@@ -10,7 +11,7 @@
 	    <link type="text/css" href="/static/css/jplayer.blue.monday.css" rel="stylesheet" />
 	    <script src="/static/javascript/lib/jquery.min.js" type="text/javascript" charset="utf-8"></script>
 	    <script src="/static/javascript/lib/jquery.hoverIntent.minified.js" type="text/javascript" charset="utf-8"></script>
-	    <script src="/static/javascript/lib/jquery.jplayer.min.js" type="text/javascript" charset="utf-8"></script>
+	    <script src="/static/javascript/lib/jquery.jplayer.js" type="text/javascript" charset="utf-8"></script>
 	    <script src="/static/javascript/lib/jplayer.playlist.min.js" type="text/javascript" charset="utf-8"></script>
 	    <script src="/static/javascript/lib/spin.min.js" type="text/javascript" charset="utf-8"></script>
 	    <script src="/static/javascript/base.js" type="text/javascript" charset="utf-8"></script>
@@ -18,7 +19,7 @@
 	    {% block head %}{% endblock %}
 	    {% block extrahead %}{% endblock %}
 	</head>
-	<body>
+	<body id="{{ theme }}">
 		<div id="site_header_wrapper">
 			<div id="site_header">
 				<div id="site_title">Q Music</div>
@@ -68,10 +69,9 @@
 				</div>
 			</div>
 		</div>
-		<div id="site_body">
-			
-			{% block content %}
 			<div id="message_wrapper"><div id="status_message" style="display:none;"></div></div>
+		<div id="site_body">
+			{% block content %}
 			<div id=content>
 				<!-- <center><text id="welcome">Q</text></center> -->
 				

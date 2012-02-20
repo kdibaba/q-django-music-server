@@ -10,6 +10,7 @@ urlpatterns = patterns('',
     
     (r'^$',                                         'media.music.views.music'),
     (r'^music/$',                                   'media.music.views.music'),
+    (r'^test/$',                                   'media.music.views.catalog_drive_music'),
     (r'^login/$',                                   'media.views.user_login' ),
     (r'^logout/$',                                  'media.views.user_logout' ),
     (r'^register/$',                                'media.views.register_user' ),
@@ -29,13 +30,16 @@ urlpatterns = patterns('',
     (r'^song/(?P<song_id>\d+)/$',                   'media.music.views.get_song'),
     
     (r'^rating/(?P<song_id>\d+)/(?P<rating>\d+)/$', 'media.music.views.set_rating'),
-    
+    (r'^get_profile_song_columns/$',                'media.music.views.get_profile_song_columns'),
+    (r'^set_profile_song_columns/$',                'media.music.views.set_profile_song_columns'),
+       
     (r'^rename_nzbs/$',                             'media.music.views.rename_nzbs' ),
     (r'^filter_nzbs/$',                             'media.music.views.filter_nzbs' ),  
     (r'^update_album_art/$',                        'media.music.views.update_album_art' ),  
     
     (r'^search_music_artists/$',                    'media.music.views.search_music_artists'),
     (r'^search_music_albums/$',                     'media.music.views.search_music_albums'),
+    (r'^search_music_songs/$',                     'media.music.views.search_music_songs'),
     (r'^artists/0/$',                           'media.music.views.artists', {'letter': '0'}),
     (r'^artists/A/$',                           'media.music.views.artists', {'letter': 'A'}),
     (r'^artists/B/$',                           'media.music.views.artists', {'letter': 'B'}),

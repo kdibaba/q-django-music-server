@@ -1,7 +1,3 @@
-
-from __future__ import with_statement
-import time
-
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core import serializers
@@ -25,39 +21,25 @@ GUEST_ACCESS = 50
 
 @login_required
 def music(request):
+    theme = 'theme_white'
     letter_list = LETTERS
     album_art = len(Music_Album.objects.filter(album_art=True))
     artists_count = Music_Artist.objects.count()
     albums_count = Music_Album.objects.count()
     missing_album_art = int(albums_count) - album_art
     songs_count = Music_Song.objects.count()
+    
+    profile = Profile.objects.filter(user=request.user.id)
+    if profile:
+        theme = 'theme_'+profile[0].theme
     return render_to_response('base.html', locals())
-
-
-class Timer(object):
-    def __enter__(self):
-        self.__start = time.time()
-
-    def __exit__(self, type, value, traceback):
-        # Error handling here
-        self.__finish = time.time()
-
-    def duration_in_seconds(self):
-        return self.__finish - self.__start
-
 
 @login_required
 def add_to_music_db(request):
     result = 0    
     if request.is_ajax():
         mimetype = 'application/javascript'
-
-        timer = Timer()
-        with timer:
-            # Whatever you want to measure goes here
-            catalog_drive_music('add')
-        print timer.duration_in_seconds()
-        result = 1
+        catalog_drive_music('add')
     return HttpResponse(result, mimetype)
     
 @login_required
@@ -169,122 +151,132 @@ def catalog_drive_music(type):
         directory = settings.MUSIC_DIRECTORY + letter + "/"
         files = get_folder_names(directory)
         for file_object in files:
-            try:
-                file = str(file_object).split('-')
-                album_exists = Music_Album.objects.filter(folder=str(file_object))
-                if file.__len__() > 1 and not album_exists:
-                    album_length = 0
-                    album_year = 0
-                    album_size = 0
-                    album_artist = []
-                    album_genres = {}
-                    try: songs = os.listdir(directory+str(file_object))
-                    except: songs = []
-                    
-                    artist_name = file[0].replace('.', ' ')
-                    album_artist = Music_Artist.objects.filter(artist=artist_name)
-                    if not album_artist:
-                        album_artist = Music_Artist.objects.create(artist=artist_name)
-                    else: album_artist = album_artist[0]
-                    album_name = file[1].replace('.', ' ')
-                    
-                    album_art = True
-                    if 'Folder.jpg' not in songs:
-                        album_art=False
-                    
-                    album = Music_Album.objects.create(album_genre=unknown_genre, album_artist=album_artist, album=album_name, folder=str(file_object), album_art=album_art, letter=letter)
-                    album_artist.letter = letter
-                    album_artist.save()
-                    id3_info = {}
-                    song_count = 0
-                    for song in songs:
-                        #print file, ' ----- ', song
-                        if song.rsplit('.')[-1] == 'mp3' or song.rsplit('.')[-1] == 'MP3':
-                            song_length = 0
-                            song_rating = 0
-                            song_artist = ''
-                            file_size = ''
-                            try:
-                                id3 = ID3(directory+str(file_object)+'/'+song)
-                                property = MP3(directory+str(file_object)+'/'+song)
-                                song_length = property.info.length
-                                album_length += song_length
-                                result = time.strftime('%M:%S', time.gmtime(song_length))
-                                #print directory+str(file_object)+'/'+song
-                                file_size=os.path.getsize(directory+str(file_object)+'/'+song)
-                                album_size += file_size
-                                
-                                # Song title
-                                title=''
-                                try:title=id3.getall('TIT2')[0].text[0]
-                                except:title=filename
-                                
-                                # Song genre
-                                genre=''
-                                try:
-                                    genre=id3.getall('TCON')[0].text[0]
-                                    song_genre = Music_Genre.objects.filter(genre=genre)
-                                    if not song_genre:
-                                        song_genre = Music_Genre.objects.create(genre=genre)
-                                        song_genre.save()
-                                    else: 
-                                        song_genre = song_genre[0]
-                                        if album_genres and song_genre in album_genres.keys():
-                                            album_genres[song_genre] += 1
-                                        else: album_genres[song_genre] = 0
-                                except:song_genre = unknown_genre
-                                
-                                artist_name = ''
-                                try:
-                                    artist_name=id3.getall('TPE1')[0].text[0]
-                                    song_artist = Music_Artist.objects.filter(artist=artist_name)
-                                    if not song_artist:
-                                        song_artist = Music_Artist.objects.create(artist=artist_name)
-                                        song_artist.save()
-                                    else: 
-                                        song_artist = song_artist[0]
-                                         
-                                except:song_artist = album_artist
-                                if not album_year:
-                                    try:album_year=id3.getall('TDRC')[0].text[0]
-                                    except:pass
-                                try:song_rating=get_rating(id3.getall('POPM')[0].rating)
-                                except:pass
-                                Music_Song.objects.create(song_artist=song_artist, 
-                                                          song_genre=song_genre, 
-                                                          album=album, 
-                                                          filename=song, 
-                                                          type=song.rsplit('.')[-1],
-                                                          path=str(file_object),
-                                                          title=title,
-                                                          length=str(result),
-                                                          letter=letter,
-                                                          rating=song_rating,
-                                                          file_size=str(file_size)
-                                                          )
-                                song_count += 1
-                            except:
-                                pass #exit(file_object)
-                    album.length = time.strftime('%M:%S', time.gmtime(album_length))
-                    album.song_count = song_count
-                    album.album_size = str(album_size)
-                    album.album_genre = max(album_genres, key=album_genres.get)
-                    if album_year: 
-                        string_album_year = album_year.encode('ascii','ignore')
+            album = ''
+            file = str(file_object).split('-')
+            album_exists = Music_Album.objects.filter(folder=str(file_object))
+            if file.__len__() > 1 and not album_exists:
+                album_length = 0
+                album_year = 0
+                album_size = 0
+                album_artist = []
+                album_genres = {}
+                try: songs = os.listdir(directory+str(file_object))
+                except: 
+                    print file_object, ' doesnt exist!'
+                    continue
+                
+                artist_name = file[0].replace('.', ' ')
+                album_artist = Music_Artist.objects.filter(artist=artist_name)
+                if not album_artist:
+                    album_artist = Music_Artist.objects.create(artist=artist_name)
+                else: album_artist = album_artist[0]
+                album_name = file[1].replace('.', ' ')
+                
+                album_art = True
+                if 'Folder.jpg' not in songs:
+                    album_art=False
+                
+                album = Music_Album.objects.create(album_genre=unknown_genre, album_artist=album_artist, album=album_name, folder=str(file_object), album_art=album_art, letter=letter)
+                album_artist.letter = letter
+                album_artist.save()
+                id3_info = {}
+                song_count = 0
+                for song in songs:
+                    #print file, ' ----- ', song
+                    if song.rsplit('.')[-1] == 'mp3' or song.rsplit('.')[-1] == 'MP3':
+                        song_length = 0
+                        song_rating = 0
+                        song_artist = ''
+                        file_size = ''
                         try: 
-                            album.year = int(string_album_year[0]+string_album_year[1]+string_album_year[2]+string_album_year[3])
-                            if album.year < 1800 or album.year > 2020:
-                                album.year = 0
-                        except: album.year = 0
-                    else: album.year = 0
-                    album.save()
-                    
-                else:
-                    pass
-            except:
-                print 'Excepted on ' + file_object
-    return
+                            id3 = ID3(directory+str(file_object)+'/'+song)
+                            property = MP3(directory+str(file_object)+'/'+song)
+                        except: continue
+                        song_length = property.info.length
+                        album_length += song_length
+                        result = time.strftime('%M:%S', time.gmtime(song_length))
+                        #print directory+str(file_object)+'/'+song
+                        file_size=os.path.getsize(directory+str(file_object)+'/'+song)
+                        album_size += file_size
+                                                
+                        # Song genre
+                        genre=''
+                        genres=id3.getall('TCON')
+                        song_genre = unknown_genre
+                        if genres:
+                            genre = genres[0].text
+                            if genre: 
+                                genre = genre[0]
+                                get_genre = Music_Genre.objects.filter(genre=genre)
+                                if not get_genre:
+                                    song_genre = Music_Genre.objects.create(genre=genre)
+                                else: 
+                                    song_genre = get_genre[0]
+                                    if album_genres and song_genre in album_genres.keys():
+                                        album_genres[song_genre] += 1
+                                    else: album_genres[song_genre] = 0
+                        
+                        song_artist = album_artist
+                        artist_names=id3.getall('TPE1')
+                        if artist_names:
+                            artist_name = artist_names[0].text
+                            if artist_name:
+                                artist_name = artist_name[0]
+                                get_song_artist = Music_Artist.objects.filter(artist=artist_name)
+                                if not get_song_artist:
+                                    song_artist = Music_Artist.objects.create(artist=artist_name)
+                                else: 
+                                    song_artist = get_song_artist[0]
+                            
+                        if not album_year:
+                            get_years = album_year=id3.getall('TDRC')
+                            if get_years:
+                                get_year = get_years[0].text
+                                if get_year:
+                                    album_year = get_year[0]
 
+                        safe_song = unicode(song, errors='ignore').encode('utf-8')
+                        if song != safe_song:
+                            win32file.MoveFile(directory+str(file_object)+'/'+song, directory+str(file_object)+'/'+safe_song)
+                            print 'renamed ' + song + ' to ' + safe_song
+                            
+                            
+                        # Song title
+                        title = safe_song
+                        titles = id3.getall('TIT2')
+                        if titles:
+                            get_title = titles[0].text
+                            if get_title:
+                                title = get_title[0]
+                                
+                        song_rating=get_rating(id3)
+                        Music_Song.objects.create(song_artist=song_artist, 
+                                                  song_genre=song_genre, 
+                                                  album=album, 
+                                                  filename=safe_song, 
+                                                  type=safe_song.rsplit('.')[-1],
+                                                  path=str(file_object),
+                                                  title=title,
+                                                  length=str(result),
+                                                  letter=letter,
+                                                  rating=song_rating,
+                                                  file_size=str(file_size)
+                                                  )
+                        song_count += 1
+                album.length = time.strftime('%M:%S', time.gmtime(album_length))
+                album.song_count = song_count
+                album.album_size = str(album_size)
+                if album_genres: album.album_genre = max(album_genres, key=album_genres.get)
+                
+                if album_year: 
+                    string_album_year = album_year.encode('ascii','ignore')
+                    if string_album_year: album.year = int(string_album_year[0]+string_album_year[1]+string_album_year[2]+string_album_year[3])
+                    if album.year < 1800 or album.year > 2020:
+                        album.year = 0
+                else: album.year = 0
+                album.save()
+    return #render_to_response('confirmation.html', locals())
+ 
 def update_album_art(request):
     letter_list = LETTERS
     existing_album_art = len(Music_Album.objects.filter(album_art=True))
@@ -303,13 +295,16 @@ def update_album_art(request):
     message = 'Album Art Updated<br/> Existing = ' + str(existing_album_art) + '<br />New = ' + str(new_album_art) + '<br />Missing = ' + str(len(missing_album_art))
     return render_to_response('confirmation.html', locals()) 
 
-def get_rating(rating):
-    if rating == 255:
-        return 5
-    elif rating < 255 and rating >= 196:
-        return 4
-    elif rating < 196 and rating >= 128:
-        return 3
+def get_rating(id3):
+    ratings = id3.getall('POPM')
+    if ratings:
+        rating = ratings[0].rating
+        if rating == 255:
+            return 5
+        elif rating < 255 and rating >= 196:
+            return 4
+        elif rating < 196 and rating >= 128:
+            return 3
     return 0
 
 def filter_nzbs(request):
@@ -710,7 +705,28 @@ def set_rating(request, song_id, rating):
     if request.is_ajax():
         mimetype = 'application/javascript'
     return HttpResponse(message, mimetype)
+ 
+@login_required
+def get_profile_song_columns(request):
+    columns = Profile.objects.get(user=request.user.id)
     
+    if request.is_ajax():
+        mimetype = 'application/javascript'
+    return HttpResponse(simplejson.dumps(columns.song_table_columns), mimetype)
+    
+@login_required    
+def set_profile_song_columns(request):
+    columns = Profile.objects.get(user=request.user.id)
+    if request.GET['query'] in columns.song_table_columns:
+        columns.song_table_columns = columns.song_table_columns.replace(';'+request.GET['query'], '')
+        columns.save() 
+    else:
+        columns.song_table_columns = columns.song_table_columns+';'+request.GET['query']
+        columns.save()
+    if request.is_ajax():
+        mimetype = 'application/javascript'
+    return HttpResponse(mimetype)
+        
 @login_required    
 def search_music_artists(request):
     all_artists = Music_Album.objects.all()
@@ -780,7 +796,40 @@ def search_music_albums(request):
         mimetype = 'application/javascript'
         albums = simplejson.dumps(dictionary_albums)
     return HttpResponse(albums, mimetype)
-        
+      
+      
+@login_required
+def search_music_songs(request):
+    
+    get_songs = Music_Song.objects.all()
+    all_songs = []
+    for items in get_songs:
+        if items.title:
+            if request.GET['query'].upper() in items.title.upper():
+                all_songs.append(items)
+                      
+    dictionary_songs = []
+    for song in all_songs:
+        song_dict = {}
+        song_dict['pk']  =  song.id
+        song_dict['filename']  =  song.filename
+        song_dict['length']  =  song.length
+        song_dict['title']  =  song.title
+        song_dict['artist']  =  song.song_artist.artist
+        song_dict['genre']  =  song.song_genre.genre
+        song_dict['type']  =  song.type
+        song_dict['path']  =  song.path
+        song_dict['letter']  =  song.letter
+        song_dict['rating']  =  song.rating
+        song_dict['file_size']  =  song.get_file_size()
+        dictionary_songs.append(song_dict)
+     
+    if request.is_ajax():
+        mimetype = 'application/javascript'
+        albums = simplejson.dumps(dictionary_songs)
+    return HttpResponse(albums, mimetype)
+
+
 def upload_music(request):
     letter_list = LETTERS
     if request.method == 'POST':
