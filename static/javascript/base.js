@@ -1,14 +1,14 @@
 $(document).ready(function(){
 
-	ARTISTS_HOR = parseInt($(window).width()/350);
-	ARTISTS_VERT = parseInt(($(window).height()-140)/190);
+	ARTISTS_HOR = parseInt(($(window).width()-200)/265);
+	ARTISTS_VERT = parseInt(($(window).height()-200)/135);
 	ARTISTS_COUNT = ARTISTS_HOR * ARTISTS_VERT;
 	ARTISTS_CONTENT = ''
 	ARTISTS_LETTER = ''
 	ARTISTS_PAGE = ''
 
-	ALBUMS_HOR = parseInt($(window).width()/250);
-	ALBUMS_VERT = parseInt(($(window).height()-140)/250);
+	ALBUMS_HOR = parseInt($(window).width()/220);
+	ALBUMS_VERT = parseInt(($(window).height()-140)/200);
 	ALBUMS_COUNT = ALBUMS_HOR * ALBUMS_VERT;
 	ALBUMS_CONTENT = ''
 	ALBUMS_LETTER = ''
@@ -16,18 +16,37 @@ $(document).ready(function(){
 	ALBUMS_PAGE = ''
 		
 	$(window).resize(function() {
-		ARTISTS_HOR = parseInt($(window).width()/350);
-		ARTISTS_VERT = parseInt(($(window).height()-140)/190);
+		ARTISTS_HOR = parseInt(($(window).width()-200)/265);
+		ARTISTS_VERT = parseInt(($(window).height()-200)/135);
 		ARTISTS_COUNT = ARTISTS_HOR * ARTISTS_VERT;
-		$('#artists').css('width', ARTISTS_HOR*320+'px')
+		$('#artists').css('width', ARTISTS_HOR*265+'px')
 		
 		
-		ALBUMS_HOR = parseInt($(window).width()/250);
-		ALBUMS_VERT = parseInt(($(window).height()-140)/250);
+		ALBUMS_HOR = parseInt($(window).width()/220);
+		ALBUMS_VERT = parseInt(($(window).height()-140)/200);
 		ALBUMS_COUNT = ALBUMS_HOR * ALBUMS_VERT;
-		$('#albums').css('width', ALBUMS_HOR*220+'px')
+		$('#albums').css('width', ALBUMS_HOR*200+'px')
 		
-		});
+		// Fix the jplayer dimensions on window resize;
+		if ($('div.jp-progress')){$('div.jp-progress').css("width", $(window).width()-340+'px');}
+		if ($('div.jp-time-holder')){$('div.jp-time-holder').css("width", $(window).width()-350+'px');}
+		if ($('.jp-toggles')){$('.jp-toggles').css("left", $(window).width()/2+'px');}
+		
+		// If on an album page fix the height of the song table on window resize
+		
+		if ($('#song_table_wrapper')){
+			var table_height = $("#song_table_wrapper").height();
+			var content_height = $(window).height()-310;
+			
+			if (content_height < table_height) { 
+				$('#song_table_wrapper').css('height', content_height+'px');
+			}
+			else {
+				$('#song_table_wrapper').css('height', "")
+				$('#song_table_wrapper').css('height', content_height+'px');
+			}
+		}
+	})
 	
     //HANDLE url changes
     $(window).bind( 'hashchange', function(){handle_hash()});

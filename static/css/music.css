@@ -1,5 +1,5 @@
-#next_page,
-#prev_page {
+.theme_white #next_page,
+.theme_white #prev_page {
 	background-color: #F7F7F7;
 	border: none;
 	bottom: 0;
@@ -14,14 +14,36 @@
 	-webkit-transition: width 150ms, right 150ms, background-color 150ms;
 }
 
-#next_page:hover,
-#prev_page:hover {
+.theme_white #next_page:hover,
+.theme_white #prev_page:hover {
 	background-color: #DDDDDD;
 }
 
+.theme_black #next_page,
+.theme_black #prev_page {
+	background-color: #333333;
+	border: none;
+	bottom: 0;
+	font-size: 40px;
+	padding: 0;
+	position: absolute;
+	margin: 0;
+	max-width: 150px;
+	min-width: 90px;
+	top: 0px;
+	z-index: 5;
+	-webkit-transition: width 150ms, right 150ms, background-color 150ms;
+}
+
+.theme_black #next_page:hover,
+.theme_black #prev_page:hover {
+	background-color: #555555;
+}
+
+
 #albums, 
 #artists{
-	margin-left	: 140px;
+	margin	: auto;
 }
 
 #albums{
@@ -110,40 +132,57 @@
 .album {
     display: inline-block;
     font-size: 10px;
-    height: 200px;
-    width: 200px;
+    height: 160px;
+    width: 170px;
     text-align: center;
 	padding : 5px;
 }
 
 
-.album:hover {	
+.theme_white .album:hover {	
 	box-shadow: 0 0 5px #ccc;
-background: rgb(255,255,255); /* Old browsers */
-background: -moz-linear-gradient(top,  rgba(255,255,255,1) 0%, rgba(241,241,241,1) 50%, rgba(246,246,246,1) 100%); /* FF3.6+ */
-background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(50%,rgba(241,241,241,1)), color-stop(100%,rgba(246,246,246,1))); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* Opera 11.10+ */
-background: -ms-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* IE10+ */
-background: linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* W3C */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f6f6f6',GradientType=0 ); /* IE6-9 */
+	background: rgb(255,255,255); /* Old browsers */
+	background: -moz-linear-gradient(top,  rgba(255,255,255,1) 0%, rgba(241,241,241,1) 50%, rgba(246,246,246,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(50%,rgba(241,241,241,1)), color-stop(100%,rgba(246,246,246,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* IE10+ */
+	background: linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f6f6f6',GradientType=0 ); /* IE6-9 */
+}
+
+
+.theme_black .album:hover {	
+	background: rgb(76,76,76); /* Old browsers */
+	background: -moz-linear-gradient(top,  rgba(76,76,76,1) 0%, rgba(89,89,89,1) 12%, rgba(102,102,102,1) 25%, rgba(71,71,71,1) 39%, rgba(44,44,44,1) 50%, rgba(43,43,43,1) 75%, rgba(28,28,28,1) 91%, rgba(19,19,19,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(76,76,76,1)), color-stop(12%,rgba(89,89,89,1)), color-stop(25%,rgba(102,102,102,1)), color-stop(39%,rgba(71,71,71,1)), color-stop(50%,rgba(44,44,44,1)), color-stop(75%,rgba(43,43,43,1)), color-stop(91%,rgba(28,28,28,1)), color-stop(100%,rgba(19,19,19,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  rgba(76,76,76,1) 0%,rgba(89,89,89,1) 12%,rgba(102,102,102,1) 25%,rgba(71,71,71,1) 39%,rgba(44,44,44,1) 50%,rgba(43,43,43,1) 75%,rgba(28,28,28,1) 91%,rgba(19,19,19,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  rgba(76,76,76,1) 0%,rgba(89,89,89,1) 12%,rgba(102,102,102,1) 25%,rgba(71,71,71,1) 39%,rgba(44,44,44,1) 50%,rgba(43,43,43,1) 75%,rgba(28,28,28,1) 91%,rgba(19,19,19,1) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  rgba(76,76,76,1) 0%,rgba(89,89,89,1) 12%,rgba(102,102,102,1) 25%,rgba(71,71,71,1) 39%,rgba(44,44,44,1) 50%,rgba(43,43,43,1) 75%,rgba(28,28,28,1) 91%,rgba(19,19,19,1) 100%); /* IE10+ */
+	background: linear-gradient(top,  rgba(76,76,76,1) 0%,rgba(89,89,89,1) 12%,rgba(102,102,102,1) 25%,rgba(71,71,71,1) 39%,rgba(44,44,44,1) 50%,rgba(43,43,43,1) 75%,rgba(28,28,28,1) 91%,rgba(19,19,19,1) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4c4c4c', endColorstr='#131313',GradientType=0 ); /* IE6-9 */
 }
 
 .album text {	
 	color	: #999999;
 }
 
-#album h1 {
-	color: #444444;
+.theme_white #album h1 {
 	font-size: 16px;
 	background: -webkit-gradient(linear, left top, left bottom, from(#bbb), to(#000));
 	-webkit-background-clip: text;
 	-webkit-text-fill-color: transparent;
 }
 
+.theme_black #album h1 {
+	font-size: 16px;
+	background: -webkit-gradient(linear, left top, left bottom, from(#CCC), to(#FFF));
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
 .album h1,
 .current_album h1 {
-    color: #000000;
     font-size: 11px;
     font-weight: normal;
     margin: 6px 8px 0 0;
@@ -152,7 +191,6 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', end
 }
 .album h2,
 .current_album h2 {
-    color: #555555;
     font-size: 11px;
     font-weight: normal;
     margin: 2px 2px 0 0;
@@ -163,17 +201,15 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', end
 .album h2:hover,
 .current_album h2:hover {
     text-decoration : underline;
-    color			: #333333;
     cursor			: pointer;
 }
 .album h3,
 .current_album h3 {
-    color: #777777;
     font-size: 10px;
     font-weight: normal;
     margin: 4px 2px 0 0;
     overflow: hidden;
-    white-space: normal;
+    white-space: nowrap;
 }
 
 .year:hover {
@@ -191,14 +227,14 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', end
     font-size: 10px;
     height: 100px;
     width: 0px;
-    -webkit-transform-origin-x: 49px;
-	-webkit-transform-origin-y: 49px;
-    -moz-transform-origin: 49px 49px;
+    -webkit-transform-origin-x: 39px;
+	-webkit-transform-origin-y: 39px;
+    -moz-transform-origin: 39px 39px;
 }
 
 .artist_album img {
-	width: 100px;
-	height: 100px;
+	width: 80px;
+	height: 80px;
 	margin: -1px;
 }
 
@@ -212,7 +248,6 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', end
 }
 	
 .artist_info h1 {
-    color: #000000;
     font-size: 12px;
     font-weight: normal;
     margin: 6px 8px 0 0;
@@ -222,12 +257,10 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', end
 
 .artist_info h1:hover{
     text-decoration : underline;
-    color			: #333333;
     cursor			: pointer;
 }
 
 .artist_info h2 {
-    color: #888888;
     font-size: 10px;
     font-weight: normal;
     margin: 2px 2px 0 0;
@@ -236,7 +269,6 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', end
 
 
 .artist_info h3 {
-    color: #777777;
     font-size: 10px;
     font-weight: normal;
     margin: 4px 2px 0 0;
@@ -245,32 +277,45 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', end
 }
 
 .album_art_wrapper {
-	height: 100px;
+	height: 80px;
 	margin: 28px;
-	width: 100px;
+	width: 80px;
 	display: inline-block;
 }
 	
 .artist_albums {
-	width: 275px;
+	width: 255px;
 	white-space: normal;
-	height: 160px;
+	height: 135px;
 	display: inline-block;
 	margin-right: 10px;
 }
 
-.artist_albums:hover {
-
+.theme_white .artist_albums:hover {
 	box-shadow: 0 0 5px #ccc;
-background: rgb(255,255,255); /* Old browsers */
-background: -moz-linear-gradient(top,  rgba(255,255,255,1) 0%, rgba(241,241,241,1) 50%, rgba(246,246,246,1) 100%); /* FF3.6+ */
-background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(50%,rgba(241,241,241,1)), color-stop(100%,rgba(246,246,246,1))); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* Opera 11.10+ */
-background: -ms-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* IE10+ */
-background: linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* W3C */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f6f6f6',GradientType=0 ); /* IE6-9 */
+	background: rgb(255,255,255); /* Old browsers */
+	background: -moz-linear-gradient(top,  rgba(255,255,255,1) 0%, rgba(241,241,241,1) 50%, rgba(246,246,246,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(50%,rgba(241,241,241,1)), color-stop(100%,rgba(246,246,246,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* IE10+ */
+	background: linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(241,241,241,1) 50%,rgba(246,246,246,1) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f6f6f6',GradientType=0 ); /* IE6-9 */
 }
+
+.theme_black .artist_albums:hover {
+	background: rgb(76,76,76); /* Old browsers */
+	background: -moz-linear-gradient(top,  rgba(76,76,76,1) 0%, rgba(89,89,89,1) 12%, rgba(102,102,102,1) 25%, rgba(71,71,71,1) 39%, rgba(44,44,44,1) 50%, rgba(43,43,43,1) 75%, rgba(28,28,28,1) 91%, rgba(19,19,19,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(76,76,76,1)), color-stop(12%,rgba(89,89,89,1)), color-stop(25%,rgba(102,102,102,1)), color-stop(39%,rgba(71,71,71,1)), color-stop(50%,rgba(44,44,44,1)), color-stop(75%,rgba(43,43,43,1)), color-stop(91%,rgba(28,28,28,1)), color-stop(100%,rgba(19,19,19,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  rgba(76,76,76,1) 0%,rgba(89,89,89,1) 12%,rgba(102,102,102,1) 25%,rgba(71,71,71,1) 39%,rgba(44,44,44,1) 50%,rgba(43,43,43,1) 75%,rgba(28,28,28,1) 91%,rgba(19,19,19,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  rgba(76,76,76,1) 0%,rgba(89,89,89,1) 12%,rgba(102,102,102,1) 25%,rgba(71,71,71,1) 39%,rgba(44,44,44,1) 50%,rgba(43,43,43,1) 75%,rgba(28,28,28,1) 91%,rgba(19,19,19,1) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  rgba(76,76,76,1) 0%,rgba(89,89,89,1) 12%,rgba(102,102,102,1) 25%,rgba(71,71,71,1) 39%,rgba(44,44,44,1) 50%,rgba(43,43,43,1) 75%,rgba(28,28,28,1) 91%,rgba(19,19,19,1) 100%); /* IE10+ */
+	background: linear-gradient(top,  rgba(76,76,76,1) 0%,rgba(89,89,89,1) 12%,rgba(102,102,102,1) 25%,rgba(71,71,71,1) 39%,rgba(44,44,44,1) 50%,rgba(43,43,43,1) 75%,rgba(28,28,28,1) 91%,rgba(19,19,19,1) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4c4c4c', endColorstr='#131313',GradientType=0 ); /* IE6-9 */
+
+}
+
+
 .current_album	{
 	width: 20%;
 	display: inline-block;
@@ -289,15 +334,15 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', end
 	height: 200px;
 }
 #img_div {
-	width: 98px;
-	height: 98px;
+	width: 79px;
+	height: 79px;
 	overflow: hidden;
 	box-shadow: 0 0 10px #999;
 }
 
 .album #img_div {
-	width: 123px;
-	height: 123px;
+	width: 79px;
+	height: 79px;
 	overflow: hidden;
 	box-shadow: 0 0 10px #999;
 	margin: auto;
@@ -319,8 +364,8 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', end
 }
 
 .album img {
-	width: 125px;
-	height: 125px;
+	width: 80px;
+	height: 80px;
 	margin: -1px;
 }
 
@@ -335,45 +380,83 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', end
 	width: 75%;
 	}
 
-#song_table {
+#song_table_wrapper {
+	overflow: auto;
+}
+	
+table#song_table {
+	text-align	: left;
 	width: 100%;
 	border-spacing: 0px;
-	overflow: auto;
+}
+	
+.theme_white #song_table {
 	border: 1px solid #DDD;
 }
 
-#current_album_songs #song_table_header {
+.theme_black #song_table {
+	border: 1px solid #777777;
+}
+
+#current_album_songs #song_table_header th {
+	font-size		: 13px;
+	height: 32px;
+}
+
+#current_album_songs #song_table tr {
+	height: 20px;
+}
+
+.theme_white #current_album_songs #song_table_header {
+ 	color			: #000000;
+	background: rgb(247,247,247); /* Old browsers */
+	background: -moz-linear-gradient(top,  rgba(247,247,247,1) 0%, rgba(229,229,229,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(247,247,247,1)), color-stop(100%,rgba(229,229,229,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  rgba(247,247,247,1) 0%,rgba(229,229,229,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  rgba(247,247,247,1) 0%,rgba(229,229,229,1) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  rgba(247,247,247,1) 0%,rgba(229,229,229,1) 100%); /* IE10+ */
+	background: linear-gradient(top,  rgba(247,247,247,1) 0%,rgba(229,229,229,1) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', endColorstr='#e5e5e5',GradientType=0 ); /* IE6-9 */
+}
+
+.theme_black #current_album_songs #song_table_header {
  	padding-top		: 10px;
  	padding-bottom	: 7px;
- 	color			: #000000;
-background: rgb(247,247,247); /* Old browsers */
-background: -moz-linear-gradient(top,  rgba(247,247,247,1) 0%, rgba(229,229,229,1) 100%); /* FF3.6+ */
-background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(247,247,247,1)), color-stop(100%,rgba(229,229,229,1))); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(top,  rgba(247,247,247,1) 0%,rgba(229,229,229,1) 100%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(top,  rgba(247,247,247,1) 0%,rgba(229,229,229,1) 100%); /* Opera 11.10+ */
-background: -ms-linear-gradient(top,  rgba(247,247,247,1) 0%,rgba(229,229,229,1) 100%); /* IE10+ */
-background: linear-gradient(top,  rgba(247,247,247,1) 0%,rgba(229,229,229,1) 100%); /* W3C */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', endColorstr='#e5e5e5',GradientType=0 ); /* IE6-9 */
-
-	border-bottom: 1px solid #EEE;
+	background: rgb(102,102,102); /* Old browsers */
+	background: -moz-linear-gradient(top,  rgba(102,102,102,1) 0%, rgba(150,150,150,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(102,102,102,1)), color-stop(100%,rgba(150,150,150,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  rgba(102,102,102,1) 0%,rgba(150,150,150,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  rgba(102,102,102,1) 0%,rgba(150,150,150,1) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  rgba(102,102,102,1) 0%,rgba(150,150,150,1) 100%); /* IE10+ */
+	background: linear-gradient(top,  rgba(102,102,102,1) 0%,rgba(150,150,150,1) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#666666', endColorstr='#969696',GradientType=0 ); /* IE6-9 */
 }
 
 #current_album_songs .song_table_field {
  	text-align		: left;
-	display			: inline-block;
 	vertical-align: middle;
 }
 
-#current_album_songs .songs{
+.theme_white #current_album_songs .songs{
 	cursor		: pointer;
 	color		: #888888;
-	border-top: 1px solid #F2F2F2;
-	
+	background	: #ffffff;
 }
 
-#current_album_songs .songs:hover {
+.theme_white #current_album_songs .songs:hover {
 	color		: #333333;
 	background	: #FAFAFA;
+}
+
+.theme_black #current_album_songs .songs{
+	cursor		: pointer;
+	color		: #555555;
+	background	: #fafafa;
+}
+
+.theme_black #current_album_songs .songs:hover {
+	color		: #333333;
+	background	: #dddddd;
 }
 
 .title_column,
@@ -384,19 +467,9 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', end
 .add_column,
 .file_size_column,
 .length_column {
- 	display 	: inline-block;
  	padding-left	: 5px;
 }
 
-
-.title_column {		width   : 30%}
-.artist_column {	width 	: 20%}
-.genre_column {		width   : 10%}
-.play_column {		width   : 50px}
-.add_column {		width   : 50px}
-.file_size_column {	width   : 50px}
-.length_column {	width   : 50px}
-.rating_column {	width 	: 110px}
 
 #current_album_songs .now_playing{
 	padding: 5px;
@@ -408,7 +481,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7f7f7', end
 
 #playlist_button_wrapper {
 	margin: auto;
-	width: 1440px;
+	width: 100%;
 	background: white;
 	box-shadow: 0px -1px 5px #DDDDDD;
 }

@@ -3,22 +3,57 @@ body {
 	padding:0; 
 	font-size:12px; 
 	font-family:Volkhov; 
+    -webkit-transition	: all .7s ease-in-out;
+    -moz-transition		: all .7s ease-in-out;
+    -o-transition		: all .7s ease-in-out;
 }
 
-body#theme_white { 
+body.theme_white { 
 	color: #555555;
 	background: #ffffff;
-	}
+}
 
-body#theme_black { 
+body.theme_black { 
 	color: #f2f2f2;
-	background: #3D3D3D;
+	background: #000000;
 }
 
 body a{ 
 	color: #555555;
 }
 	
+body.theme_white a{ 
+	color: #333333;
+}
+
+body.theme_black a{ 
+	color: #DDDDDD;
+}
+
+.theme_white h1 {
+	color	: #000000;
+}
+
+.theme_white h2 {
+	color 	: #444444;
+}
+
+.theme_white h3 {
+	color	: #999999;
+}
+
+.theme_black h1 {
+	color	: #FFFFFF;
+}
+
+.theme_black h2 {
+	color 	: #CCCCCC;
+}
+
+.theme_black h3 {
+	color	: #999999;
+}
+
 #site_header_wrapper { 
 	margin: 0;
 	width: 100%;
@@ -29,10 +64,10 @@ body a{
 }
 
 #site_header {
-    height: 30px;
+    height: 33px;
 }
 
-#theme_white #site_header{
+.theme_white #site_header{
 	background: linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
 	background: -o-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
 	background: -moz-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
@@ -40,50 +75,62 @@ body a{
 	background: -ms-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
 	border-bottom: 1px solid #DDD;
 }
-#theme_black #site_header{
-background: rgb(76,76,76); /* Old browsers */
-background: -moz-linear-gradient(top,  rgba(76,76,76,1) 0%, rgba(89,89,89,1) 12%, rgba(102,102,102,1) 25%, rgba(71,71,71,1) 39%, rgba(44,44,44,1) 50%, rgba(0,0,0,1) 51%, rgba(17,17,17,1) 60%, rgba(43,43,43,1) 76%, rgba(28,28,28,1) 91%, rgba(19,19,19,1) 100%); /* FF3.6+ */
-background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(76,76,76,1)), color-stop(12%,rgba(89,89,89,1)), color-stop(25%,rgba(102,102,102,1)), color-stop(39%,rgba(71,71,71,1)), color-stop(50%,rgba(44,44,44,1)), color-stop(51%,rgba(0,0,0,1)), color-stop(60%,rgba(17,17,17,1)), color-stop(76%,rgba(43,43,43,1)), color-stop(91%,rgba(28,28,28,1)), color-stop(100%,rgba(19,19,19,1))); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(top,  rgba(76,76,76,1) 0%,rgba(89,89,89,1) 12%,rgba(102,102,102,1) 25%,rgba(71,71,71,1) 39%,rgba(44,44,44,1) 50%,rgba(0,0,0,1) 51%,rgba(17,17,17,1) 60%,rgba(43,43,43,1) 76%,rgba(28,28,28,1) 91%,rgba(19,19,19,1) 100%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(top,  rgba(76,76,76,1) 0%,rgba(89,89,89,1) 12%,rgba(102,102,102,1) 25%,rgba(71,71,71,1) 39%,rgba(44,44,44,1) 50%,rgba(0,0,0,1) 51%,rgba(17,17,17,1) 60%,rgba(43,43,43,1) 76%,rgba(28,28,28,1) 91%,rgba(19,19,19,1) 100%); /* Opera 11.10+ */
-background: -ms-linear-gradient(top,  rgba(76,76,76,1) 0%,rgba(89,89,89,1) 12%,rgba(102,102,102,1) 25%,rgba(71,71,71,1) 39%,rgba(44,44,44,1) 50%,rgba(0,0,0,1) 51%,rgba(17,17,17,1) 60%,rgba(43,43,43,1) 76%,rgba(28,28,28,1) 91%,rgba(19,19,19,1) 100%); /* IE10+ */
-background: linear-gradient(top,  rgba(76,76,76,1) 0%,rgba(89,89,89,1) 12%,rgba(102,102,102,1) 25%,rgba(71,71,71,1) 39%,rgba(44,44,44,1) 50%,rgba(0,0,0,1) 51%,rgba(17,17,17,1) 60%,rgba(43,43,43,1) 76%,rgba(28,28,28,1) 91%,rgba(19,19,19,1) 100%); /* W3C */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4c4c4c', endColorstr='#131313',GradientType=0 ); /* IE6-9 */
-
-	border-bottom: 1px solid #DDD;
+.theme_black #site_header{
+	background: rgb(69,72,77); /* Old browsers */
+	background: -moz-linear-gradient(top,  rgba(69,72,77,1) 0%, rgba(0,0,0,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(69,72,77,1)), color-stop(100%,rgba(0,0,0,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  rgba(69,72,77,1) 0%,rgba(0,0,0,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  rgba(69,72,77,1) 0%,rgba(0,0,0,1) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  rgba(69,72,77,1) 0%,rgba(0,0,0,1) 100%); /* IE10+ */
+	background: linear-gradient(top,  rgba(69,72,77,1) 0%,rgba(0,0,0,1) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#45484d', endColorstr='#000000',GradientType=0 ); /* IE6-9 */
+	border-bottom: 1px solid #444444;
 }
 
 #site_header text{
     font-size	: 12px;
 }
 
-#theme_white #site_header text{
+.theme_white #site_header text{
     color: #9E0800;
-    text-shadow: 3px 0 8px white;
     font-size	: 12px;
 }
 
-#theme_black #site_header text{
-    color: #fafafa;
+.theme_black #site_header text{
+    color: #999999;
     font-size	: 12px;
 }
+
 #site_header a{
 	font-size: 14px;
-	text-shadow: 3px 0 8px white;
 	text-decoration: none;
-	background: white;
 	padding: 1px 20px;
-	border: 1px solid #DDD;
 	margin-left: 10px;
     -webkit-transition	: all .3s ease-in-out;
     -moz-transition		: all .3s ease-in-out;
     -o-transition		: all .3s ease-in-out;
 }
 
-#site_header a:hover{
+.theme_white #site_header a{
+	text-shadow: 0 0 2px #dddddd;
+	background: #ffffff;
+	border: 1px solid #DDD;
+}
+
+.theme_black #site_header a{
+	text-shadow: 0 0 2px #000000;
+	background: #777777;
+	border: 1px solid #999999;
+}
+
+.theme_white #site_header a:hover{
     box-shadow	: 0 0 5px #999999;
 }
 
+
+.theme_black #site_header a:hover{
+    box-shadow	: 0 0 5px #eeeeee;
+}
 
 #logout {
 	margin-right: 20px;
@@ -96,11 +143,11 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4c4c4c', end
 	float: left;
 }
 
-#theme_black #site_title {
+.theme_black #site_title {
 	color: #ffffff;
 }
 
-#theme_white #site_title {
+.theme_white #site_title {
 	color: #575757;
 	text-shadow: 3px 0 8px white;
 }
@@ -113,14 +160,22 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4c4c4c', end
 	margin: auto;
 	width: 100%;
 	height: 40px;
+}
+
+.theme_white #navigation {
+	margin: auto;
+	width: 100%;
+	height: 40px;
 	background	: #ffffff;
 }
 
-#menu_home,
-#menu_albums,
-#menu_artists,
-#menu_add_music,
-#menu_search {
+.theme_black #navigation {
+	margin: auto;
+	width: 100%;
+	height: 40px;
+	background	: #000000;
+}
+#menu_home,#menu_albums,#menu_artists,#menu_add_music,#menu_search {
 	background: transparent;
 	display		: inline-block;
 	text-decoration: none;
@@ -136,11 +191,20 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4c4c4c', end
 	box-shadow: 0 0 5px #DDDDDD;
 }
 
-#menu_home:hover,
-#menu_artists:hover,
-#menu_add_music:hover,
-#menu_search:hover,
-#menu_albums:hover {
+.theme_white #menu_home,.theme_white #menu_albums,.theme_white #menu_artists,.theme_white #menu_add_music,.theme_white #menu_search {
+	box-shadow: 0 0 5px #DDDDDD;
+}
+
+.theme_black #menu_home,.theme_black #menu_albums,.theme_black #menu_artists,.theme_black #menu_add_music,.theme_black #menu_search {
+	box-shadow: 0 0 5px #999999;
+}
+
+
+.theme_white #menu_home:hover,
+.theme_white #menu_artists:hover,
+.theme_white #menu_add_music:hover,
+.theme_white #menu_search:hover,
+.theme_white #menu_albums:hover {
 	background: linear-gradient(bottom, #f7f7f7 7%, #EEEEEE 54%);
 	background: -o-linear-gradient(bottom, #f7f7f7 7%, #EEEEEE 54%);
 	background: -moz-linear-gradient(bottom, #f7f7f7 7%, #EEEEEE 54%);
@@ -148,6 +212,21 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4c4c4c', end
 	background: -ms-linear-gradient(bottom, #f7f7f7 7%, #EEEEEE 54%);
 }
 
+.theme_black #menu_home:hover,
+.theme_black #menu_artists:hover,
+.theme_black #menu_add_music:hover,
+.theme_black #menu_search:hover,
+.theme_black #menu_albums:hover {
+	background: rgb(125,126,125); /* Old browsers */
+	background: -moz-linear-gradient(top,  rgba(125,126,125,1) 0%, rgba(14,14,14,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(125,126,125,1)), color-stop(100%,rgba(14,14,14,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  rgba(125,126,125,1) 0%,rgba(14,14,14,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  rgba(125,126,125,1) 0%,rgba(14,14,14,1) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  rgba(125,126,125,1) 0%,rgba(14,14,14,1) 100%); /* IE10+ */
+	background: linear-gradient(top,  rgba(125,126,125,1) 0%,rgba(14,14,14,1) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7d7e7d', endColorstr='#0e0e0e',GradientType=0 ); /* IE6-9 */
+
+}
 #searchBox {
 	margin-top: 6px;
 	width: 215px;
@@ -231,21 +310,91 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4c4c4c', end
 	text-shadow: 0 0 2px #777777;
 }
 
+
+
+.theme_black #searchBox {
+	color: #888;
+	border: 1px solid #DDDDDD;
+	height: 19px;
+}
+
+.theme_black .nav_button {
+	height: 100%;
+	margin: auto;
+	width: 920px;
+	text-align	: center;
+	font-size: 12px;
+}
+
+
+.theme_black .nav_button a:hover {  
+	text-shadow: 0 0 1px #FFFFFF;
+}
+
+.theme_black .nav_button_albums,
+.theme_black .nav_button_artists,
+.theme_black .nav_button_add,
+.theme_black .nav_button_search{
+background: rgb(125,126,125); /* Old browsers */
+background: -moz-radial-gradient(center, ellipse cover,  rgba(125,126,125,1) 0%, rgba(14,14,14,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(125,126,125,1)), color-stop(100%,rgba(14,14,14,1))); /* Chrome,Safari4+ */
+background: -webkit-radial-gradient(center, ellipse cover,  rgba(125,126,125,1) 0%,rgba(14,14,14,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-radial-gradient(center, ellipse cover,  rgba(125,126,125,1) 0%,rgba(14,14,14,1) 100%); /* Opera 12+ */
+background: -ms-radial-gradient(center, ellipse cover,  rgba(125,126,125,1) 0%,rgba(14,14,14,1) 100%); /* IE10+ */
+background: radial-gradient(center, ellipse cover,  rgba(125,126,125,1) 0%,rgba(14,14,14,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7d7e7d', endColorstr='#0e0e0e',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
+}
+
+
+
+.theme_black .sub_menu_link{
+	text-shadow: 0 0 1px #999999;
+}
+
+.theme_black .sub_menu_link:hover{  
+	text-shadow: 0 0 2px #777777;
+}
+
 #stats {
 	width: 800px;
 	font-size	: 20px;
-	color: #8D2100;
-	border: 1px solid #F2F2F2;
 	margin	: auto;
 	padding		: 20px;
-	background: linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
-	background: -o-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
-	background: -moz-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
-	background: -webkit-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
-	background: -ms-linear-gradient(bottom, #EEE 7%, #F7F7F7 54%);
 	
 }
 
+.theme_white #stats {
+	background: rgb(238,238,238); /* Old browsers */
+	background: -moz-linear-gradient(top,  rgba(238,238,238,1) 0%, rgba(238,238,238,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(238,238,238,1)), color-stop(100%,rgba(238,238,238,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  rgba(238,238,238,1) 0%,rgba(238,238,238,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  rgba(238,238,238,1) 0%,rgba(238,238,238,1) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  rgba(238,238,238,1) 0%,rgba(238,238,238,1) 100%); /* IE10+ */
+	background: linear-gradient(top,  rgba(238,238,238,1) 0%,rgba(238,238,238,1) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#eeeeee',GradientType=0 ); /* IE6-9 */
+	border: 1px solid #F2F2F2;
+	color: #8D2100;
+}
+	
+.theme_white #stats h1 {
+	color: #8D2100;
+}
+
+.theme_black #stats {
+background: rgb(255,255,255); /* Old browsers */
+background: -moz-linear-gradient(top,  rgba(255,255,255,1) 0%, rgba(243,243,243,1) 50%, rgba(237,237,237,1) 100%, rgba(255,255,255,1) 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(50%,rgba(243,243,243,1)), color-stop(100%,rgba(237,237,237,1)), color-stop(100%,rgba(255,255,255,1))); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(243,243,243,1) 50%,rgba(237,237,237,1) 100%,rgba(255,255,255,1) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(243,243,243,1) 50%,rgba(237,237,237,1) 100%,rgba(255,255,255,1) 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(243,243,243,1) 50%,rgba(237,237,237,1) 100%,rgba(255,255,255,1) 100%); /* IE10+ */
+background: linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(243,243,243,1) 50%,rgba(237,237,237,1) 100%,rgba(255,255,255,1) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=0 ); /* IE6-9 */
+
+	color: #8D2100;
+	border: 1px solid #999999;
+	}
+		
 #stats label {
 	width		: 200px;
 	text-align	: right;
@@ -278,11 +427,20 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4c4c4c', end
 
 #message {
 	width: 700px;
-	margin: auto;
+	margin: 25px auto;
 	text-align: center;
 	font-size: 30px;
 	padding: 165px;
+}
+
+.theme_white #message {
 	background: #F2f2f2;
+	color		: #333333;
+}
+
+.theme_black #message {
+	background: #fafafa;
+	color		: #666666;
 }
 
 #page_header {
@@ -300,35 +458,87 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#4c4c4c', end
 
 #nav_headers {
 	margin-top: 60px;
-	padding: 10px;
+	padding: 0px 10px;
+	}
+	
+.theme_white #nav_headers {
 	border-bottom: 1px solid #EEE;
 	}
 	
-.nav_header_albums,
-.nav_header_artists,
-.nav_header_songs{
+.theme_black #nav_headers {
+	border-bottom: 1px solid #999999;
+	}
+			
+#nav_header_albums,
+#nav_header_artists,
+#nav_header_songs{
 	font-size: 13px;
 	padding: 10px 50px;
 	background: #F2F2F2;
-	margin: 10px;
+	margin: 0px 10px;
+	display	: inline-block;
+	margin-bottom: -2px;
+}
+
+.theme_white #nav_header_albums,
+.theme_white #nav_header_artists,
+.theme_white #nav_header_songs{
+	background: #F2F2F2;
 	border-top	: 1px solid #EEEEEE;
 	border-right	: 1px solid #EEEEEE;
 	border-left	: 1px solid #EEEEEE;
 }
 
-.nav_header_albums:hover,
-.nav_header_artists:hover,
-.nav_header_songs:hover {
+
+.theme_black #nav_header_albums,
+.theme_black #nav_header_artists,
+.theme_black #nav_header_songs{
+	background: #555555;
+	border-top	: 1px solid #999999;
+	border-right	: 1px solid #999999;
+	border-left	: 1px solid #999999;
+}
+
+#nav_header_albums:hover,
+#nav_header_artists:hover,
+#nav_header_songs:hover {
 	cursor	: pointer;
+}
+
+
+.theme_white #nav_header_albums:hover,
+.theme_white #nav_header_artists:hover,
+.theme_white #nav_header_songs:hover {
 	background	: #F7F7F7;
 }
 
-.nav_header_albums.selected,
-.nav_header_artists.selected,
-.nav_header_songs.selected {
+
+.theme_black #nav_header_albums:hover,
+.theme_black #nav_header_artists:hover,
+.theme_black #nav_header_songs:hover {
+	background	: #333333;
+}
+
+#nav_header_albums.selected,
+#nav_header_artists.selected,
+#nav_header_songs.selected {
+}
+
+
+.theme_white #nav_header_albums.selected,
+.theme_white #nav_header_artists.selected,
+.theme_white #nav_header_songs.selected {
 	background: #FFFFFF;
 	border-bottom: 1px solid white;
-	}
+}
+
+
+.theme_black #nav_header_albums.selected,
+.theme_black #nav_header_artists.selected,
+.theme_black #nav_header_songs.selected {
+	background: #000000;
+	border-bottom: 1px solid #000000;
+}
 
 .header_button {
     height: 100%;
@@ -521,7 +731,7 @@ input:-webkit-autofill {
 	color			: #FFFFFF;
     height			: 110px;
     width			: 100%;   
-    z-index			: 2; 
+    z-index			: 10; 
     position		: fixed;
 }
 
@@ -529,7 +739,7 @@ input:-webkit-autofill {
 	bottom: 0;
 	color: white;
 	height: 112px;
-	width: 1440px;
+	width: 100%;
 	margin-left: auto;
 	margin-right: auto;
 	text-align: center;

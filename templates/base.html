@@ -19,12 +19,13 @@
 	    {% block head %}{% endblock %}
 	    {% block extrahead %}{% endblock %}
 	</head>
-	<body id="{{ theme }}">
+	<body class="{{ theme }}">
 		<div id="site_header_wrapper">
 			<div id="site_header">
 				<div id="site_title">Q Music</div>
 		   		{% if request.user.is_authenticated  %}
 		   		<div id="logout">
+		   			<button onclick="$('body').toggleClass('theme_black').toggleClass('theme_white')">Toggle Theme</button>
 		   			<text>Logged In : {{request.user.username.title}} 
 		   			[{% if request.user.is_superuser %}SuperUser
 		   			{% else %}{% if request.user.is_staff %}Member
