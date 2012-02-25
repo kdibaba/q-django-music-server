@@ -14,8 +14,17 @@ $(document).ready(function(){
 	ALBUMS_LETTER = ''
 	ALBUMS_YEAR = ''
 	ALBUMS_PAGE = ''
-		
+
+	$('body').css('height',($(window).height()-80)+'px')		
+	
+	$('.redButton').click(function(){$('body').removeClass('theme_white').removeClass('theme_black').addClass('theme_red');set_theme('red');})
+	$('.whiteButton').click(function(){$('body').removeClass('theme_red').removeClass('theme_black').addClass('theme_white');set_theme('white');})
+	$('.blackButton').click(function(){$('body').removeClass('theme_white').removeClass('theme_red').addClass('theme_black');set_theme('black');})
+
 	$(window).resize(function() {
+
+		$('body').css('height',($(window).height()-80)+'px')	
+		
 		ARTISTS_HOR = parseInt(($(window).width()-200)/265);
 		ARTISTS_VERT = parseInt(($(window).height()-200)/135);
 		ARTISTS_COUNT = ARTISTS_HOR * ARTISTS_VERT;
@@ -136,3 +145,14 @@ $(document).ready(function(){
 function show_hide_admin() {
 	$('#admin_pane').toggle('slow')
 }
+
+
+function set_theme(field){
+	jQuery.ajax({
+		url: "/set_theme/?query="+field,
+		failure: function(){
+			display_message_alert('Failed.', false);
+		},
+		async:   false
+	});
+}	

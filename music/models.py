@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 class Music_Artist(models.Model):
@@ -44,7 +45,9 @@ class Music_Song(models.Model):
             size = int(self.file_size)/(1024*1024)
             return str(size) + ' MB'
     
-class Profile(models.Model):
-    user                = models.IntegerField(null=True, blank=True, unique=True)
+class UserProfile(models.Model):
+    user                = models.ForeignKey(User, unique=True)
     theme               = models.CharField( max_length = 200, null=True, blank=True )
     song_table_columns  = models.CharField( max_length = 200, null=True, blank=True )
+    
+    

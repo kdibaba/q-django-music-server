@@ -32,6 +32,7 @@ urlpatterns = patterns('',
     (r'^rating/(?P<song_id>\d+)/(?P<rating>\d+)/$', 'media.music.views.set_rating'),
     (r'^get_profile_song_columns/$',                'media.music.views.get_profile_song_columns'),
     (r'^set_profile_song_columns/$',                'media.music.views.set_profile_song_columns'),
+    (r'^set_theme/$',                               'media.music.views.set_theme'),
        
     (r'^rename_nzbs/$',                             'media.music.views.rename_nzbs' ),
     (r'^filter_nzbs/$',                             'media.music.views.filter_nzbs' ),  

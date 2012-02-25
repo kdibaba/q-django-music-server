@@ -29,9 +29,7 @@ def music(request):
     missing_album_art = int(albums_count) - album_art
     songs_count = Music_Song.objects.count()
     
-    profile = Profile.objects.filter(user=request.user.id)
-    if profile:
-        theme = 'theme_'+profile[0].theme
+    theme = 'theme_'+request.user.get_profile().theme
     return render_to_response('base.html', locals())
 
 @login_required
@@ -708,15 +706,15 @@ def set_rating(request, song_id, rating):
  
 @login_required
 def get_profile_song_columns(request):
-    columns = Profile.objects.get(user=request.user.id)
+    columns = request.user.get_profile().song_table_columns
     
     if request.is_ajax():
         mimetype = 'application/javascript'
-    return HttpResponse(simplejson.dumps(columns.song_table_columns), mimetype)
+    return HttpResponse(simplejson.dumps(columns), mimetype)
     
 @login_required    
 def set_profile_song_columns(request):
-    columns = Profile.objects.get(user=request.user.id)
+    columns = request.user.get_profile()
     if request.GET['query'] in columns.song_table_columns:
         columns.song_table_columns = columns.song_table_columns.replace(';'+request.GET['query'], '')
         columns.save() 
@@ -726,7 +724,16 @@ def set_profile_song_columns(request):
     if request.is_ajax():
         mimetype = 'application/javascript'
     return HttpResponse(mimetype)
-        
+     
+@login_required    
+def set_theme(request):
+    profile = request.user.get_profile()
+    profile.theme = request.GET['query']
+    profile.save()
+    if request.is_ajax():
+        mimetype = 'application/javascript'
+    return HttpResponse(mimetype)
+
 @login_required    
 def search_music_artists(request):
     all_artists = Music_Album.objects.all()

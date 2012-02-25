@@ -25,7 +25,12 @@
 				<div id="site_title">Q Music</div>
 		   		{% if request.user.is_authenticated  %}
 		   		<div id="logout">
-		   			<button onclick="$('body').toggleClass('theme_black').toggleClass('theme_white')">Toggle Theme</button>
+		   			<div id="theme_wrapper">
+			   			<span>Theme :</span>
+			   			<div class="toggleButton blackButton"></div>
+			   			<div class="toggleButton whiteButton"></div>
+			   			<div class="toggleButton redButton"></div>
+		   			</div>
 		   			<text>Logged In : {{request.user.username.title}} 
 		   			[{% if request.user.is_superuser %}SuperUser
 		   			{% else %}{% if request.user.is_staff %}Member

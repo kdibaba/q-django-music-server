@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from music.views import LETTERS
 
 
+from media.music.models import *
 from media.forms import *
   
 def user_login(request):
@@ -20,7 +21,6 @@ def user_login(request):
             message = 'Your username and password didn\'t match. Please try again.'
         else:                
             login(request, user)
-            request.session.set_expiry(9999);
             if request.POST.get('home', None):
                 return HttpResponseRedirect('/')
             return HttpResponseRedirect( request.META.get('HTTP_REFERER', None) or '/')
@@ -45,7 +45,10 @@ def register_user (request):
             if user is None:
                 message = 'Registration Failed. Please try again.'
             else:
-                return render_to_response('confirmation.html', {'message': 'Registration is Complete.'})  
+                user_login = authenticate(username=username, password=password)
+                login(request, user_login)
+                UserProfile.objects.create(user=user, theme='white', song_table_columns=";")
+                return HttpResponseRedirect('/') 
     return render_to_response('register.html', locals())
 
 def user_logout(request):

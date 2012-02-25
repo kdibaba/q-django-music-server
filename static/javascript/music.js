@@ -170,9 +170,9 @@ function show_results_artists(jsonArtists, letter) {
 	var length = 0
 	
 	$('#content').replaceWith('<div id="content" style="display:none"></div>')
-	$('#content').append('<div id="artists"></div>');
+	$('#content').append('<div id="artists" style="margin-top: 20px"></div>');
 	$.each(artists, function(i,items){
-		$('#artists').append('<div class="artist_albums artist_albums_'+items.pk+'"></div>');
+		$('#artists').append('<div class="rounder artist_albums artist_albums_'+items.pk+'"></div>');
 		$('.artist_albums_'+items.pk).prepend('<div class="album_art_wrapper album_art_wrapper_' + items.pk+ '"></div>');
 		artist_count+=1;
 		deg = 15
@@ -226,7 +226,7 @@ function show_results_albums(jsonAlbums) {
 	$('#content').append('<div id="albums" style="display:none"></div>');
 	$.each(albums, function(i,item){
 		album_count+=1;
-		$('#albums').append('<div class="album album2_' + item.pk+ '"><h1 class="album_name">' + item.album + '</h1>' + '</div>');
+		$('#albums').append('<div class="rounder album album2_' + item.pk+ '"><h1 class="album_name">' + item.album + '</h1>' + '</div>');
 		$('.album2_' + item.pk).append('<h2 onclick="location.href=\'/#/albums_by_artist/'+item.artist_id+'\'">' + item.artist + '</h2>')
 		$('.album2_' + item.pk).append('<h3> <item class="year" onclick="location.href=\'/#/albums_by_year/'+item.year+'\'">' + item.year + '</item> | ' + item.song_count + ' SONGS | ' + item.album_size + '</h3>')
 		if (item.album_art){
@@ -372,14 +372,14 @@ function build_artist_page() {
 	
 	$.each(ARTISTS_CONTENT, function(i,items){
 		if (i >= iterator && i < iterator + ARTISTS_COUNT ) {
-			$('#artists').append('<div class="artist_albums artist_albums_'+items.pk+'"></div>');
+			$('#artists').append('<div class="rounder artist_albums artist_albums_'+items.pk+'"></div>');
 			$('.artist_albums_'+items.pk).prepend('<div class="album_art_wrapper album_art_wrapper_' + items.pk+ '"></div>');
 			artist_count+=1;
 			deg = 15
 			length = items.albums.length - 1;
 			$.each(items.albums, function(g,item){
 				if (length == g){ deg = 0;}
-				$('.album_art_wrapper_'+items.pk).append('<div class="artist_album album_' + item.pk+ '" style="-webkit-transform: rotate('+ deg + 'deg); -moz-transform: rotate('+ deg + 'deg)"></div>');
+				$('.album_art_wrapper_'+items.pk).append('<div class="rounder artist_album album_' + item.pk+ '" style="-webkit-transform: rotate('+ deg + 'deg); -moz-transform: rotate('+ deg + 'deg)"></div>');
 				//$('.album_' + item.pk).hover(function(){$(this).css('width',  '125px')}, function(){$(this).css('width',  '44px')});
 				if (item.album_art){
 					//cover_count += 1;
@@ -501,7 +501,7 @@ function build_album_page() {
 	$.each(ALBUMS_CONTENT, function(i,item){
 
 		if (i >= iterator && i < iterator + ALBUMS_COUNT ) {
-			$('#albums').append('<div class="album album_' + item.pk+ '"><h1 class="album_name">' + item.album + '</h1>' + '</div>');
+			$('#albums').append('<div class="rounder album album_' + item.pk+ '"><h1 class="album_name">' + item.album + '</h1>' + '</div>');
 			$('.album_' + item.pk).append('<h2 onclick="location.href=\'/#/albums_by_artist/'+item.artist_id+'\'">' + item.artist + '</h2>')
 			$('.album_' + item.pk).append('<h3> <item class="year" onclick="location.href=\'/#/albums_by_year/'+item.year+'/0/\'">' + item.year + '</item> | ' + item.song_count + 
 					' SONGS | ' + item.album_size + ' | <item class="genre" onclick="location.href=\'/#/albums_by_genre/'+item.genre_id+'/0/\'">' + item.genre + '</h3>')
