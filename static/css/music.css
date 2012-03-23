@@ -41,6 +41,27 @@
 }
 
 
+.theme_red #next_page,
+.theme_red #prev_page {
+	background-color: #680018;
+	border: none;
+	bottom: 0;
+	font-size: 40px;
+	padding: 0;
+	position: absolute;
+	margin: 0;
+	max-width: 150px;
+	min-width: 90px;
+	top: 0px;
+	z-index: 5;
+	-webkit-transition: width 150ms, right 150ms, background-color 150ms;
+}
+
+.theme_red #next_page:hover,
+.theme_red #prev_page:hover {
+	background-color: #930020;
+}
+
 #albums, 
 #artists{
 	margin	: auto;
@@ -162,12 +183,26 @@
 	background: -ms-radial-gradient(center, ellipse cover,  rgba(109,109,109,1) 0%,rgba(63,63,63,1) 100%); /* IE10+ */
 	background: radial-gradient(center, ellipse cover,  rgba(109,109,109,1) 0%,rgba(63,63,63,1) 100%); /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#6d6d6d', endColorstr='#3f3f3f',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-	box-shadow	: 0 0 20px #000000;
+	box-shadow	: 0 0 10px #000000;
 }
 
 
+.theme_red .album:hover {	
+	background: #ad0322; /* Old browsers */
+	background: -moz-linear-gradient(top,  #ad0322 0%, #8f0222 44%, #890019 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ad0322), color-stop(44%,#8f0222), color-stop(100%,#890019)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #ad0322 0%,#8f0222 44%,#890019 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #ad0322 0%,#8f0222 44%,#890019 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #ad0322 0%,#8f0222 44%,#890019 100%); /* IE10+ */
+	background: linear-gradient(top,  #ad0322 0%,#8f0222 44%,#890019 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ad0322', endColorstr='#890019',GradientType=0 ); /* IE6-9 */
+
+	box-shadow	: 0 0 10px #000000;
+}
+
 .theme_black .album:active,
-.theme_white .album:active {
+.theme_white .album:active,
+.theme_red .album:active {
 	box-shadow	: none;
 }
 .album text {	
@@ -182,6 +217,13 @@
 }
 
 .theme_black #album h1 {
+	font-size: 16px;
+	background: -webkit-gradient(linear, left top, left bottom, from(#CCC), to(#FFF));
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+}
+
+.theme_red #album h1 {
 	font-size: 16px;
 	background: -webkit-gradient(linear, left top, left bottom, from(#CCC), to(#FFF));
 	-webkit-background-clip: text;
@@ -319,11 +361,26 @@
 	background: -ms-radial-gradient(center, ellipse cover,  rgba(109,109,109,1) 0%,rgba(63,63,63,1) 100%); /* IE10+ */
 	background: radial-gradient(center, ellipse cover,  rgba(109,109,109,1) 0%,rgba(63,63,63,1) 100%); /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#6d6d6d', endColorstr='#3f3f3f',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
-	box-shadow	: 0 0 20px #000000;
+	box-shadow	: 0 0 10px #000000;
+}
+
+
+.theme_red .artist_albums:hover {	
+	background: #ad0322; /* Old browsers */
+	background: -moz-linear-gradient(top,  #ad0322 0%, #8f0222 44%, #890019 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ad0322), color-stop(44%,#8f0222), color-stop(100%,#890019)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #ad0322 0%,#8f0222 44%,#890019 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #ad0322 0%,#8f0222 44%,#890019 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #ad0322 0%,#8f0222 44%,#890019 100%); /* IE10+ */
+	background: linear-gradient(top,  #ad0322 0%,#8f0222 44%,#890019 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ad0322', endColorstr='#890019',GradientType=0 ); /* IE6-9 */
+
+	box-shadow	: 0 0 10px #000000;
 }
 
 .theme_black .artist_albums:active,
-.theme_white .artist_albums:active {
+.theme_white .artist_albums:active,
+.theme_red .artist_albums:active {
 	box-shadow	: none;
 }
 
@@ -382,6 +439,7 @@
 
 #songs #current_album_songs {
 	width	: 90%;
+	margin-left: 25px;
 }
 
 #current_album_songs {
@@ -407,6 +465,11 @@ table#song_table {
 
 .theme_black #song_table {
 	border: 1px solid #777777;
+}
+
+
+.theme_red #song_table {
+	border: 1px solid #ffffff;
 }
 
 #current_album_songs #song_table_header th {
@@ -443,9 +506,34 @@ table#song_table {
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#666666', endColorstr='#969696',GradientType=0 ); /* IE6-9 */
 }
 
+
+.theme_red #current_album_songs #song_table_header {
+ 	padding-top		: 10px;
+ 	padding-bottom	: 7px;
+	background: #eeeeee; /* Old browsers */
+	background: -moz-linear-gradient(top,  #eeeeee 0%, #cccccc 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#eeeeee), color-stop(100%,#cccccc)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #eeeeee 0%,#cccccc 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #eeeeee 0%,#cccccc 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #eeeeee 0%,#cccccc 100%); /* IE10+ */
+	background: linear-gradient(top,  #eeeeee 0%,#cccccc 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#cccccc',GradientType=0 ); /* IE6-9 */
+	color			: #6D0019;
+}
+
 #current_album_songs .song_table_field {
  	text-align		: left;
 	vertical-align: middle;
+}
+
+.theme_white #current_album_songs .song_table_field {
+	border-bottom	: 1px solid #cccccc;
+}
+.theme_black #current_album_songs .song_table_field {
+	border-bottom	: 1px solid #999;
+}
+.theme_red #current_album_songs .song_table_field {
+	border-bottom	: 1px solid #999999;
 }
 
 .theme_white #current_album_songs .songs{
@@ -469,6 +557,19 @@ table#song_table {
 	color		: #333333;
 	background	: #dddddd;
 }
+
+
+.theme_red #current_album_songs .songs{
+	cursor		: pointer;
+	color		: #ffffff;
+	background	: #820224;
+}
+
+.theme_red #current_album_songs .songs:hover {
+	color		: #6D0019;
+	background	: #dddddd;
+}
+
 
 .title_column,
 .artist_column,

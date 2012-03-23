@@ -625,7 +625,9 @@ function show_album(jsonAlbum, show_or_play) {
 
 function song_column_selector_handler() {
 	
-	$('#album_settings').click(function() {$('#song_column_selectors').toggle()})
+	$('#album_settings').click(function() {
+		$('#song_column_selectors').toggle();
+		})
 	$('.select_artist').click(function() {
 		$('.artist_column').toggle();
 		$('.select_artist').toggleClass("selected");
@@ -789,6 +791,7 @@ function play_album(jsonAlbum){
     		solution: "flash, html"
 		});	
 	NOW_PLAYING = true
+	hide_playlist()
 }
 
 function recreate_playlist(){
@@ -840,12 +843,19 @@ function recreate_playlist(){
 }
 
 function show_playlist(){
+	$('.jp-playlist li').show()
 	final_height =  $('.jp-playlist').height()+132
 	$("#footer_wrapper").animate({height: final_height})
 }
 
 function hide_playlist(){
-	$("#footer_wrapper").animate({height: '112px'})
+	$('.jp-playlist li').hide()
+	var now_playing = $('.jp-playlist li.jp-playlist-current')
+	if (now_playing){ 
+		$(now_playing).show();
+		$("#footer_wrapper").animate({height: '132px'});
+		}
+	else {$("#footer_wrapper").animate({height: '112px'})}
 }
 
 function destroy_playlist(){

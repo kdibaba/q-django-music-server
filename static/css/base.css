@@ -86,11 +86,11 @@ body.theme_red a{
 }
 
 .theme_red h2 {
-	color 	: #CCCCCC;
+	color 	: #dddddd;
 }
 
 .theme_red h3 {
-	color	: #999999;
+	color	: #bbbbbb;
 }
 
 #site_header_wrapper { 
@@ -115,14 +115,7 @@ body.theme_red a{
 	border-bottom: 1px solid #DDD;
 }
 .theme_black #site_header{
-	background: #b5b5b5; /* Old browsers */
-	background: -moz-radial-gradient(center, ellipse cover,  #b5b5b5 0%, #999999 100%); /* FF3.6+ */
-	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#b5b5b5), color-stop(100%,#999999)); /* Chrome,Safari4+ */
-	background: -webkit-radial-gradient(center, ellipse cover,  #b5b5b5 0%,#999999 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-radial-gradient(center, ellipse cover,  #b5b5b5 0%,#999999 100%); /* Opera 12+ */
-	background: -ms-radial-gradient(center, ellipse cover,  #b5b5b5 0%,#999999 100%); /* IE10+ */
-	background: radial-gradient(center, ellipse cover,  #b5b5b5 0%,#999999 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b5b5b5', endColorstr='#999999',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+	background: #000000;
 }
 .theme_red #site_header{
 	background: #a90329; /* Old browsers */
@@ -912,10 +905,10 @@ input:-webkit-autofill {
 #status_message {
 	background: #FFC;
 	width: 1024px;
-	margin: auto;
+	margin-top: 10px;
 	font-size: 18px;
 	text-align: center;
-	height: 30px;
+	height: 27px;
 	border-top: 1px solid #EEE;
 	border-bottom: 1px solid #EEE;
 	position	: absolute;

@@ -683,7 +683,7 @@ def rebuild(request, letter):
 @login_required
 def set_rating(request, song_id, rating):
     message = 0
-    if request.user.is_superuser:
+    if request.user.username == 'kdibaba':
         song = Music_Song.objects.get(id=song_id)
         path_to_song = settings.MUSIC_DIRECTORY + song.letter +"/"+song.path+"/"+song.filename
         audio = ID3(path_to_song)
@@ -838,7 +838,9 @@ def search_music_songs(request):
 
 
 def upload_music(request):
+    theme = 'theme_white'
     letter_list = LETTERS
+    theme = 'theme_'+request.user.get_profile().theme
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
@@ -846,8 +848,13 @@ def upload_music(request):
             return HttpResponseRedirect('/')
     else:
         form = UploadFileForm()
-    return render_to_response('upload.html', {'form': form})     
+    return render_to_response('upload.html',  locals())     
 
 def handle_uploaded_file(file):
-    print file
+    for key in file.keys():
+        print file[key].name
+        destination = open('L:/media/static/music/UPLOADS/'+file[key].name, 'wb+')
+        for chunk in file[key].chunks():
+            destination.write(chunk)
+        destination.close()
     return 
