@@ -16,7 +16,7 @@ import mutagen.id3
 
 
 LETTERS = ['0','A', 'B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'VA']
-SET_RATING = {'1': 32, '2': 64, '3': 128,'4':196, '5':255}
+SET_RATING = {'0': 0, '1': 32, '2': 64, '3': 128,'4':196, '5':255}
 GUEST_ACCESS = 50
 
 @login_required
@@ -550,6 +550,21 @@ def album(request, album_id):
         mimetype = 'application/javascript'
     return HttpResponse(simplejson.dumps(all_album), mimetype)
 
+
+@login_required
+def get_song(request, song_id):
+    original_song = Music_Song.objects.get(id=song_id)
+    song = {}
+    song['pk'] = original_song.id 
+    song['letter'] = original_song.letter 
+    song['path'] = original_song.path 
+    song['filename'] = original_song.filename 
+    song['title'] = original_song.title 
+    song['artist'] = original_song.song_artist.artist 
+    if request.is_ajax():
+        mimetype = 'application/javascript'
+    return HttpResponse(simplejson.dumps(song), mimetype)
+
 @login_required
 def delete_album(request, album_id):
     album = Music_Album.objects.get(id=album_id)
@@ -563,17 +578,6 @@ def delete_album(request, album_id):
         mimetype = 'application/javascript'
     return HttpResponse(message, mimetype)
 
-@login_required
-def get_song(request, song_id):
-    original_song = Music_Song.objects.get(id=song_id)
-    song = {}
-    song['pk'] = original_song.id 
-    song['full_path'] = "/static/music/"+original_song.letter+"/"+original_song.path+"/"+original_song.filename
-    song['title'] = original_song.title 
-    song['artist'] = original_song.song_artist.artist 
-    if request.is_ajax():
-        mimetype = 'application/javascript'
-    return HttpResponse(simplejson.dumps(song), mimetype)
 
 @login_required
 def albums_by_artist(request, artist_id):
@@ -858,3 +862,52 @@ def handle_uploaded_file(file):
             destination.write(chunk)
         destination.close()
     return 
+
+def copy_favs(request):
+    existing_favs = []
+    start = time.clock()
+    
+    for root, dirs, files in os.walk(settings.MUSIC_DIRECTORY+'/'+'FAVS'):
+        for file in files:
+            existing_favs.append(file)
+            
+    print 'Took ', time.clock() - start, ' to walk and find the files.'  
+
+
+    five_star_songs = Music_Song.objects.filter(rating__gte=4)
+    print 'Took ', time.clock() - start, ' to do the query.'
+                
+    
+    print 'Five Star songs - ', len(five_star_songs)    
+    print 'Existing Favs - ', len(existing_favs)
+
+    five_star_songs = five_star_songs.exclude(filename__in=existing_favs)
+    
+      
+    print 'Need to be copied - ', len(five_star_songs)
+                        
+    for songs in five_star_songs:
+        try: 
+            os.makedirs(settings.MUSIC_DIRECTORY+'/'+'FAVS'+'/'+songs.album.album_artist.artist)
+        except: 
+            pass
+        try: 
+            win32file.CopyFile(settings.MUSIC_DIRECTORY+songs.letter+'/'+songs.album.folder+'/'+songs.filename, 
+                               settings.MUSIC_DIRECTORY+'/'+'FAVS'+'/'+songs.album.album_artist.artist+'/'+songs.filename, 0)
+        except: 
+            print songs.album.folder
+    print 'Took ', time.clock() - start, ' to copy files.'
+    return music(request)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

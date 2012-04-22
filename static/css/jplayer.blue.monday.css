@@ -418,6 +418,10 @@ div.jp-type-playlist div.jp-playlist a.jp-playlist-current {
 	color:#0d88c1;
 }
 
+div.jp-type-playlist div.jp-playlist li.jp-playlist-current a.jp-playlist-item-remove{
+	display: none;
+}
+
 div.jp-type-playlist div.jp-playlist a.jp-playlist-item-remove {
 	float:right;
 	display:inline;

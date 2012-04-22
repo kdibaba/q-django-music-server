@@ -35,7 +35,8 @@ urlpatterns = patterns('',
     (r'^set_theme/$',                               'media.music.views.set_theme'),
        
     (r'^rename_nzbs/$',                             'media.music.views.rename_nzbs' ),
-    (r'^filter_nzbs/$',                             'media.music.views.filter_nzbs' ),  
+    (r'^filter_nzbs/$',                             'media.music.views.filter_nzbs' ), 
+    (r'^copy_favs/$',                             'media.music.views.copy_favs' ), 
     (r'^update_album_art/$',                        'media.music.views.update_album_art' ),  
     
     (r'^search_music_artists/$',                    'media.music.views.search_music_artists'),

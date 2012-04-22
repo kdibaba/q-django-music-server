@@ -773,6 +773,7 @@
 			}
 
 			$.jPlayer.prototype.count++; // Change static variable via prototype.
+			jPlayerObject = this
 		},
 		destroy: function() {
 			// MJP: The background change remains. Would need to store the original to restore it correctly.
@@ -1477,6 +1478,7 @@
 			}
 		},
 		volume: function(v) {
+			testing = this
 			v = this._limitValue(v, 0, 1);
 			this.options.volume = v;
 

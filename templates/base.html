@@ -15,7 +15,6 @@
 	    <script src="/static/javascript/lib/jplayer.playlist.min.js" type="text/javascript" charset="utf-8"></script>
 	    <script src="/static/javascript/lib/spin.min.js" type="text/javascript" charset="utf-8"></script>
 	    <script src="/static/javascript/base.js" type="text/javascript" charset="utf-8"></script>
-	    <script src="/static/javascript/music.js" type="text/javascript" charset="utf-8"></script>
 	    {% block head %}{% endblock %}
 	    {% block extrahead %}{% endblock %}
 	</head>
@@ -91,13 +90,14 @@
 				</div>
 				
 				{% if request.user.is_superuser %}
-					<div id="stats"><h1>Status Report</h1>
-						<label>Artists : </label>{{artists_count}}<BR />
-						<label>Albums : </label>{{albums_count}}<BR />
-						<label>Songs : </label>{{songs_count}}<BR />
-						<label>Albums with Art : </label>{{album_art}}<BR />
-						<label>Albums without Art : </label>{{missing_album_art}}<BR />
-					</div>
+					<table id="stats">
+						<tr><td colspan="0"><h1>Status Report</h1></td></tr>
+						<tr><td>Artists : </td><td>{{artists_count}}</td></tr>
+						<tr><td>Albums : </td><td>{{albums_count}}</td></tr>
+						<tr><td>Songs : </td><td>{{songs_count}}</td></tr>
+						<tr><td>Albums with Art : </td><td>{{album_art}}</td></tr>
+						<tr><td>Albums without Art : </td><td>{{missing_album_art}}</td></tr>
+					</table>
 			   	{% endif %}
 			   	
 			</div>

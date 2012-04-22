@@ -11,6 +11,7 @@ from media.music.models import *
 from media.forms import *
   
 def user_login(request):
+    theme = 'theme_white'
     form = AuthenticationForm()
     if request.method == 'POST':
         form = AuthenticationForm(request.POST)

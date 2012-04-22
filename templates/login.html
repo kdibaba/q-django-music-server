@@ -7,18 +7,18 @@
 	    <link rel="stylesheet" type="text/css" href="/static/css/base.css" />
 	    <script src="/static/javascript/lib/jquery.min.js" type="text/javascript" charset="utf-8"></script>
 	</head>
-<body>
-<div id="site_header_wrapper">
-	<div id="site_header">
-		<qtext id="site_title">Q Music</qtext>
-   		{% if request.user.is_authenticated  %}
-   		<div id="logout">
-   			<text>Logged In : {{request.user.username.upper}}</text>
-   			<a href="/logout">Logout</a>
-   		</div>
-    	{% endif %}</text>
-    </div>
-</div>
+	<body class="{{ theme }}">
+	<div id="site_header_wrapper">
+		<div id="site_header">
+			<div id="site_title">Q Music</div>
+	   		{% if request.user.is_authenticated  %}
+	   		<div id="logout">
+	   			<text>Logged In : {{request.user.username.upper}}</text>
+	   			<a href="/logout">Logout</a>
+	   		</div>
+	    	{% endif %}</text>
+	    </div>
+	</div>
 	<div id="login_form">
 		<form method="post" action="">		
 			{% if message %}
