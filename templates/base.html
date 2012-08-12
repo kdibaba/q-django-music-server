@@ -10,7 +10,6 @@
 	    <link rel="stylesheet" type="text/css" href="/static/css/music.css" />
 	    <link type="text/css" href="/static/css/jplayer.blue.monday.css" rel="stylesheet" />
 	    <script src="/static/javascript/lib/jquery.min.js" type="text/javascript" charset="utf-8"></script>
-	    <script src="/static/javascript/lib/jquery.hoverIntent.minified.js" type="text/javascript" charset="utf-8"></script>
 	    <script src="/static/javascript/lib/jquery.jplayer.js" type="text/javascript" charset="utf-8"></script>
 	    <script src="/static/javascript/lib/jplayer.playlist.min.js" type="text/javascript" charset="utf-8"></script>
 	    <script src="/static/javascript/lib/spin.min.js" type="text/javascript" charset="utf-8"></script>
@@ -31,9 +30,9 @@
 			   			<div class="toggleButton redButton"></div>
 		   			</div>
 		   			<text>Logged In : {{request.user.username.title}} 
-		   			[{% if request.user.is_superuser %}SuperUser
-		   			{% else %}{% if request.user.is_staff %}Member
-		   			{% else %}{% if not request.user.is_staff or not request.user.is_superuser %}Guest{% endif %}{% endif %}{% endif %}]</text>
+		   			{% if request.user.is_superuser %}<a href="/music_admin/">SuperUser</a>
+		   			{% else %}[{% if request.user.is_staff %}Member
+		   			{% else %}[{% if not request.user.is_staff or not request.user.is_superuser %}Guest{% endif %}]{% endif %}]{% endif %}</text>
 		   			<a href="/logout">Logout</a>
 		   		</div>
 		    	{% endif %}</text>
@@ -43,7 +42,7 @@
 					<div id="menu_home" onclick="location.href='/'" ><p>Home</p></div>
 					<div ondblclick="location.href='#/artists/all/0/'" id="menu_artists">
 						<p>Artists</p>
-						<div class="nav_button_artists" style="display:none;">
+						<div class="nav_buttons nav_button_artists" style="display:none;">
 							{% for letter in letter_list %}
 								<div class="sub_menu_link" onclick="location.href='/#/artists/{{letter}}/0/'">{{letter}}</div>
 							{% endfor %}
@@ -51,21 +50,18 @@
 						</div>
 					<div ondblclick="location.href='#/albums/all/0/'" id="menu_albums">
 						<p>Albums</p>
-						<div class="nav_button_albums" style="display:none;">
-							{% for letter in letter_list %}
+						<div class="nav_buttons nav_button_albums" style="display:none;">
+							{% for letter in albums_list %}
 								<div class="sub_menu_link" onclick="location.href='/#/albums/{{letter}}/0/'">{{letter}}</div>
 							{% endfor %}
 						</div>
 						</div>
 					<div id="menu_search">
 						<p>Search</p>
-						<div class="nav_button_search" style="display:none;">
-							<input class="" type="text" id="searchBox" placeholder="Search My Library">
-						</div>
 					</div>
-					<div id="menu_add_music">
+					<div id="menu_add">
 						<p>Add Music</p>
-						<div class="nav_button_add" style="display:none;">
+						<div class="nav_buttons nav_button_add" style="display:none;">
 							{% if request.user.is_superuser  %}<div class="sub_menu_link" onclick="add_music('add')">Add New</div>{% endif %}
 							{% if request.user.is_superuser  %}<div class="sub_menu_link" onclick="add_music('rebuild')">Rebuild DB</div>{% endif %}
 							<div class="sub_menu_link" onclick="location.href='/add_music/upload/'">Upload</div>
@@ -73,8 +69,17 @@
 						</div>
 				</div>
 			</div>
+			<div id="mask"></div>
+			<div id="searchPromptWrapper" style="display:none;">
+				<div id="searchPrompt">
+					<input class="" type="text" id="searchBox" placeholder="Search My Library" /> 
+					<button id="close_button" style="margin-top:11px;" onclick="close_search()">X</button>
+				</div>
+			</div>
 		</div>
-			<div id="message_wrapper"><div id="status_message" style="display:none;"></div></div>
+			<div id="message_wrapper">
+				<div id="status_message" style="display:none;"></div>
+			</div>
 		<div id="site_body">
 			{% block content %}
 			<div id=content>
@@ -82,14 +87,8 @@
 				
 				<div id="welcome_message">
 					<p class="hello_msg">Hello {{ request.user.first_name }}!</p>
-				{% if not request.user.is_staff and not request.user.is_superuser %}
-					<p class="warning_msg">As a guest user functionality on the site will be limited.<br/>
-					Please contact the system admin for access to the complete site. <br/><br/>
-					If you dont know how to reach him then you do not belong here.</p>
-					{% endif %}
 				</div>
 				
-				{% if request.user.is_superuser %}
 					<table id="stats">
 						<tr><td colspan="0"><h1>Status Report</h1></td></tr>
 						<tr><td>Artists : </td><td>{{artists_count}}</td></tr>
@@ -98,7 +97,6 @@
 						<tr><td>Albums with Art : </td><td>{{album_art}}</td></tr>
 						<tr><td>Albums without Art : </td><td>{{missing_album_art}}</td></tr>
 					</table>
-			   	{% endif %}
 			   	
 			</div>
 			{% endblock %}

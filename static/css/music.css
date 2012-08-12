@@ -82,6 +82,10 @@
 	box-shadow	: 0 0 10px #999999;
 }
 
+#album_settings.selected {
+	box-shadow	: 0 0 30px #dddddd inset;
+}
+
 #song_column_selectors {
 	float		: right;
 	border		: 1px solid #dddddd;
@@ -156,7 +160,7 @@
 	padding : 5px;
 }
 
-
+/*
 .theme_white .album:hover {	
 	box-shadow: 0 0 15px #ccc;
 	background: rgb(255,255,255); /* Old browsers */
@@ -196,6 +200,8 @@
 
 	box-shadow	: 0 0 10px #000000;
 }
+
+*/
 
 .theme_black .album:active,
 .theme_white .album:active,
@@ -337,6 +343,7 @@
 	margin-right: 10px;
 }
 
+/********************************
 .theme_white .artist_albums:hover {
 	box-shadow: 0 0 15px #ccc;
 	background: rgb(255,255,255); /* Old browsers */
@@ -374,6 +381,7 @@
 
 	box-shadow	: 0 0 10px #000000;
 }
+****************************************/
 
 .theme_black .artist_albums:active,
 .theme_white .artist_albums:active,
@@ -382,10 +390,10 @@
 }
 
 .current_album	{
-	width: 20%;
+	width: 270px;
 	display: inline-block;
 	vertical-align: top;
-	margin: 30px 15px;
+	margin: 70px 15px;
 	text-align	: center;
 }
 #curr_album_img_div {
@@ -409,7 +417,7 @@
 	width: 79px;
 	height: 79px;
 	overflow: hidden;
-	box-shadow: 0 0 10px #999;
+	box-shadow: 0 4px 10px #555555;
 	margin: auto;
 }
 
@@ -421,6 +429,7 @@
 #album {
 	margin: 30px auto 0px auto;
 	width	: 100%;
+	white-space: nowrap;
 	-webkit-user-select: none;
 	-khtml-user-select: none;
 	-moz-user-select: none;
@@ -620,20 +629,20 @@ table#song_table {
 	background: -moz-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
 	background: -webkit-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
 	background: -ms-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
-	border: 1px solid #CCCCCC;
-	padding: 4px;
+	padding: 1px 4px;
 	cursor: pointer;
-	color: #666666;
+	color: #666;
 	font-size: 14px;
-	margin	: 2px 6px;
-	float	: right;
+	margin: 2px 6px;
+	float: right;
+	border: none;
 }
 
 #close_button:hover {
-	color		: #ffffff;
-	background	: #999999;
-	box-shadow : 0 0 4px #999999;
+	color: black;
+	background: #EEE;
 }
+
 
 #play_album_button,
 #delete_album_button {

@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 # Create your models here.
 class Music_Artist(models.Model):
     artist              = models.CharField( max_length = 200 )
-    letter              = models.CharField( max_length = 2 ) 
+    letter              = models.CharField( max_length = 3 ) 
     
 
 class Music_Genre(models.Model):
@@ -16,10 +16,11 @@ class Music_Album(models.Model):
     album               = models.CharField( max_length = 200 ) 
     folder              = models.CharField( max_length = 200 )
     album_size          = models.CharField( max_length = 200 )
-    letter              = models.CharField( max_length = 2 )
+    letter              = models.CharField( max_length = 3 )
     year                = models.IntegerField(null=True, blank=True)
     song_count          = models.IntegerField(null=True, blank=True)
     length              = models.CharField( max_length = 50, null=True, blank=True)
+    access              = models.CharField( max_length = 100, null=True, blank=True)
     album_art           = models.BooleanField( )    
     
     def get_album_size (self):
@@ -37,8 +38,9 @@ class Music_Song(models.Model):
     title               = models.CharField( max_length = 400, null=True, blank=True )
     type                = models.CharField( max_length = 200 ) 
     path                = models.CharField( max_length = 400 )
-    letter              = models.CharField( max_length = 2 ) 
+    letter              = models.CharField( max_length = 3 ) 
     rating              = models.IntegerField(null=True, blank=True)
+    bitrate             = models.IntegerField(null=True, blank=True)
     
     def get_file_size (self):
         if self.file_size:
@@ -50,4 +52,10 @@ class UserProfile(models.Model):
     theme               = models.CharField( max_length = 200, null=True, blank=True )
     song_table_columns  = models.CharField( max_length = 200, null=True, blank=True )
     
+class Music_Playlist(models.Model):
+    user                = models.ForeignKey(User)
+    name                = models.CharField(max_length = 200)
+    note                = models.CharField(max_length = 200, null=True, blank=True)
+    song                = models.ManyToManyField(Music_Song)
+    visible_to_others   = models.BooleanField()
     

@@ -5,94 +5,113 @@ from django.utils import simplejson
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 
+from itertools import chain
+from operator import attrgetter
+
 from media.music.forms import *
 from media.music.models import *
+from media.music.utils import *
 
-import os, sys, shutil, win32file, re, time, unicodedata
+import os, sys, shutil, win32file, re, time, unicodedata, random
 
 from mutagen.id3 import ID3
 from mutagen.mp3 import MP3
+from mutagen.apev2 import APEv2
 import mutagen.id3
 
 
-LETTERS = ['0','A', 'B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'VA']
+LETTERS = ['0','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'VA', 'OST']
+ALBUMS_HEAD = ['0','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
 SET_RATING = {'0': 0, '1': 32, '2': 64, '3': 128,'4':196, '5':255}
-GUEST_ACCESS = 50
+GUEST_ACCESS = 25
 
 @login_required
 def music(request):
     theme = 'theme_white'
     letter_list = LETTERS
-    album_art = len(Music_Album.objects.filter(album_art=True))
-    artists_count = Music_Artist.objects.count()
-    albums_count = Music_Album.objects.count()
-    missing_album_art = int(albums_count) - album_art
-    songs_count = Music_Song.objects.count()
+    albums_list = ALBUMS_HEAD
     
+
+    if request.user.is_superuser or request.user.is_staff:
+        album_art = len(Music_Album.objects.filter(album_art=True))
+        artists_count = Music_Artist.objects.count()
+        albums_count = Music_Album.objects.count()
+        missing_album_art = int(albums_count) - album_art
+        songs_count = Music_Song.objects.count()
+    else:
+        album_art = len(Music_Album.objects.filter(access="public").filter(album_art=True))
+        artists_count = len(Music_Album.objects.filter(access="public").distinct("album_artist"))
+        albums_count = Music_Album.objects.filter(access="public").count()
+        missing_album_art = int(albums_count) - album_art
+        songs_count = 0
+        for album in Music_Album.objects.filter(access="public"):
+            print album.album_artist_id
+            songs_count += int(album.song_count)
+
     theme = 'theme_'+request.user.get_profile().theme
     return render_to_response('base.html', locals())
 
 @login_required
 def add_to_music_db(request):
     result = 0    
+    catalog_drive_music('add')
     if request.is_ajax():
         mimetype = 'application/javascript'
-        catalog_drive_music('add')
-    return HttpResponse(result, mimetype)
+        result = 1
+        return HttpResponse(result, mimetype)
+    else:
+        return music(request)
     
 @login_required
 def rebuild_music_db(request):
     result = 0        
+    catalog_drive_music('rebuild')
     if request.is_ajax():
         mimetype = 'application/javascript'
-        catalog_drive_music('rebuild')
         result = 1
-    return HttpResponse(result, mimetype)
-        
-#def handle_music_drive(request):
-#    msg = ''
-#    directory = ''
-#    directories = []
-#    string_file_list = []
-#    copies = []
-#    renamed_files = []
-#    file_list = []
-#    cataloged = []
-#    problems = []
-#    num_of_copies = 0
-#    duplicates = []
-#    if request.method == 'POST':
-#        form = Drive_form(request.POST)
-#        if 'catalog_drive' in request.POST:
-#            catalog_drive_music()
-#        elif 'filter_nzbs' in request.POST:
-#            if request.POST['nzbs']:
-#                num_of_copies, copies  = filter_nzbs_music (file_list, request.POST['nzbs'])
-#            else: problems.append('You forgot to give me the location of the nzbs!')
-#        elif 'fix_albums' in request.POST:
-#            if request.POST['directory']:
-#                duplicates  = fix_albums (request.POST['directory'])
-#            else: problems.append('You forgot to give me the location of the nzbs!')
-#                
-#    else:
-#        form = Drive_form()
-#    return render_to_response('handle_music_drive.html', {  'form'              : form, 
-#                                                            'cataloged'         : cataloged,
-#                                                            'file_list'         : file_list,
-#                                                            'problems'          : problems,
-#                                                            'copies'            : copies,
-#                                                            'num_of_copies'     : num_of_copies,
-#                                                            'duplicates'        : duplicates,
-#                                                            'msg'               : msg, } )    
+        return HttpResponse(result, mimetype)
+    else:
+        return music(request)
     
-def get_folder_names (directory):
-    folder_names = []
-    counter = 0
-    for root, dirs, files in os.walk(directory):
-        for dir in dirs:
-            folder_names.append(dir)
-    return folder_names
-
+def music_admin(request):
+    theme = 'theme_'+request.user.get_profile().theme
+    letter_list = LETTERS
+    albums_list = ALBUMS_HEAD
+    msg = ''
+    directory = ''
+    directories = []
+    string_file_list = []
+    copies = []
+    renamed_files = []
+    file_list = []
+    cataloged = []
+    problems = []
+    moved = []
+    num_of_copies = 0
+    duplicates_count = {}
+    if request.method == 'POST':
+        form = Drive_form(request.POST)
+        if 'filter_nzbs' in request.POST:
+            if request.POST['nzbs']:
+                problems, duplicates_count = filter_nzbs(request.POST['nzbs'])
+            else: problems.append('You forgot to give me the location of the nzbs!')
+        elif 'rename_nzbs' in request.POST:
+            if request.POST['nzbs']:
+                problems, renamed_files = rename_nzbs(request.POST['nzbs'])
+            else: problems.append('You forgot to give me the location of the nzbs!')
+        elif 'rename_albums' in request.POST:
+            if request.POST['albums']:
+                problems, renamed_files = rename_albums(request.POST['albums'])
+        elif 'move_new_folders' in request.POST:
+            problems, moved = move_new_folders()
+        elif 'update_album_art' in request.POST:
+            update_album_art(request)
+                
+    else:
+        form = Drive_form()
+    return render_to_response('admin.html', locals())
+    
+    
 def fix_albums (directory):
     
     albums = os.listdir(directory)
@@ -131,7 +150,7 @@ def fix_albums (directory):
     
                 
     return duplicates
-
+    
 def catalog_drive_music(type):
     if type == 'rebuild':
         Music_Song.objects.all().delete()
@@ -143,58 +162,77 @@ def catalog_drive_music(type):
         unknown_genre = unknown_genre[0]
     else: 
         unknown_genre = Music_Genre.objects.create(genre='unknown')
-    
+        
+    start_time = time.time()
     for letter in LETTERS: 
         print letter
         directory = settings.MUSIC_DIRECTORY + letter + "/"
-        files = get_folder_names(directory)
+        files = os.listdir(directory)
+        
+        current_albums = Music_Album.objects.filter(letter=letter)
+        for current_album in current_albums:
+            try: files.remove(current_album.folder)
+            except: pass
+        
         for file_object in files:
+            print file_object
             album = ''
-            file = str(file_object).split('-')
-            album_exists = Music_Album.objects.filter(folder=str(file_object))
-            if file.__len__() > 1 and not album_exists:
+            final_folder_name = ''
+            file = file_object.split('-')
+            if file.__len__() > 1:
                 album_length = 0
                 album_year = 0
                 album_size = 0
                 album_artist = []
                 album_genres = {}
-                try: songs = os.listdir(directory+str(file_object))
+                album_bitrates = 0
+                try: songs = os.listdir(directory+file_object)
                 except: 
                     print file_object, ' doesnt exist!'
                     continue
-                
+                if songs.__len__() < 1:
+                    try:
+                        win32file.MoveFile(directory+file_object, settings.MUSIC_DIRECTORY+'EMPTY/'+file_object)
+                    except:
+                        print 'Couldnt Move empty folder.'
+                    continue
+                final_folder_name = file[0].upper().replace(' ', '.')
                 artist_name = file[0].replace('.', ' ')
                 album_artist = Music_Artist.objects.filter(artist=artist_name)
                 if not album_artist:
                     album_artist = Music_Artist.objects.create(artist=artist_name)
                 else: album_artist = album_artist[0]
+                
+                final_folder_name += '-'+file[1].upper().replace(' ', '.')
                 album_name = file[1].replace('.', ' ')
                 
                 album_art = True
                 if 'Folder.jpg' not in songs:
                     album_art=False
                 
-                album = Music_Album.objects.create(album_genre=unknown_genre, album_artist=album_artist, album=album_name, folder=str(file_object), album_art=album_art, letter=letter)
+                album = Music_Album.objects.create(album_genre=unknown_genre, album_artist=album_artist, album=album_name, folder=file_object, album_art=album_art, letter=letter)
                 album_artist.letter = letter
                 album_artist.save()
                 id3_info = {}
                 song_count = 0
+                song_list = []
                 for song in songs:
+                    songs_in_album = []
                     #print file, ' ----- ', song
-                    if song.rsplit('.')[-1] == 'mp3' or song.rsplit('.')[-1] == 'MP3':
+                    if song.rsplit('.')[-1].lower() == 'mp3':
                         song_length = 0
                         song_rating = 0
                         song_artist = ''
                         file_size = ''
                         try: 
-                            id3 = ID3(directory+str(file_object)+'/'+song)
-                            property = MP3(directory+str(file_object)+'/'+song)
+                            id3 = ID3(directory+file_object+'/'+song)
+                            property = MP3(directory+file_object+'/'+song)
                         except: continue
                         song_length = property.info.length
                         album_length += song_length
                         result = time.strftime('%M:%S', time.gmtime(song_length))
-                        #print directory+str(file_object)+'/'+song
-                        file_size=os.path.getsize(directory+str(file_object)+'/'+song)
+                        #print directory+file_object+'/'+song
+                        file_size=os.path.getsize(directory+file_object+'/'+song)
                         album_size += file_size
                                                 
                         # Song genre
@@ -214,6 +252,12 @@ def catalog_drive_music(type):
                                         album_genres[song_genre] += 1
                                     else: album_genres[song_genre] = 0
                         
+                        # bitrate
+                        song_bitrate=''
+                        song_bitrate=property.info.bitrate
+#                        if song_bitrate: 
+#                            album_bitrates += int(song_bitrate)
+                                    
                         song_artist = album_artist
                         artist_names=id3.getall('TPE1')
                         if artist_names:
@@ -235,8 +279,12 @@ def catalog_drive_music(type):
 
                         safe_song = unicode(song, errors='ignore').encode('utf-8')
                         if song != safe_song:
-                            win32file.MoveFile(directory+str(file_object)+'/'+song, directory+str(file_object)+'/'+safe_song)
-                            print 'renamed ' + song + ' to ' + safe_song
+                            try:
+                                win32file.MoveFile(directory+file_object+'/'+song, directory+file_object+'/'+safe_song)
+                                print 'renamed ' + song + ' to ' + safe_song
+                            except:
+                                print 'filename is a duplicate'
+                                continue
                             
                             
                         # Song title
@@ -248,18 +296,19 @@ def catalog_drive_music(type):
                                 title = get_title[0]
                                 
                         song_rating=get_rating(id3)
-                        Music_Song.objects.create(song_artist=song_artist, 
-                                                  song_genre=song_genre, 
-                                                  album=album, 
-                                                  filename=safe_song, 
-                                                  type=safe_song.rsplit('.')[-1],
-                                                  path=str(file_object),
-                                                  title=title,
-                                                  length=str(result),
-                                                  letter=letter,
-                                                  rating=song_rating,
-                                                  file_size=str(file_size)
-                                                  )
+                        song_list.append(Music_Song.objects.create(song_artist=song_artist, 
+                                                                  song_genre=song_genre, 
+                                                                  album=album, 
+                                                                  filename=safe_song, 
+                                                                  type=safe_song.rsplit('.')[-1],
+                                                                  path=file_object,
+                                                                  title=title,
+                                                                  length=str(result),
+                                                                  letter=letter,
+                                                                  rating=song_rating,
+                                                                  file_size=str(file_size),
+                                                                  bitrate=song_bitrate
+                                                                  ))
                         song_count += 1
                 album.length = time.strftime('%M:%S', time.gmtime(album_length))
                 album.song_count = song_count
@@ -268,15 +317,75 @@ def catalog_drive_music(type):
                 
                 if album_year: 
                     string_album_year = album_year.encode('ascii','ignore')
-                    if string_album_year: album.year = int(string_album_year[0]+string_album_year[1]+string_album_year[2]+string_album_year[3])
+                    if string_album_year: 
+                        album.year = int(string_album_year[0]+string_album_year[1]+string_album_year[2]+string_album_year[3])
                     if album.year < 1800 or album.year > 2020:
                         album.year = 0
-                else: album.year = 0
+                else: 
+                    album.year = 0                
+                if album.year != 0: final_folder_name += '-'+str(album.year) 
+                
+#                if album_bitrates: 
+#                    overall_bitrate = album_bitrates / song_count
+#                    if overall_bitrate:
+#                        final_folder_name += '-'+str(overall_bitrate)
+                # Rename the folder
                 album.save()
+                final_folder_name = file_string_rename(final_folder_name)
+                try:
+                    win32file.MoveFile(directory+file_object, directory+final_folder_name)
+                    album.folder = final_folder_name
+                    album.save()
+                except:
+                    saves = check_duplicate(directory, file_object, final_folder_name)
+                    if saves != 'keep':
+                        for songs in song_list:
+                            songs.delete()
+                        album.delete()
+                
+        print 'Took ', time.time() - start_time, ' to finish one iteration.'
     return #render_to_response('confirmation.html', locals())
  
+def check_duplicate(directory, current, rename_to):
+    current_file_list = get_song_files(os.listdir(directory+current))
+    rename_to_file_list = get_song_files(os.listdir(directory+rename_to))
+    for song in current_file_list:
+        if song not in rename_to_file_list:
+            try:
+                if folder_has_rated_music(directory+current):
+                    win32file.MoveFile(directory+rename_to, settings.MUSIC_DIRECTORY+'PARTIAL/'+rename_to)
+                    return 'keep'
+                else:
+                    win32file.MoveFile(directory+current, settings.MUSIC_DIRECTORY+'PARTIAL/'+rename_to)
+                    return ''                 
+            except:
+                try:
+                    win32file.MoveFile(directory+current, settings.MUSIC_DIRECTORY+'PARTIAL/'+rename_to+'.'+str(random.randrange(1, 100)))
+                except:
+                    print 'Failed to move a partial duplicate album.'
+            return
+    
+    for song in current_file_list:
+        try:
+            if folder_has_rated_music(directory+current):
+                win32file.MoveFile(directory+rename_to, settings.MUSIC_DIRECTORY+'EXACT/'+rename_to)
+                return 'keep'
+            else:
+                win32file.MoveFile(directory+current, settings.MUSIC_DIRECTORY+'EXACT/'+rename_to)
+                return ''                 
+        except:
+            try:
+                win32file.MoveFile(directory+current, settings.MUSIC_DIRECTORY+'EXACT/'+rename_to+'.'+str(random.randrange(1, 100)))
+            except:
+                print 'Failed to move an exact duplicate album.'
+        return
+
+    return ''
+
+            
 def update_album_art(request):
     letter_list = LETTERS
+    albums_list = ALBUMS_HEAD
     existing_album_art = len(Music_Album.objects.filter(album_art=True))
     new_album_art = 0
     missing_album_art = Music_Album.objects.filter(album_art=False)
@@ -293,20 +402,8 @@ def update_album_art(request):
     message = 'Album Art Updated<br/> Existing = ' + str(existing_album_art) + '<br />New = ' + str(new_album_art) + '<br />Missing = ' + str(len(missing_album_art))
     return render_to_response('confirmation.html', locals()) 
 
-def get_rating(id3):
-    ratings = id3.getall('POPM')
-    if ratings:
-        rating = ratings[0].rating
-        if rating == 255:
-            return 5
-        elif rating < 255 and rating >= 196:
-            return 4
-        elif rating < 196 and rating >= 128:
-            return 3
-    return 0
 
-def filter_nzbs(request):
-    path_to_nzbs = 'D:/QmA/NZB/Music/Albums/Download/new/ready/'
+def filter_nzbs(path_to_nzbs):
     os.chdir(path_to_nzbs)
     all_nzbs = os.listdir('.')
     
@@ -323,59 +420,112 @@ def filter_nzbs(request):
     albums_in_DB = Music_Album.objects.all()
     albums_in_collection_folder = os.listdir('D:\QmA\NZB\Music\Albums\Collection/')
     remove = ['-CDS-','.CDS.','-PROMO-','.CDS.','BOOTLEG','(CDS)','(BOOTLEG)']
+    problems = []
+    duplicates_count = {'exact': 0, 'partial': 0}
     
-    for albums in albums_in_DB:
-        counter += 1
-        for nzbs in all_nzbs:
-            if albums.folder == nzbs.rsplit('.NZB')[0]:
-                #print 'Found Match: \n', albums.folder, '\n',  nzbs.rsplit('.NZB')[0]
+    for nzbs in all_nzbs:
+        exists = Music_Album.objects.filter(folder=nzbs.rsplit('.NZB')[0])
+        if exists:
+            try:
+                os.rename(path_to_nzbs+nzbs, path_to_nzbs+'exact_duplicate/'+nzbs)
+                duplicates_count['exact'] += 1
+            except:
+                problems.append('Failed to move the duplicate file: '+ nzbs)
+                
+    for temp_nzbs in all_nzbs:
+        nzbs = temp_nzbs.split('-')
+        if len(nzbs) > 2:
+            artist = nzbs[0].replace('.', ' ')
+            album = nzbs[1].replace('.', ' ')
+            exists = Music_Album.objects.filter(album_artist__artist__exact=artist).filter(album=album)
+            if exists:
+#                print 'For ', temp_nzbs, '\n', exists[0].folder
                 try:
-                    os.rename(path_to_nzbs+nzbs, path_to_nzbs+'exact_duplicate/'+nzbs)
+                    os.rename(path_to_nzbs+temp_nzbs, path_to_nzbs+'partial_duplicate/'+temp_nzbs)
+                    duplicates_count['partial'] += 1
                 except:
-                    print 'Failed to move the duplicate file.'
-            else:
+                    problems.append('Failed to move the duplicate file: '+ nzbs)                
+            
+#    for albums in albums_in_DB:
+#        counter += 1
+#        for nzbs in all_nzbs:
+#            if albums.folder == nzbs.rsplit('.NZB')[0]:
+#                print 'Found Match: \n', albums.folder, '\n',  nzbs.rsplit('.NZB')[0]
 #                try:
-#                    safe = albums.folder[15]
-#                    if safe:
-#                        if albums.folder in nzbs.rsplit('.NZB')[0]:
-#                            try:
-#                                os.rename(path_to_nzbs+nzbs, path_to_nzbs+'partial_duplicate/'+nzbs)
-#                            except:
-#                                print 'Failed to move the duplicate file.'
+#                    os.rename(path_to_nzbs+nzbs, path_to_nzbs+'exact_duplicate/'+nzbs)
+#                    duplicates_count['exact'] += 1
+#                except:
+#                    problems.append('Failed to move the duplicate file: '+ nzbs)
+#                break
+#            else:
+##                try:
+##                    safe = albums.folder[15]
+##                    if safe:
+##                        if albums.folder in nzbs.rsplit('.NZB')[0]:
+##                            try:
+##                                os.rename(path_to_nzbs+nzbs, path_to_nzbs+'partial_duplicate/'+nzbs)
+##                            except:
+##                                print 'Failed to move the duplicate file.'
+##                except:
+##                    pass#print albums.folder, 'was not safe\n'
+#
+#                #More aggressive elimination of albums
+#                try:
+#                    name = albums.artist.artist.replace(' ','.')+'-'+albums.album.replace(' ','.')
+#                    safe = name[14]
+#                    if name in nzbs.rsplit('.NZB')[0]:
+#                        print 'Found Partial Match: \n', albums.folder, '\n',  nzbs.rsplit('.NZB')[0]
+#                        try:
+#                            os.rename(path_to_nzbs+nzbs, path_to_nzbs+'partial_duplicate/'+nzbs)
+#                            duplicates_count['partial'] += 1
+#                        except:
+#                            problems.append('Failed to move the duplicate file: '+ nzbs)
+#                        break
 #                except:
 #                    pass#print albums.folder, 'was not safe\n'
-
-                #More aggressive elimination of albums
-                try:
-                    name = albums.artist.artist.replace(' ','.')+'-'+albums.album.replace(' ','.')
-                    safe = name[14]
-                    if name in nzbs.rsplit('.NZB')[0]:
-                        try:
-                            os.rename(path_to_nzbs+nzbs, path_to_nzbs+'partial_duplicate/'+nzbs)
-                            print '----------------------found----------------------------'
-                        except:
-                            print 'Failed to move the duplicate file.', nzbs
-                except:
-                    #print name
-                    pass#print albums.folder, 'was not safe\n'
+#                
+#        if counter > 1000:
+#            return problems, duplicates_count
                                 
-        if counter % 1000 == 0:
-            print counter
-    return HttpResponseRedirect('/')
+    return problems, duplicates_count
 
-def rename_nzbs(request):
-    message = ''
-#    for letter in LETTERS:
-#        print 'processing '+ 'L:/media/static/music/'+letter+'/'
-#        path_to_nzbs = 'L:/media/static/music/'+letter+'/'
-    path_to_nzbs = 'D:/QmA/NZB/Music/Albums/Download/new/ready/'
+def rename_albums(path_to_albums):
+    renamed_files = []
+    problems = []
+    
+    for letter in LETTERS:
+        problem, renamed_file = rename_nzbs(path_to_albums+letter+'/', albums=False)
+        problems += problem
+        renamed_files += renamed_file
+    
+    return problems, renamed_files
+
+def file_string_rename(string):
+    string2 = string.replace('[', '.')
+    string2 = string2.replace('.-.', '-')
+    string2 = string2.replace('--', '-')
+    string2 = string2.replace('-.', '-')
+    string2 = string2.replace('.-', '-')
+    string2 = string2.replace('..', '.')
+    if string2[0] == '.':
+        string2 = string2.lstrip('.')
+    if string[0] == '-':
+        string2 = string2.lstrip('-')
+
+    return string2
+
+def rename_nzbs(path_to_nzbs, albums=True):
+    renamed_files = []
+    problems = []
     os.chdir(path_to_nzbs)
     all_nzbs = os.listdir('.')
-    try:
-        os.makedirs('failed')
-    except:
-        print 'Failed to create the failed directory\n'        
+    if albums:
+        try:
+            os.makedirs('failed')
+        except:
+            pass        
     
+    HYPHENATE = ['GL8', 'VBR', '2CD', '3CD', '4CD', '5CD', '6CD', '7CD']
     #Rename all the nzbs
     for nzbs in all_nzbs:
         string = str(nzbs)
@@ -391,11 +541,18 @@ def rename_nzbs(request):
         string2 = string2.replace('.bt.', '.')
         string2 = string2.replace('.BT.', '.')
         string2 = string2.replace('JAY-Z', 'JAY.Z')
+        string2 = string2.replace('T-PAIN', 'T.PAIN')
         string2 = string2.replace('Z-RO', 'Z.RO')
         string2 = string2.replace('Q-TIP', 'Q.TIP')
         string2 = string2.replace('NE-YO', 'NE.YO')
         string2 = string2.replace('AC-DC', 'ACDC')
         string2 = string2.replace('AC.DC', 'ACDC')
+        string2 = string2.replace('.VOL.', '.VOLUME.')
+        for words in HYPHENATE:
+            string2 = string2.replace('.'+words+'.', '-'+words+'-')
+            string2 = string2.replace('.'+words+'-', '-'+words+'-')
+            string2 = string2.replace('-'+words+'.', '-'+words+'-')
+            
         string2 = string2.replace('\'', '.')
         string2 = string2.replace(',', '.')
         string2 = string2.replace('{', '.')
@@ -407,6 +564,15 @@ def rename_nzbs(request):
         string2 = string2.replace('-.', '-')
         string2 = string2.replace('.-', '-')
         string2 = string2.replace('..', '.')
+        string2 = string2.replace('-NZB', '.NZB')
+        
+        if string2.startswith('000-'):
+            string2 = string2.replace('000-', '')
+        if string2.startswith('00-'):
+            string2 = string2.replace('00-', '')
+        if string2.startswith('0-'):
+            string2 = string2.replace('0-', '')
+            
         if string2[0] == '.':
             string2 = string2.lstrip('.')
         if string[0] == '-':
@@ -414,73 +580,39 @@ def rename_nzbs(request):
             
         if string != string2:
             try:
-                message += 'Renaming ' + nzbs + ' to ' + string2 + '<br/>' 
                 win32file.MoveFile(path_to_nzbs+nzbs, path_to_nzbs+string2)
-                #os.rename(path_to_nzbs+nzbs, path_to_nzbs+string2)
-                #print 'Renaming of ', nzbs , ' to \n', string2, ' completed' 
+                renamed_files.append(nzbs + ' to ' + string2)
             except:
-                print 'Renaming of ', nzbs , ' to \n', string2, ' failed' 
-                try:
-                    win32file.MoveFile(path_to_nzbs+nzbs, path_to_nzbs+'failed/'+string2)
-                except:
-                    print 'Moving a file that failed to rename also Failed. WOW.'
+                problems.append('Renaming of ' + nzbs + ' to ' + string2 + ' failed')
+                if albums: 
+                    try:
+                        win32file.MoveFile(path_to_nzbs+nzbs, path_to_nzbs+'failed/'+string2)
+                    except:
+                        problems.append('Moving a file that failed to rename also Failed. WOW.')
     
-    return render_to_response('confirmation.html', locals())
-    #    for folders in all_folders:
-    #        for nzbs in all_nzbs:
-    #            progress_counter = progress_counter + 1
-    #            if folders == str(nzbs).rsplit('.', 1)[0] or folders == str(nzbs).rsplit('.', 2)[0]:
-    #                try:
-    #                    os.rename(nzb_location+nzbs, nzb_location+'duplicate/'+nzbs)
-    #                    copies.append(str(nzbs))
-    #                    counter = counter + 1
-    #                except: print nzbs, ' duplicate file failed for\n', nzb_location+nzbs
-    #            else:
-    #                for items in remove: 
-    #                    if items in nzbs:
-    #                        try:
-    #                            os.rename(nzb_location+nzbs, nzb_location+'duplicate/'+nzbs)
-    #                            copies.append(str(nzbs))
-    #                            counter = counter + 1
-    #                        except: print nzbs, ' duplicate remove failed\n', nzb_location+nzbs
-    #            if progress_counter % 1000000 == 0:
-    #                print 'progress at ', progress_counter
-        
-    #return render_to_response('base.html', locals())
+    return problems, renamed_files
 
 @login_required
 def albums(request, letter):
-    all_albums_full = Music_Album.objects.all().order_by('album')
-    all_albums = []
-    if letter == "all":
-        all_albums = all_albums_full
+    if request.user.is_superuser or request.user.is_staff:
+        if letter == 'all':
+            all_albums = Music_Album.objects.all()
+        elif letter == '0':
+            all_albums = Music_Album.objects.filter(album__regex=r'\d')
+        else:
+            letter_albums = Music_Album.objects.filter(album__startswith=letter).exclude(album__startswith='THE ')
+            albums_with_the = Music_Album.objects.filter(album__startswith='THE '+letter)
+            all_albums = sorted(chain(letter_albums, albums_with_the),key=attrgetter('album'))
     else:
-        all_albums = []
-        for all_album_full in all_albums_full:
-            added = False
-            try: 
-                if all_album_full.album[0] == letter and letter != 'T':
-                    added = True
-                    all_albums.append(all_album_full) 
-                elif all_album_full.album[0] == 'T' and letter == 'T':
-                    added = True
-                    if all_album_full.album[1] != 'H':
-                        all_albums.append(all_album_full)
-                elif all_album_full.album[0] == 'T':
-                    added = True
-                    if all_album_full.album[1] == 'H' and all_album_full.album[2] == 'E' and all_album_full.album[4] == letter :
-                        all_albums.append(all_album_full)
-                elif letter == '0' and added == False:
-                    print all_album_full.album, '\n'
-                    all_albums.append(all_album_full)
-#                else:
-#                    all_albums.append(all_album_full)
-            except:
-                pass
-            
-            if not (request.user.is_superuser or request.user.is_staff) and len(all_albums) >= GUEST_ACCESS:
-                break
-            
+        if letter == 'all':
+            all_albums = Music_Album.objects.filter(access="public")
+        elif letter == '0':
+            all_albums = Music_Album.objects.filter(access="public").filter(album__regex=r'\d')
+        else:
+            letter_albums = Music_Album.objects.filter(access="public").filter(album__startswith=letter).exclude(album__startswith='THE ')
+            albums_with_the = Music_Album.objects.filter(access="public").filter(album__startswith='THE '+letter)
+            all_albums = sorted(chain(letter_albums, albums_with_the),key=attrgetter('album'))
+    
     dictionary_albums = []
     for album in all_albums:
         album_info = {}
@@ -585,7 +717,7 @@ def albums_by_artist(request, artist_id):
     if request.user.is_superuser or request.user.is_staff:
         all_albums = Music_Album.objects.filter(album_artist=artist).order_by('album')
     else:
-        all_albums = Music_Album.objects.filter(album_artist=artist).order_by('album')[:GUEST_ACCESS]
+        all_albums = Music_Album.objects.filter(access="public").filter(album_artist=artist).order_by('album')
         
     if request.is_ajax():
         mimetype = 'application/javascript'
@@ -598,7 +730,7 @@ def albums_by_year(request, year_id):
     if request.user.is_superuser or request.user.is_staff:
         all_albums = Music_Album.objects.filter(year=year_id).order_by('album')
     else:
-        all_albums = Music_Album.objects.filter(year=year_id).order_by('album')[:GUEST_ACCESS]    
+        all_albums = Music_Album.objects.filter(access="public").filter(year=year_id).order_by('album')
         
     if request.is_ajax():
         mimetype = 'application/javascript'
@@ -611,7 +743,7 @@ def albums_by_genre(request, genre_id):
     if request.user.is_superuser or request.user.is_staff:
         all_albums = Music_Album.objects.filter(album_genre=genre_id).order_by('album')
     else:
-        all_albums = Music_Album.objects.filter(album_genre=genre_id).order_by('album')[:GUEST_ACCESS]    
+        all_albums = Music_Album.objects.filter(access="public").filter(album_genre=genre_id).order_by('album')
         
     if request.is_ajax():
         mimetype = 'application/javascript'
@@ -640,12 +772,8 @@ def albums_by_requirement(all_albums):
 
 @login_required
 def artists(request, letter):
-    if request.user.is_superuser or request.user.is_staff:
-        if letter == 'all': get_artists = Music_Artist.objects.all().order_by('artist')
-        else: get_artists = Music_Artist.objects.filter(letter=letter).order_by('artist')
-    else:
-        if letter == 'all': get_artists = Music_Artist.objects.all().order_by('artist')[:GUEST_ACCESS]
-        else: get_artists = Music_Artist.objects.filter(letter=letter).order_by('artist')[:GUEST_ACCESS]
+    if letter == 'all': get_artists = Music_Artist.objects.all().order_by('artist')
+    else: get_artists = Music_Artist.objects.filter(letter=letter).order_by('artist')
         
     artists = []
     for get_artist in get_artists:
@@ -656,7 +784,10 @@ def artists(request, letter):
             artist['song_count'] = 0
             artist['album_count'] = 0
             artist['albums'] = []
-            get_albums = Music_Album.objects.filter(album_artist=get_artist.id).order_by('id')
+            if request.user.is_superuser or request.user.is_staff:
+                get_albums = Music_Album.objects.filter(album_artist=get_artist.id).order_by('id')
+            else:
+                get_albums = Music_Album.objects.filter(access="public").filter(album_artist=get_artist.id).order_by('id')
             if get_albums:
                 for get_album in get_albums:
                     album = {}
@@ -740,52 +871,53 @@ def set_theme(request):
 
 @login_required    
 def search_music_artists(request):
-    all_artists = Music_Album.objects.all()
-    get_artists = []
-    for items in all_artists:
-        if request.GET['query'].upper() in items.album_artist.artist.upper():
-            if items.album_artist not in get_artists:
-                get_artists.append(items.album_artist)
-            
+    start_time = time.time()
+    get_artists = Music_Artist.objects.filter(artist__icontains=request.GET['query'])   
     artists = []
     for get_artist in get_artists:
         try:
-            artist = {}
-            artist['pk'] = get_artist.id
-            artist['name'] = get_artist.artist
-            artist['song_count'] = 0
-            artist['album_count'] = 0
-            artist['albums'] = []
-            get_albums = Music_Album.objects.filter(album_artist=get_artist.id).order_by('id')
-            for get_album in get_albums:
-                album = {}
-                album['letter'] = get_album.letter
-                album['folder'] = get_album.folder
-                album['album_art'] = get_album.album_art
-                album['pk'] = get_album.id
-                
-                artist['song_count'] += get_album.song_count
-                artist['album_count'] += 1
-                artist['albums'].append(album)
-            artists.append(artist)
+            if request.user.is_superuser or request.user.is_staff:
+                get_albums = Music_Album.objects.filter(album_artist=get_artist.id).order_by('id')
+            else:
+                get_albums = Music_Album.objects.filter(access="public").filter(album_artist=get_artist.id).order_by('id')
+
+            if get_albums:
+                artist = {}
+                artist['pk'] = get_artist.id
+                artist['name'] = get_artist.artist
+                artist['song_count'] = 0
+                artist['album_count'] = 0
+                artist['albums'] = []
+                for get_album in get_albums:
+                    album = {}
+                    album['letter'] = get_album.letter
+                    album['folder'] = get_album.folder
+                    album['album_art'] = get_album.album_art
+                    album['pk'] = get_album.id
+                    
+                    artist['song_count'] += get_album.song_count
+                    artist['album_count'] += 1
+                    artist['albums'].append(album)
+                artists.append(artist)
         except:
             print 'excepted'
 
     if request.is_ajax():
         mimetype = 'application/javascript'
         artists = simplejson.dumps(artists)
+        print 'Artists search completed in ', time.time() - start_time
     return HttpResponse(artists, mimetype)
     
         
 @login_required
 def search_music_albums(request):
-    
-    get_albums = Music_Album.objects.all()
-    all_albums = []
-    for items in get_albums:
-        if request.GET['query'].upper() in items.album.upper():
-            all_albums.append(items)
-                        
+    start_time = time.time()
+             
+    if request.user.is_superuser or request.user.is_staff:           
+        all_albums = Music_Album.objects.filter(album__icontains=request.GET['query'])   
+    else:
+        all_albums = Music_Album.objects.filter(access="public").filter(album__icontains=request.GET['query']) 
+
     dictionary_albums = []
     for album in all_albums:
         album_info = {}
@@ -806,19 +938,22 @@ def search_music_albums(request):
     if request.is_ajax():
         mimetype = 'application/javascript'
         albums = simplejson.dumps(dictionary_albums)
+        print 'Albums search completed in ', time.time() - start_time
     return HttpResponse(albums, mimetype)
       
       
 @login_required
 def search_music_songs(request):
-    
-    get_songs = Music_Song.objects.all()
-    all_songs = []
-    for items in get_songs:
-        if items.title:
-            if request.GET['query'].upper() in items.title.upper():
-                all_songs.append(items)
+    start_time = time.time()    
+#    get_songs = Music_Song.objects.all()
+#    all_songs = []
+#    for items in get_songs:
+#        if items.title:
+#            if request.GET['query'].upper() in items.title.upper():
+#                all_songs.append(items)
                       
+                      
+    all_songs = Music_Song.objects.filter(title__icontains=request.GET['query'])  
     dictionary_songs = []
     for song in all_songs:
         song_dict = {}
@@ -838,12 +973,14 @@ def search_music_songs(request):
     if request.is_ajax():
         mimetype = 'application/javascript'
         albums = simplejson.dumps(dictionary_songs)
+        print 'Songs search completed in ', time.time() - start_time
     return HttpResponse(albums, mimetype)
 
 
 def upload_music(request):
     theme = 'theme_white'
     letter_list = LETTERS
+    albums_list = ALBUMS_HEAD
     theme = 'theme_'+request.user.get_profile().theme
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
@@ -857,7 +994,7 @@ def upload_music(request):
 def handle_uploaded_file(file):
     for key in file.keys():
         print file[key].name
-        destination = open('L:/media/static/music/UPLOADS/'+file[key].name, 'wb+')
+        destination = open(settings.MUSIC_DIRECTORY+'UPLOADS/'+file[key].name, 'wb+')
         for chunk in file[key].chunks():
             destination.write(chunk)
         destination.close()
@@ -899,9 +1036,97 @@ def copy_favs(request):
     print 'Took ', time.clock() - start, ' to copy files.'
     return music(request)
     
+@login_required    
+def save_playlist(request):
+    message = 0
+    visible = True
+    song_ids = request.GET['query'].split(',')
+    playlist_name = request.GET['name']
+    visibility = request.GET['visible']
+    note = request.GET['note']
+    
+#    print request.GET['query'], request.GET['name'], request.GET['visible'], request.GET['note']
+#    
+    if visibility == 'false': visible = False
+    
+    existing_playlists = Music_Playlist.objects.filter(name=playlist_name, user=request.user)
+    if not existing_playlists:
+        for song in song_ids:
+            Music_Playlist.objects.create(name=playlist_name, song=Music_Song.objects.get(id=int(song)), visible_to_others=visible, user=request.user, note=note)
+            
+        message = 1
+    else:
+        # There is a playlist with this name already.
+        message = 2
+    
+    if request.is_ajax():
+        mimetype = 'application/javascript'
+        return HttpResponse(message, mimetype)
+    else:
+        render_to_response('save_playlist.html',  locals()) 
+
     
     
-    
+
+#def filter_nzbs_music (files, nzb_location):
+#    
+#    os.chdir(nzb_location)
+#    try:
+#        os.makedirs(nzb_location+'duplicate')
+#    except:
+#        pass
+#    all_nzbs = os.listdir('.')
+#    counter = 0
+#    progress_counter = 0
+#    copies = []
+#    string2 = ''
+#    all_albums = Music_Album.objects.all()
+#    all_folders = []
+#    for album in all_albums:
+#        all_folders.append(str(album.folder))
+#        #all_folders.append(str(album.artist.artist)+'-'+str(album.album))
+#    
+#    #all_albums = os.listdir('C:\QmA\NZB\Music\Albums\Collection')
+#    #for album in all_albums:
+#        #all_folders.append(str(album).replace('.nzb', ''))    
+#    
+#    remove = ['-CDS-','.CDS.','-PROMO-','.CDS.','BOOTLEG','(CDS)','(BOOTLEG)']
+#    for nzbs in all_nzbs:
+#        string = str(nzbs)
+#        string2 = string.replace('[', '.')
+#        string2 = string2.replace(']', '.')
+#        string2 = string2.replace('.NZB.nzb', '.nzb')
+#        string2 = string2.replace('..', '.')
+#        string2 = string2.replace('..', '.')
+#        string2 = string2.replace('..', '.')
+#        if string != string2:
+#            try:
+#                print nzb_location+nzbs, ' renamed to ', nzb_location+string2
+#                os.rename(nzb_location+nzbs, nzb_location+string2)
+#            except:
+#                print "Renaming the nzb failed\n"
+#    
+#    for folders in all_folders:
+#        for nzbs in all_nzbs:
+#            progress_counter = progress_counter + 1
+#            if folders == str(nzbs).rsplit('.', 1)[0] or folders == str(nzbs).rsplit('.', 2)[0]:
+#                try:
+#                    os.rename(nzb_location+nzbs, nzb_location+'duplicate/'+nzbs)
+#                    copies.append(str(nzbs))
+#                    counter = counter + 1
+#                except: print nzbs, ' duplicate file failed for\n', nzb_location+nzbs
+#            else:
+#                for items in remove: 
+#                    if items in nzbs:
+#                        try:
+#                            os.rename(nzb_location+nzbs, nzb_location+'duplicate/'+nzbs)
+#                            copies.append(str(nzbs))
+#                            counter = counter + 1
+#                        except: print nzbs, ' duplicate remove failed\n', nzb_location+nzbs
+#            if progress_counter % 1000000 == 0:
+#                print 'progress at ', progress_counter
+#        
+#    return counter, copies
     
     
     
