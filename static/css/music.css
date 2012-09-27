@@ -725,6 +725,14 @@ table#song_table {
 }
 
 
+.download_song_button a {
+	height: 25px;
+	font-size: 20px;
+	color: black;
+	background-image: url('/static/images/download_button.png');
+	background-repeat: no-repeat;
+}
+
 #upload_content {
 	width: 1024px;
 	margin: 30px auto;

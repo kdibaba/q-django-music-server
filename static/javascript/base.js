@@ -812,13 +812,14 @@ function show_album(jsonAlbum, show_or_play) {
 		$('#current_album_songs').append('<h1>'+ all_album[0].album +'</h1>')
 		$('#current_album_songs').append('<div id="song_table_wrapper"><table id="song_table" class="rounder-top"></table></div>')
 		$('#song_table').append('<tr id="song_table_header" class="rounder-top"></tr>')
-		$('#song_table_header').append('<th class="title_column">Title</th><th class="artist_column">Artist</th><th class="genre_column">Genre</th><th class="play_column">Play</th><th class="add_column">Add</th><th class="length_column">Length</th><th class="file_size_column">File Size</th><th class="rating_column">Rating</th>')
+		$('#song_table_header').append('<th class="title_column">Title</th><th class="artist_column">Artist</th><th class="genre_column">Genre</th><th class="play_column">Play</th><th class="add_column">Add</th><th class="download_column">Download</th><th class="length_column">Length</th><th class="file_size_column">File Size</th><th class="rating_column">Rating</th>')
 		$.each(album.songs, function(i,item){
 			if (item.type == "mp3"){
 				$('#song_table').append("<tr class='songs' id='song_" + item.pk + "'><td class=\"title_column song_table_field\" ondblclick=\"get_song(" + item.pk + 
 						", 'play')\">" + item.title + "</td><td class='artist_column song_table_field'>" + item.artist + "</td><td class='genre_column song_table_field'>" + item.genre + "</td><td  class=\"play_column song_table_field play_song_button\" title='Click here to play song.' onclick=\"get_song(" + 
 						item.pk + ", 'play')\"></td><td  class=\"add_column song_table_field add_song_button\" title='Click here to add to playlist.' onclick=\"get_song(" + item.pk + 
-						", 'add')\"></td><td class='length_column song_table_field'>" + item.length +  "</td><td class='file_size_column song_table_field'>" + item.file_size + "</td><td id='rating_td' class='rating_column song_table_field'>" + get_rating_html(item.rating, item.pk) + 
+						", 'add')\"></td><td  class=\"download_column song_table_field download_song_button\" title='Click here to download the song.'><a href=\"/static/music/" + item.letter + "/" + item.path + "/"+item.filename+"\"><img src=\"/static/images/download_button.png\" /></a></td>" + 
+						"<td class='length_column song_table_field'>" + item.length +  "</td><td class='file_size_column song_table_field'>" + item.file_size + "</td><td id='rating_td' class='rating_column song_table_field'>" + get_rating_html(item.rating, item.pk) + 
 						"</td></tr>");
 				
 			}
