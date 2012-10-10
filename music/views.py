@@ -12,18 +12,26 @@ from media.music.forms import *
 from media.music.models import *
 from media.music.utils import *
 
-import os, sys, shutil, win32file, re, time, unicodedata, random
+import os, sys, shutil, win32file, re, time, unicodedata, random, pdb
 
 from mutagen.id3 import ID3
 from mutagen.mp3 import MP3
 from mutagen.apev2 import APEv2
 import mutagen.id3
 
+import json, urllib, requests
+from StringIO import StringIO
+from requests.exceptions import ConnectionError
 
+DRIVES = {  'X:/': [ '0','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O'],
+            'Y:/': [ 'P','Q','R','S','T','U','V','W','X','Y','Z', 'VA', 'OST']}
 LETTERS = ['0','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'VA', 'OST']
 ALBUMS_HEAD = ['0','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
 SET_RATING = {'0': 0, '1': 32, '2': 64, '3': 128,'4':196, '5':255}
 GUEST_ACCESS = 25
+MUSIC_FILE_EXTENSIONS = ['MP3','WAV','MPA','FLAC']
+
+DEFAULT_DIRECTORY = 'Y:/'
 
 @login_required
 def music(request):
@@ -102,8 +110,6 @@ def music_admin(request):
         elif 'rename_albums' in request.POST:
             if request.POST['albums']:
                 problems, renamed_files = rename_albums(request.POST['albums'])
-        elif 'move_new_folders' in request.POST:
-            problems, moved = move_new_folders()
         elif 'update_album_art' in request.POST:
             update_album_art(request)
                 
@@ -162,64 +168,119 @@ def catalog_drive_music(type):
         unknown_genre = unknown_genre[0]
     else: 
         unknown_genre = Music_Genre.objects.create(genre='unknown')
-        
+
+
+    unknown_artist = Music_Artist.objects.filter(artist='UNKNOWN')
+    if unknown_artist:
+        unknown_artist = unknown_artist[0]
+    else: 
+        unknown_artist = Music_Artist.objects.create(artist='UNKNOWN')
+       
+
     start_time = time.time()
-    for letter in LETTERS: 
-        print letter
-        directory = settings.MUSIC_DIRECTORY + letter + "/"
-        files = os.listdir(directory)
-        
-        current_albums = Music_Album.objects.filter(letter=letter)
-        for current_album in current_albums:
-            try: files.remove(current_album.folder)
-            except: pass
-        
-        for file_object in files:
-            print file_object
-            album = ''
-            final_folder_name = ''
-            file = file_object.split('-')
-            if file.__len__() > 1:
+    for drive in DRIVES.keys():
+        for letter in DRIVES[drive]: 
+
+            print '\nProcessing albums in directory - ', letter
+            directory = drive + letter + "/"
+
+
+            print '\nMoving albums to their correct directories...'
+            fail_to_move, moved_folders = move_new_folders(drive, letter)
+            print 'Successfully moved %d albums to their correct directories.' % len(moved_folders)
+            print 'Failed to move %d albums to their correct directories.' % len(fail_to_move)
+
+            # files = os.listdir(directory)
+            # original_album_count = len(files)
+            # print 'Removing empty directories.... '
+            # removeEmptyFolders(directory)
+            files = os.listdir(directory)
+            # print '%d empty directories were deleted' % (original_album_count - len(files))
+            
+            current_albums = Music_Album.objects.filter(letter=letter)
+
+            avoid_reprocess = 0
+            album_deleted = 0
+
+            for current_album in current_albums:
+                if current_album.folder in files:
+                    files.remove(current_album.folder)
+                    avoid_reprocess+=1
+                else:
+                    current_album.delete()
+                    album_deleted+=1 
+
+            print 'Successfully avoided - %d - albums from being re-evaluated.' % avoid_reprocess
+            print 'Successfully deleted - %d - albums since they no longer exist in the file system.\n' % album_deleted
+
+            count_folders = len(files)
+            print 'Processing %d files' % count_folders
+
+            for file_object in files:
+                print count_folders, ' Remaining to process.'
+                print file_object
+                count_folders-=1
+                if file_object != unicode(file_object, errors='ignore').encode('utf-8'):
+                    try:
+                        win32file.MoveFile(directory+file_object, directory+unicode(file_object, errors='ignore').encode('utf-8'))
+                    except:
+                        print 'Renamed folder.'
+                    continue
+
+                album = ''
+                final_folder_name = ''
+                probable_artist_name = ''
+
+                file = file_object.split('-')
+                if file.__len__() > 2:
+                    probable_artist_name = file[0]
+
                 album_length = 0
                 album_year = 0
                 album_size = 0
-                album_artist = []
                 album_genres = {}
+                album_artists = {}
+                album_names = {}
                 album_bitrates = 0
+
                 try: songs = os.listdir(directory+file_object)
                 except: 
                     print file_object, ' doesnt exist!'
                     continue
                 if songs.__len__() < 1:
                     try:
-                        win32file.MoveFile(directory+file_object, settings.MUSIC_DIRECTORY+'EMPTY/'+file_object)
+                        win32file.MoveFile(directory+file_object, drive+'EMPTY/'+file_object)
                     except:
                         print 'Couldnt Move empty folder.'
                     continue
-                final_folder_name = file[0].upper().replace(' ', '.')
-                artist_name = file[0].replace('.', ' ')
-                album_artist = Music_Artist.objects.filter(artist=artist_name)
-                if not album_artist:
-                    album_artist = Music_Artist.objects.create(artist=artist_name)
-                else: album_artist = album_artist[0]
                 
-                final_folder_name += '-'+file[1].upper().replace(' ', '.')
-                album_name = file[1].replace('.', ' ')
                 
                 album_art = True
                 if 'Folder.jpg' not in songs:
                     album_art=False
                 
-                album = Music_Album.objects.create(album_genre=unknown_genre, album_artist=album_artist, album=album_name, folder=file_object, album_art=album_art, letter=letter)
-                album_artist.letter = letter
-                album_artist.save()
+                album = Music_Album.objects.create(album_genre=unknown_genre, album_artist=unknown_artist, album='', folder=file_object, album_art=album_art, letter=letter, drive=drive[0])
+                unknown_artist.letter = letter
+                unknown_artist.save()
                 id3_info = {}
                 song_count = 0
                 song_list = []
+                mp3_exists = False
+                other_format_exists = False
                 for song in songs:
-                    songs_in_album = []
                     #print file, ' ----- ', song
-                    if song.rsplit('.')[-1].lower() == 'mp3':
+
+                    if os.path.isdir(directory+file_object+'/'+song):
+                        print song, ' is a folder.'
+                        try:
+                            new_folder_name = directory+song+str(random.randrange(1, 10000000))
+                            win32file.MoveFile(directory+file_object+'/'+song, new_folder_name )
+                            print 'Successfully moved folder - ', new_folder_name
+                        except:
+                            print 'Failed to move folder - ', new_folder_name
+
+                    elif song.rsplit('.')[-1].lower() == 'mp3':
+                        mp3_exists = True
                         song_length = 0
                         song_rating = 0
                         song_artist = ''
@@ -248,28 +309,42 @@ def catalog_drive_music(type):
                                     song_genre = Music_Genre.objects.create(genre=genre)
                                 else: 
                                     song_genre = get_genre[0]
-                                    if album_genres and song_genre in album_genres.keys():
-                                        album_genres[song_genre] += 1
-                                    else: album_genres[song_genre] = 0
+                                if album_genres and song_genre in album_genres.keys():
+                                    album_genres[song_genre] += 1
+                                else: album_genres[song_genre] = 0
                         
                         # bitrate
                         song_bitrate=''
                         song_bitrate=property.info.bitrate
-#                        if song_bitrate: 
-#                            album_bitrates += int(song_bitrate)
+    #                        if song_bitrate: 
+    #                            album_bitrates += int(song_bitrate)
                                     
-                        song_artist = album_artist
-                        artist_names=id3.getall('TPE1')
-                        if artist_names:
-                            artist_name = artist_names[0].text
-                            if artist_name:
-                                artist_name = artist_name[0]
-                                get_song_artist = Music_Artist.objects.filter(artist=artist_name)
-                                if not get_song_artist:
-                                    song_artist = Music_Artist.objects.create(artist=artist_name)
-                                else: 
-                                    song_artist = get_song_artist[0]
-                            
+                        song_artist = unknown_artist
+                        
+                        id3_artist = get_artist_from_id3(id3)
+                        if id3_artist:
+                            get_song_artist = Music_Artist.objects.filter(artist=id3_artist.replace('-', '.'))
+                            if not get_song_artist:
+                                song_artist = Music_Artist.objects.create(artist=id3_artist.replace('-', '.'))
+                                song_artist.save()
+                            else: 
+                                song_artist = get_song_artist[0]
+                                song_artist.save()
+                            if album_artists and song_artist in album_artists.keys():
+                                album_artists[song_artist] += 1
+                            else: album_artists[song_artist] = 0
+
+                        # print 'song artist - ', song_artist.artist
+
+                        get_album_name=id3.getall('TALB')
+                        if get_album_name:
+                            album_name = get_album_name[0].text
+                            if album_name:
+                                album_name = album_name[0]
+                                if album_names and album_name in album_names.keys():
+                                    album_names[album_name] += 1
+                                else: album_names[album_name] = 0
+
                         if not album_year:
                             get_years = album_year=id3.getall('TDRC')
                             if get_years:
@@ -305,102 +380,205 @@ def catalog_drive_music(type):
                                                                   title=title,
                                                                   length=str(result),
                                                                   letter=letter,
+                                                                  drive=drive[0],
                                                                   rating=song_rating,
                                                                   file_size=str(file_size),
                                                                   bitrate=song_bitrate
                                                                   ))
                         song_count += 1
-                album.length = time.strftime('%M:%S', time.gmtime(album_length))
-                album.song_count = song_count
-                album.album_size = str(album_size)
-                if album_genres: album.album_genre = max(album_genres, key=album_genres.get)
-                
-                if album_year: 
-                    string_album_year = album_year.encode('ascii','ignore')
-                    if string_album_year: 
-                        album.year = int(string_album_year[0]+string_album_year[1]+string_album_year[2]+string_album_year[3])
-                    if album.year < 1800 or album.year > 2020:
-                        album.year = 0
-                else: 
-                    album.year = 0                
-                if album.year != 0: final_folder_name += '-'+str(album.year) 
-                
-#                if album_bitrates: 
-#                    overall_bitrate = album_bitrates / song_count
-#                    if overall_bitrate:
-#                        final_folder_name += '-'+str(overall_bitrate)
-                # Rename the folder
-                album.save()
-                final_folder_name = file_string_rename(final_folder_name)
-                try:
-                    win32file.MoveFile(directory+file_object, directory+final_folder_name)
-                    album.folder = final_folder_name
+
+                    elif song.rsplit('.')[-1].upper() in MUSIC_FILE_EXTENSIONS:
+                        other_format_exists = True
+                if not mp3_exists:
+                    if other_format_exists:
+                        try:
+                            win32file.MoveFile(directory+file_object, drive+'OTHER_FORMATS/'+file_object)
+                            print 'Moved Other format folder - ', file_object
+                        except:
+                            print 'Couldnt Move other format folder.'
+                    else:
+                        try:
+                            win32file.MoveFile(directory+file_object, drive+'EMPTY/'+file_object)
+                            print 'Moved No MP3 folder - ', file_object
+                        except:
+                            print 'Couldnt Move empty folder.'
+
+                else:
+                    album.length = time.strftime('%M:%S', time.gmtime(album_length))
+                    album.song_count = song_count
+                    album.album_size = str(album_size)
+                    if album_genres: album.album_genre = max(album_genres, key=album_genres.get)
+
+                    if album_names: 
+                        temp_album = max(album_names, key=album_names.get)
+                        album.album = temp_album.replace('-', '.').encode('ascii','ignore')
+
+                    if album_artists and album_artists[max(album_artists)] == song_count-1:
+                        album.album_artist = max(album_artists, key=album_artists.get)
+                        final_artist_name = max(album_artists, key=album_artists.get).artist
+                        max(album_artists).letter = letter
+                        max(album_artists).save()
+                    elif album_artists and album_artists.keys().__len__() >= int(song_count/2):
+                        # print 'Going with VA since keys = ',  album_artists.keys().__len__(), ' and count / 2 = ', int(song_count/2)
+                        final_artist_name = 'VA'
+                        if Music_Artist.objects.filter(artist='VA'):
+                            album.album_artist = Music_Artist.objects.filter(artist='VA')[0]
+                        else:
+                            probable_artist = Music_Artist.objects.create(artist='VA')
+                            probable_artist.letter = letter
+                            probable_artist.save()
+                    elif probable_artist_name:
+                        final_artist_name = probable_artist_name
+                        get_probable_artist_name = Music_Artist.objects.filter(artist=probable_artist_name)
+                        if not get_probable_artist_name:
+                            probable_artist = Music_Artist.objects.create(artist=probable_artist_name)
+                            probable_artist.letter = letter
+                            probable_artist.save()
+                        else: 
+                            album.album_artist = get_probable_artist_name[0]
+                    elif album_artists: 
+                        album.album_artist = max(album_artists, key=album_artists.get)
+                        final_artist_name = max(album_artists, key=album_artists.get).artist
+                        max(album_artists).letter = letter
+                        max(album_artists).save()
+                    else:
+                        final_artist_name = 'unknown'
+
+                    if album_year: 
+                        string_album_year = album_year.encode('ascii','ignore')
+                        if string_album_year: 
+                            album.year = int(string_album_year[0]+string_album_year[1]+string_album_year[2]+string_album_year[3])
+                        if album.year < 1800 or album.year > 2020:
+                            album.year = 0
+                    else: 
+                        album.year = 0   
+
+                    album.save()  
+
+                    final_folder_name = final_artist_name+'-'+str(album.album)
+                    if album.year != 0: final_folder_name += '-'+str(album.year) 
+
                     album.save()
-                except:
-                    saves = check_duplicate(directory, file_object, final_folder_name)
-                    if saves != 'keep':
-                        for songs in song_list:
-                            songs.delete()
-                        album.delete()
-                
-        print 'Took ', time.time() - start_time, ' to finish one iteration.'
+                    final_folder_name = file_string_rename(final_folder_name)
+                    # try: print file_object, '\n', final_folder_name
+                    # except: pass
+                    if final_folder_name != 'UNKNOWN':
+                        try:
+                            if file_object != final_folder_name:
+                                #print 'Folder name havent changed so skipping the rename folder section \n', file_object, '\n', final_folder_name 
+                                win32file.MoveFile(directory+file_object, directory+final_folder_name)
+                                album.folder = final_folder_name
+                                album.save()
+                                for songs in song_list:
+                                    songs.path = final_folder_name
+                                    songs.save()
+                            else:
+                                pass#print 'Folder name havent changed so skipping the rename folder section \n'#, file_object, '\n', final_folder_name 
+
+                            if not album_art and final_artist_name != 'unknown':
+                                success = get_album_art(final_artist_name+' '+ str(album.album), directory+final_folder_name)
+                                if success:
+                                    album.album_art = True
+                                    album.save()
+                                else:
+                                    print 'Failed to get album art.'
+                        except: 
+                            saves = check_duplicate(directory, file_object, final_folder_name)
+                            if saves != 'keep':
+                                for songs in song_list:
+                                    songs.delete()
+                                album.delete()
+                    else:
+                        try:
+                            win32file.MoveFile(directory+file_object, drive+'UNKNOWN/'+file_object+'.'+str(random.randrange(1, 10000000)))
+                            #print 'Final Folder Name is UNKNOWN so moving on.'
+                        except:
+                            pass
+                    
+            print 'Took ', time.time() - start_time, ' to finish one iteration.'
     return #render_to_response('confirmation.html', locals())
- 
+
+def get_album_art(query, path):
+    BASE_URL = 'https://ajax.googleapis.com/ajax/services/search/images?'\
+             'v=1.0&q=' + query + '&start=%d'
+
+    r = requests.get(BASE_URL % 1)
+    try:
+        image_info = json.loads(r.text)['responseData']['results'][0]
+    except:
+        return False
+
+    url = image_info['unescapedUrl']
+    try:
+        response = urllib.urlopen(url)
+        file = open(os.path.join(path, 'Folder.jpg') , 'wb')
+        file.write(response.read()) 
+        file.close()
+    except ConnectionError, e:
+        print 'could not download %s' % url
+        return False
+
+    return True
+
 def check_duplicate(directory, current, rename_to):
-    current_file_list = get_song_files(os.listdir(directory+current))
-    rename_to_file_list = get_song_files(os.listdir(directory+rename_to))
+    try:
+        current_file_list = get_song_files(os.listdir(directory+current))
+        rename_to_file_list = get_song_files(os.listdir(directory+rename_to))
+    except:
+        return
     for song in current_file_list:
-        if song not in rename_to_file_list:
+        #if the list of songs has a mismatch then its not an exact copy so move the folder to a Partial match folder
+        if song.rsplit('.')[-1].lower() == 'mp3' and song not in rename_to_file_list:
             try:
                 if folder_has_rated_music(directory+current):
-                    win32file.MoveFile(directory+rename_to, settings.MUSIC_DIRECTORY+'PARTIAL/'+rename_to)
+                    win32file.MoveFile(directory+rename_to, drive+'PARTIAL/'+rename_to)
                     return 'keep'
                 else:
-                    win32file.MoveFile(directory+current, settings.MUSIC_DIRECTORY+'PARTIAL/'+rename_to)
+                    win32file.MoveFile(directory+current, drive+'PARTIAL/'+rename_to)
                     return ''                 
             except:
                 try:
-                    win32file.MoveFile(directory+current, settings.MUSIC_DIRECTORY+'PARTIAL/'+rename_to+'.'+str(random.randrange(1, 100)))
+                    win32file.MoveFile(directory+current, drive+'PARTIAL/'+rename_to+'.'+str(random.randrange(1, 10000000)))
                 except:
                     print 'Failed to move a partial duplicate album.'
-            return
+                return
     
-    for song in current_file_list:
+    #if all the songs were a match then the folders are identical and the new one should be in the exact match folder
+    try:
+        if folder_has_rated_music(directory+current):
+            win32file.MoveFile(directory+rename_to, drive+'EXACT/'+rename_to)
+            return 'keep'
+        else:
+            win32file.MoveFile(directory+current, drive+'EXACT/'+rename_to)
+            return ''                 
+    except:
         try:
-            if folder_has_rated_music(directory+current):
-                win32file.MoveFile(directory+rename_to, settings.MUSIC_DIRECTORY+'EXACT/'+rename_to)
-                return 'keep'
-            else:
-                win32file.MoveFile(directory+current, settings.MUSIC_DIRECTORY+'EXACT/'+rename_to)
-                return ''                 
+            win32file.MoveFile(directory+current, drive+'EXACT/'+rename_to+'.'+str(random.randrange(1, 100)))
         except:
-            try:
-                win32file.MoveFile(directory+current, settings.MUSIC_DIRECTORY+'EXACT/'+rename_to+'.'+str(random.randrange(1, 100)))
-            except:
-                print 'Failed to move an exact duplicate album.'
+            print 'Failed to move an exact duplicate album.\n'
         return
 
     return ''
 
             
-def update_album_art(request):
-    letter_list = LETTERS
-    albums_list = ALBUMS_HEAD
-    existing_album_art = len(Music_Album.objects.filter(album_art=True))
-    new_album_art = 0
-    missing_album_art = Music_Album.objects.filter(album_art=False)
-    for albums in missing_album_art: 
-        try: 
-            songs = os.listdir(settings.MUSIC_DIRECTORY + albums.letter + "/" + albums.folder)
-            if 'Folder.jpg' in songs:
-                new_album_art += 1
-                albums.album_art = True
-                albums.save()
-        except: pass
+# def update_album_art(request):
+#     letter_list = LETTERS
+#     albums_list = ALBUMS_HEAD
+#     existing_album_art = len(Music_Album.objects.filter(album_art=True))
+#     new_album_art = 0
+#     missing_album_art = Music_Album.objects.filter(album_art=False)
+#     for albums in missing_album_art: 
+#         try: 
+#             songs = os.listdir(settings.MUSIC_DIRECTORY + albums.letter + "/" + albums.folder)
+#             if 'Folder.jpg' in songs:
+#                 new_album_art += 1
+#                 albums.album_art = True
+#                 albums.save()
+#         except: pass
         
     
-    message = 'Album Art Updated<br/> Existing = ' + str(existing_album_art) + '<br />New = ' + str(new_album_art) + '<br />Missing = ' + str(len(missing_album_art))
-    return render_to_response('confirmation.html', locals()) 
+#     message = 'Album Art Updated<br/> Existing = ' + str(existing_album_art) + '<br />New = ' + str(new_album_art) + '<br />Missing = ' + str(len(missing_album_art))
+#     return render_to_response('confirmation.html', locals()) 
 
 
 def filter_nzbs(path_to_nzbs):
@@ -501,16 +679,42 @@ def rename_albums(path_to_albums):
     return problems, renamed_files
 
 def file_string_rename(string):
-    string2 = string.replace('[', '.')
+    string2 = string.replace(' ', '.').upper()
+    string2 = string2.replace('[', '.')
+    string2 = string2.replace(']', '.')
+    string2 = string2.replace('(', '.')
+    string2 = string2.replace(')', '.')
+    string2 = string2.replace('{', '.')
+    string2 = string2.replace('}', '.')
+    string2 = string2.replace(',.', '.')
+    string2 = string2.replace('.,', '.')
     string2 = string2.replace('.-.', '-')
-    string2 = string2.replace('--', '-')
     string2 = string2.replace('-.', '-')
     string2 = string2.replace('.-', '-')
+    string2 = string2.replace('.-.', '-')
+    string2 = string2.replace('/', '.')
+    string2 = string2.replace(';', '-')
+    string2 = string2.replace(':', '.')
+    string2 = string2.replace('?', '.')
+    string2 = string2.replace('!', '.')
+    string2 = string2.replace('+', '.')
+    string2 = string2.replace('"', '.')
     string2 = string2.replace('..', '.')
+    string2 = string2.replace('--', '-')
+    string2 = string2.replace('..', '.')
+    string2 = string2.replace('--', '-')
+    string2 = string2.replace('..', '.')
+    string2 = string2.replace('--', '-')
+    string2 = string2.replace('..', '.')
+    string2 = string2.replace('--', '-')
     if string2[0] == '.':
         string2 = string2.lstrip('.')
     if string[0] == '-':
         string2 = string2.lstrip('-')
+    if string2[-1] == '.':
+        string2 = string2.rstrip('.')
+    if string[-1] == '-':
+        string2 = string2.rstrip('-')
 
     return string2
 
@@ -624,6 +828,7 @@ def albums(request, letter):
         album_info['album'] = album.album
         album_info['song_count'] = album.song_count
         album_info['letter'] = album.letter
+        album_info['drive'] = album.drive
         album_info['folder'] = album.folder
         album_info['album_art'] = album.album_art
         album_info['year'] = album.year
@@ -656,6 +861,7 @@ def album(request, album_id):
     album['genre_id'] = original_album.album_genre.id 
     album['folder'] = original_album.folder 
     album['letter'] = original_album.letter 
+    album['drive'] = original_album.drive 
     album['year'] = original_album.year 
     album['song_count'] = original_album.song_count 
     album['artist'] = original_album.album_artist.artist 
@@ -674,6 +880,7 @@ def album(request, album_id):
         song_dict['type']  =  song.type
         song_dict['path']  =  song.path
         song_dict['letter']  =  song.letter
+        song_dict['drive']  =  song.drive
         song_dict['rating']  =  song.rating
         song_dict['file_size']  =  song.get_file_size()
         album['songs'].append(song_dict)
@@ -689,6 +896,7 @@ def get_song(request, song_id):
     song = {}
     song['pk'] = original_song.id 
     song['letter'] = original_song.letter 
+    song['drive'] = original_song.drive 
     song['path'] = original_song.path 
     song['filename'] = original_song.filename 
     song['title'] = original_song.title 
@@ -702,7 +910,7 @@ def delete_album(request, album_id):
     album = Music_Album.objects.get(id=album_id)
     message = album.album_artist.id
     songs = Music_Song.objects.filter(album=album)
-    shutil.move(settings.MUSIC_DIRECTORY+album.letter+'/'+album.folder, settings.MUSIC_DIRECTORY+'DELETED/')
+    shutil.move(album.drive+album.letter+'/'+album.folder, album.drive +'DELETED/')
     for song in songs:
         song.delete()
     album.delete()      
@@ -762,6 +970,7 @@ def albums_by_requirement(all_albums):
         album_info['album'] = album.album
         album_info['song_count'] = album.song_count
         album_info['letter'] = album.letter
+        album_info['drive'] = album.drive
         album_info['folder'] = album.folder
         album_info['album_art'] = album.album_art
         album_info['year'] = album.year
@@ -792,6 +1001,7 @@ def artists(request, letter):
                 for get_album in get_albums:
                     album = {}
                     album['letter'] = get_album.letter
+                    album['drive'] = get_album.drive
                     album['folder'] = get_album.folder
                     album['album_art'] = get_album.album_art
                     album['pk'] = get_album.id
@@ -820,7 +1030,7 @@ def set_rating(request, song_id, rating):
     message = 0
     if request.user.username == 'kdibaba':
         song = Music_Song.objects.get(id=song_id)
-        path_to_song = settings.MUSIC_DIRECTORY + song.letter +"/"+song.path+"/"+song.filename
+        path_to_song = song.drive + song.letter +"/"+song.path+"/"+song.filename
         audio = ID3(path_to_song)
         key_found = False
         for key in audio.keys():
@@ -891,6 +1101,7 @@ def search_music_artists(request):
                 for get_album in get_albums:
                     album = {}
                     album['letter'] = get_album.letter
+                    album['drive'] = get_album.drive
                     album['folder'] = get_album.folder
                     album['album_art'] = get_album.album_art
                     album['pk'] = get_album.id
@@ -929,6 +1140,7 @@ def search_music_albums(request):
         album_info['album'] = album.album
         album_info['song_count'] = album.song_count
         album_info['letter'] = album.letter
+        album_info['drive'] = album.drive
         album_info['folder'] = album.folder
         album_info['album_art'] = album.album_art
         album_info['year'] = album.year
@@ -966,6 +1178,7 @@ def search_music_songs(request):
         song_dict['type']  =  song.type
         song_dict['path']  =  song.path
         song_dict['letter']  =  song.letter
+        song_dict['drive']  =  song.drive
         song_dict['rating']  =  song.rating
         song_dict['file_size']  =  song.get_file_size()
         dictionary_songs.append(song_dict)
@@ -994,7 +1207,7 @@ def upload_music(request):
 def handle_uploaded_file(file):
     for key in file.keys():
         print file[key].name
-        destination = open(settings.MUSIC_DIRECTORY+'UPLOADS/'+file[key].name, 'wb+')
+        destination = open(DEFAULT_DIRECTORY+'UPLOADS/'+file[key].name, 'wb+')
         for chunk in file[key].chunks():
             destination.write(chunk)
         destination.close()
@@ -1004,7 +1217,7 @@ def copy_favs(request):
     existing_favs = []
     start = time.clock()
     
-    for root, dirs, files in os.walk(settings.MUSIC_DIRECTORY+'/'+'FAVS'):
+    for root, dirs, files in os.walk(DEFAULT_DIRECTORY+'/'+'FAVS'):
         for file in files:
             existing_favs.append(file)
             
@@ -1025,12 +1238,12 @@ def copy_favs(request):
                         
     for songs in five_star_songs:
         try: 
-            os.makedirs(settings.MUSIC_DIRECTORY+'/'+'FAVS'+'/'+songs.album.album_artist.artist)
+            os.makedirs(DEFAULT_DIRECTORY+'/'+'FAVS'+'/'+songs.album.album_artist.artist)
         except: 
             pass
         try: 
-            win32file.CopyFile(settings.MUSIC_DIRECTORY+songs.letter+'/'+songs.album.folder+'/'+songs.filename, 
-                               settings.MUSIC_DIRECTORY+'/'+'FAVS'+'/'+songs.album.album_artist.artist+'/'+songs.filename, 0)
+            win32file.CopyFile(DEFAULT_DIRECTORY+songs.letter+'/'+songs.album.folder+'/'+songs.filename, 
+                               DEFAULT_DIRECTORY+'/'+'FAVS'+'/'+songs.album.album_artist.artist+'/'+songs.filename, 0)
         except: 
             print songs.album.folder
     print 'Took ', time.clock() - start, ' to copy files.'

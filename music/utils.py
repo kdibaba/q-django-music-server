@@ -8,20 +8,27 @@ import mutagen.id3
 
 from django.conf import settings
 
+DRIVES = {  'X:/': [ '0','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O'],
+            'Y:/': [ 'P','Q','R','S','T','U','V','W','X','Y','Z', 'VA', 'OST']}
 
-def move_new_folders():
-    new_albums = 'NEW/'
+def move_new_folders(drive, letter):
     problems = []
     moved = []
-    folders = os.listdir(settings.MUSIC_DIRECTORY + new_albums)
-    print  folders
+    folders = []
+    original_letter = letter
+    original_drive = drive
+
+    folders = os.listdir(drive + letter + '/')
     for folder in folders:
         letter = folder[0].upper()
         if letter == 'T':
             if len(folder) > 4:
                 if folder[1].upper() == 'H' and folder[2].upper() == 'E':
                     if folder[3] == '-' or folder[3] == '.':
-                        letter = folder[4].upper()
+                        if is_number(folder[4].upper()):
+                            letter = '0'
+                        else:
+                            letter = folder[4].upper()
         elif is_number(folder[0].upper()):
             letter = '0'
         elif letter == 'V':
@@ -36,17 +43,21 @@ def move_new_folders():
                         letter = folder[4].upper()
                     letter = 'OST'
         
-        try:
-            print settings.MUSIC_DIRECTORY+new_albums+folder, 'moved to', settings.MUSIC_DIRECTORY+letter+'/'+folder
-            win32file.MoveFile(settings.MUSIC_DIRECTORY+new_albums+folder, settings.MUSIC_DIRECTORY+letter+'/'+folder)
-            moved.append(folder)
-        except:
+        if original_letter != letter:
+            if letter in DRIVES['X:/']: drive = 'X:/'
+            else: drive = 'Y:/'
             try:
-                win32file.MoveFile(settings.MUSIC_DIRECTORY+new_albums+folder, settings.MUSIC_DIRECTORY+letter+'/'+folder+str(random.randrange(1, 100)))
+                win32file.MoveFile(original_drive+original_letter+'/'+folder, drive+letter+'/'+folder)
+                #print original_drive+original_letter+'/'+folder, 'moved to\n', drive+letter+'/'+folder
                 moved.append(folder)
             except:
-                problems.append(folder)
-                        
+                #print 'FAILED ',original_drive+original_letter+'/'+folder, 'moved to\n', drive+letter+'/'+folder
+                try:
+                    win32file.MoveFile(original_drive+original_letter+'/'+folder, drive+letter+'/'+folder+str(random.randrange(1, 100000)))
+                    moved.append(folder)
+                except:
+                    problems.append(folder)
+                            
     return problems, moved
        
 def is_number(s):
@@ -95,3 +106,49 @@ def get_rating(id3):
         elif rating < 196 and rating >= 128:
             return 3
     return 0
+
+
+def get_artist_from_id3(id3):
+    
+    album_artist_names=id3.getall('TPE1')
+    album_artist_names2=id3.getall('TOPE')
+
+    lead_artist = ''
+    contributing_artist = ''
+
+    try: 
+        lead_artist = album_artist_names[0].text
+    except:
+        pass
+
+    if lead_artist:
+        return lead_artist[0].encode('ascii','ignore')
+
+    try: 
+        contributing_artist = album_artist_names2[0].text
+    except:
+        pass
+
+    if contributing_artist:
+        return contributing_artist[0].encode('ascii','ignore')
+    else:
+        return ''
+
+def removeEmptyFolders(path):
+    if not os.path.isdir(path):
+        return
+
+    # remove empty subfolders
+    files = os.listdir(path)
+    if len(files):
+        for f in files:
+            fullpath = os.path.join(path, f)
+            if os.path.isdir(fullpath):
+                removeEmptyFolders(fullpath)
+
+    # if folder empty, delete it
+    files = os.listdir(path)
+    if len(files) == 0:
+        print "Removing empty folder:", path
+        os.rmdir(path)
+        
