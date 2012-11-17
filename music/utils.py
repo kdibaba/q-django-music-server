@@ -47,14 +47,23 @@ def move_new_folders(drive, letter):
             if letter in DRIVES['X:/']: drive = 'X:/'
             else: drive = 'Y:/'
             try:
-                win32file.MoveFile(original_drive+original_letter+'/'+folder, drive+letter+'/'+folder)
-                #print original_drive+original_letter+'/'+folder, 'moved to\n', drive+letter+'/'+folder
-                moved.append(folder)
+                if original_drive == drive:
+                    win32file.MoveFile(original_drive+original_letter+'/'+folder, drive+letter+'/'+folder)
+                    #print original_drive+original_letter+'/'+folder, 'moved to\n', drive+letter+'/'+folder
+                    moved.append(folder)
+                else:
+                    win32file.MoveFile(original_drive+original_letter+'/'+folder, original_drive+'MOVE/'+folder)
+                    moved.append(folder)
+
             except:
                 #print 'FAILED ',original_drive+original_letter+'/'+folder, 'moved to\n', drive+letter+'/'+folder
                 try:
-                    win32file.MoveFile(original_drive+original_letter+'/'+folder, drive+letter+'/'+folder+str(random.randrange(1, 100000)))
-                    moved.append(folder)
+                    if original_drive == drive:
+                        win32file.MoveFile(original_drive+original_letter+'/'+folder, drive+letter+'/'+folder+str(random.randrange(1, 100000)))
+                        moved.append(folder)
+                    else:
+                        win32file.MoveFile(original_drive+original_letter+'/'+folder, original_drive+'MOVE/'+folder+str(random.randrange(1, 100000)))
+                        moved.append(folder)
                 except:
                     problems.append(folder)
                             
