@@ -604,7 +604,7 @@ table#song_table {
 	box-shadow: 0px -1px 5px #DDDDDD;
 }
 
-#playlist_button {
+.playlist_button {
 	background: linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
 	background: -o-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
 	background: -moz-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
@@ -619,7 +619,7 @@ table#song_table {
 	margin	: 2px 6px;
 }
 
-#playlist_button:hover {
+.playlist_button:hover {
 	box-shadow : 0 0 4px #999999;
 }
 

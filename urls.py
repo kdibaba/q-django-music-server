@@ -6,7 +6,8 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    (r'^admin/(.*)', admin.site.root) ,
+    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    url(r'^admin/', include(admin.site.urls)),
     
     (r'^$',                                         'media.music.views.music'),
     (r'^music/$',                                   'media.music.views.music'),
@@ -25,6 +26,7 @@ urlpatterns = patterns('',
     (r'^album_info/(?P<album_id>\d+)/$',            'media.music.views.album_info'),
     (r'^album_show/(?P<album_id>\d+)/$',            'media.music.views.album'),
     (r'^album_delete/(?P<album_id>\d+)/$',          'media.music.views.delete_album'),
+    (r'^album_share/(?P<album_id>\d+)/$',           'media.music.views.share_album'),
     (r'^albums_by_artist/(?P<artist_id>\d+)/$',     'media.music.views.albums_by_artist'),
     (r'^albums_by_genre/(?P<genre_id>\d+)/$',       'media.music.views.albums_by_genre'),
     (r'^albums_by_year/(?P<year_id>\d+)/$',         'media.music.views.albums_by_year'),
@@ -68,6 +70,7 @@ urlpatterns = patterns('',
     (r'^artists/U/$',                           'media.music.views.artists', {'letter': 'U'}),
     (r'^artists/V/$',                           'media.music.views.artists', {'letter': 'V'}),
     (r'^artists/VA/$',                           'media.music.views.artists', {'letter': 'VA'}),
+    (r'^artists/OST/$',                           'media.music.views.artists', {'letter': 'OST'}),
     (r'^artists/W/$',                           'media.music.views.artists', {'letter': 'W'}),
     (r'^artists/X/$',                           'media.music.views.artists', {'letter': 'X'}),
     (r'^artists/Y/$',                           'media.music.views.artists', {'letter': 'Y'}),
@@ -139,4 +142,5 @@ if settings.DEBUG:
         url( r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT} ),
         url( r'^X/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.DRIVE_X} ),
         url( r'^Y/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.DRIVE_Y} ),
+        url( r'^Z/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.DRIVE_Z} ),
     )

@@ -320,14 +320,42 @@ function display_message_alert(message, status) {
 	setTimeout("$('#status_message').slideUp(500, function(){$('#status_message').removeClass('good');$('#status_message').removeClass('bad');})", 4000)
 	
 }
-function add_music(type) {
+
+function add_music(type, message) {
 	jQuery.ajax({
 		url: "/add_music/"+type+"/", 
-		success: function() {get_all_albums('all', 0)},
-		async	: false
+		success: function() {
+			display_message_alert(message, true);
+		},
+		async	: true
 	});
 	return false;  
 }
+
+
+function share_album(album_id) {
+	jQuery.ajax({
+		url: "/album_share/" + album_id + "/", 
+		success: function() {
+			display_message_alert(message, true);
+		},
+		async	: false
+	});
+};
+
+function rebuild_letter(letter) {
+	display_message_alert('Rebuilding the letter ' + letter + ' as requested.', true);
+	jQuery.ajax({
+		url: "/rebuild/"+letter+"/", 
+		success: function() { 
+			display_message_alert('Deleting albums complete. Rebuilding....', true);
+			add_music('add', 'Rebuilding '+ letter + ' is complete.');
+		},
+		async	: true
+	});
+	return false;  
+}
+
 
 function check_session_status(){
 	var logged_in = true
@@ -521,7 +549,7 @@ function get_all_artists(letter, page) {
 	jQuery.ajax({
 		url: "/artists/"+letter+"/", 
 		success: function(jsonArtists) {show_artists(jsonArtists, letter, page)},
-		async	: true
+		async	: false
 	});
 };
 
@@ -537,10 +565,7 @@ function show_artists(jsonArtists, letter, page) {
 	$('#content').replaceWith('<div id="content"></div>')
 	$('#content').append('<div id="artists"></div>');
 	
-
-	console.time('build_artist')
 	build_artist_page()
-	console.timeEnd('build_artist')
 }
 
 function next_artist_page() {
@@ -548,10 +573,8 @@ function next_artist_page() {
 
 	ARTISTS_PREV = ARTISTS_CURR
 	$('#artists').animate({opacity : 0, "margin-left" : "-1000px"}, 300, function(){
-		$('#artists').html('')
-		console.time('build_artist')
+		$('#artists').html('');
 		build_artist_page();
-		console.timeEnd('build_artist')
 		$('#artists').css({"margin" : "auto", opacity : 1}).show();
 	})
 	
@@ -563,26 +586,24 @@ function previous_artist_page() {
 
 	//ARTISTS_NEXT = ARTISTS_CURR
 	$('#artists').animate({opacity : 0, "margin-left" : "1000px"}, 300, function(){
-		$('#artists').html('')
-		console.time('build_artist')
+		$('#artists').html('');
 		build_artist_page();
-		console.timeEnd('build_artist')
 		$('#artists').css({"margin" : "auto", opacity : 1}).show();
 	})
 	location.hash = '/artists/'+ARTISTS_LETTER+'/'+ARTISTS_PAGE+'/'
 }
 
 function build_artist_page() {
-	var artist_count = 0
-	var deg = 0
-	var length = 0
+	var artist_count = 0;
+	var deg = 0;
+	var length = 0;
 	var cover_count = 0;
 	var missing_cover_count = 0;
 	
-	var iterator = ARTISTS_PAGE * ARTISTS_COUNT
+	var iterator = ARTISTS_PAGE * ARTISTS_COUNT;
 
-	var artists = $('#artists')
-	var content = $('#content')
+	var artists = $('#artists');
+	var content = $('#content');
 	if (ARTISTS_PAGE == 0){$('#prev_page').remove()}
 	else if(!$('#prev_page').html()){content.append('<button id="prev_page" onclick="previous_artist_page();" style="width: 31px; left: 0px; padding-bottom: 0px; "><img src="/static/images/prev.png" /></button>')}
 	
@@ -615,8 +636,7 @@ function build_artist_page() {
 	})
 	artists.append('</ul>');
 	if (user_is_admin()) {
-		//artists.prepend('<p class="nav_header">' + ARTISTS_CONTENT.length + ' Artist(s) found. <button id="rebuild_button" onclick="location.href=\'/#/rebuild/'+ARTISTS_LETTER+'\'">Rebuild '+ARTISTS_LETTER+'</button> </p>');
-		artists.prepend('<p class="nav_header">' + ARTISTS_CONTENT.length + ' Artist(s) found.')
+		artists.prepend('<p class="nav_header">' + ARTISTS_CONTENT.length + ' Artist(s) found. <button id="rebuild_button" onclick="rebuild_letter(\''+ARTISTS_LETTER+'\')">Rebuild '+ARTISTS_LETTER+'</button></p>');
 	}
 	else {
 		artists.prepend('<p class="nav_header">' + ARTISTS_CONTENT.length + ' Artist(s) found.')
@@ -801,6 +821,7 @@ function show_album(jsonAlbum, show_or_play) {
 	$('#album').append('<div class="current_album"></div>')
 	//$('#album').append( '<button id="delete_album_button" style="float:right;" onclick="delete_album('+all_album[0].pk+')">DELETE ALBUM</button>')
 	$('#album').append('<div id="current_album_songs"></div>')
+	$('#current_album_songs').append( '<button class="playlist_button" style="float:right;" onclick="share_album('+all_album[0].pk+')">SHARE ALBUM</button>')
 	$.each(all_album, function(i,album){
 		if (album.album_art){$('.current_album').append( '<div id="curr_album_img_div"><img src="/' + album.drive + '/' +album.letter+ '/' + album.folder + '/Folder.jpg' + '" /></div>' )}
 		else {$('.current_album').append( '<div id="curr_album_img_div"><img src="/static/images/default_album_art.jpg" /></div>' )}
@@ -1056,9 +1077,9 @@ function recreate_playlist(){
 	$('.jp-no-solution').append('To play the media you will need to either update your browser to a recent version or update your <a href="http://get.adobe.com/flashplayer/" target="_blank">Flash plugin</a>.');
 	
 	$('#footer').prepend('<div id="playlist_button_wrapper"></div>');
-	$('#playlist_button_wrapper').append('<button id="playlist_button" onclick="show_playlist()">Show Playlist</button>');
-	$('#playlist_button_wrapper').append('<button id="playlist_button" onclick="hide_playlist()">Hide Playlist</button>');
-	$('#playlist_button_wrapper').append('<button id="playlist_button" onclick="save_playlist()">Save Playlist</button>');
+	$('#playlist_button_wrapper').append('<button class="playlist_button" onclick="show_playlist()">Show Playlist</button>');
+	$('#playlist_button_wrapper').append('<button class="playlist_button" onclick="hide_playlist()">Hide Playlist</button>');
+	$('#playlist_button_wrapper').append('<button class="playlist_button" onclick="save_playlist()">Save Playlist</button>');
 	$('#playlist_button_wrapper').append('<button id="close_button" onclick="destroy_playlist()">X</button>');
 	$('div.jp-progress').css("width", $(window).width()-340+'px');
 	$('div.jp-time-holder').css("width", $(window).width()-350+'px');

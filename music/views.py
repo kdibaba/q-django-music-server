@@ -23,13 +23,15 @@ import json, urllib, requests
 from StringIO import StringIO
 from requests.exceptions import ConnectionError
 
-DRIVES = {  'X:/': [ '0','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O'],
-            'Y:/': [ 'P','Q','R','S','T','U','V','W','X','Y','Z', 'VA', 'OST']}
+DRIVES = {  'X:/': [ '0','A','B','C','D','E','F','G'],
+            'Y:/': [ 'H','I','J','K','L','M','N','O', 'P','Q','R','S','T','U','V','W','X','Y','Z'],
+            'Z:/': [ 'OST', 'VA']}
 LETTERS = ['0','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z', 'VA', 'OST']
 ALBUMS_HEAD = ['0','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
 SET_RATING = {'0': 0, '1': 32, '2': 64, '3': 128,'4':196, '5':255}
 GUEST_ACCESS = 25
 MUSIC_FILE_EXTENSIONS = ['WMA','WAV','MPA','FLAC','M4A', 'MP4']
+BAD_FILE_EXTENSIONS = ['RAR','SFV','PAR2','PAR']
 
 DEFAULT_DIRECTORY = 'Y:/'
 
@@ -178,17 +180,18 @@ def catalog_drive_music(type):
        
 
     start_time = time.time()
-    loops = [1,2,3,4,5]
+    loops = [1,2]#,3,4,5,6,7,8,9]
 
+    loop_counter = 0
     for loop in loops:
+        loop_counter += 1
         for drive in DRIVES.keys():
             for letter in DRIVES[drive]: 
 
                 print '\nProcessing albums in directory - ', letter
                 directory = drive + letter + "/"
 
-
-                if loop == 5:
+                if loop_counter == loops[-1]:
                     print '\nMoving albums to their correct directories...'
                     fail_to_move, moved_folders = move_new_folders(drive, letter)
                     print 'Successfully moved %d albums to their correct directories.' % len(moved_folders)
@@ -393,6 +396,13 @@ def catalog_drive_music(type):
 
                         elif song.rsplit('.')[-1].upper() in MUSIC_FILE_EXTENSIONS:
                             other_format_exists = True
+                        elif song.rsplit('.')[-1].upper() in BAD_FILE_EXTENSIONS:
+                            print 'Deleting file - ' + song, ' From ', file_object
+                            try:
+                                shutil.move(directory+file_object+'/'+song, drive +'DELETED/'+song)
+                            except:
+                                shutil.move(directory+file_object+'/'+song, drive +'DELETED/'+song+str(random.randrange(1, 10000000)))
+
                     if not mp3_exists:
                         if other_format_exists:
                             try:
@@ -621,7 +631,7 @@ def update_front_jpg():
         #import pdb; pdb.set_trace()
         songs = os.listdir(albums.drive+':/'+albums.letter+'/'+albums.folder)
         for song in songs:
-            if 'front.jpg' == song.lower():
+            if 'front.jpg' == song.lower() or 'front.jpeg' == song.lower() or 'cover.jpg' == song.lower() or 'cover.jpeg' == song.lower():
                 try:
                     win32file.MoveFile(albums.drive+':/'+albums.letter+'/'+albums.folder+'/'+song, albums.drive+':/'+albums.letter+'/'+albums.folder+'/'+'Folder.jpg')
                 except:
@@ -981,6 +991,23 @@ def delete_album(request, album_id):
         mimetype = 'application/javascript'
     return HttpResponse(message, mimetype)
 
+@login_required
+def share_album(request, album_id):
+    album = Music_Album.objects.get(id=album_id)
+    album_path = album.drive+':/'+album.letter+'/'+album.folder
+    share_path = album.drive+':/'+'SHARED/'+album.folder
+    try:
+        os.makedirs(share_path)
+        files = os.listdir(album_path)
+        for file in files:
+            win32file.CopyFile(album_path+'/'+file, share_path+'/'+file, 0)
+        message = 'Successfully shared album - '+ album.folder
+    except:
+        message = 'That album is already shared'
+
+    if request.is_ajax():
+        mimetype = 'application/javascript'
+    return HttpResponse(message, mimetype)
 
 @login_required
 def albums_by_artist(request, artist_id):
@@ -1084,9 +1111,13 @@ def artists(request, letter):
     
 @login_required
 def rebuild(request, letter):
-    Music_Artist.objects.filter(letter=letter).delete()
-    catalog_drive_music('none')
-    return HttpResponseRedirect('/#/artists/'+letter)
+    message = 0
+    if request.user.username == 'kdibaba' and letter:
+        Music_Album.objects.filter(letter=letter).delete()
+        message = 1
+    if request.is_ajax():
+        mimetype = 'application/javascript'
+    return HttpResponse(message, mimetype)
     
 @login_required
 def set_rating(request, song_id, rating):

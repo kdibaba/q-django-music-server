@@ -8,8 +8,9 @@ import mutagen.id3
 
 from django.conf import settings
 
-DRIVES = {  'X:/': [ '0','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O'],
-            'Y:/': [ 'P','Q','R','S','T','U','V','W','X','Y','Z', 'VA', 'OST']}
+DRIVES = {  'X:/': [ '0','A','B','C','D','E','F','G'],
+            'Y:/': [ 'H','I','J','K','L','M','N','O', 'P','Q','R','S','T','U','V','W','X','Y','Z'],
+            'Z:/': [ 'OST', 'VA']}
 
 def move_new_folders(drive, letter):
     problems = []
@@ -31,17 +32,11 @@ def move_new_folders(drive, letter):
                             letter = folder[4].upper()
         elif is_number(folder[0].upper()):
             letter = '0'
-        elif letter == 'V':
-            if len(folder) > 2:
-                if folder[1].upper() == 'A':
-                    if folder[2] == '-' or folder[2] == '.':
-                        letter = 'VA'
-        elif letter == 'O':
-            if len(folder) > 3:
-                if folder[1].upper() == 'S' and folder[2] == 'T':
-                    if folder[3] == '-' or folder[3] == '.':
-                        letter = folder[4].upper()
-                    letter = 'OST'
+
+        elif str(folder).startswith('VA-') or str(folder).startswith('VA.') or str(folder).startswith('VARIOUS-') or str(folder).startswith('VARIOUS.ARTIST'):
+            letter = 'VA'
+        elif str(folder).startswith('SOUNDTRACK') or str(folder).startswith('OST') or str(folder).startswith('ORIGINAL.SOUNDTRACK'):
+            letter = 'OST'
         
         if original_letter != letter:
             if letter in DRIVES['X:/']: drive = 'X:/'
@@ -119,11 +114,13 @@ def get_rating(id3):
 
 def get_artist_from_id3(id3):
     
-    album_artist_names=id3.getall('TPE1')
-    album_artist_names2=id3.getall('TOPE')
+    album_artist_names=id3.getall('TPE2')
+    album_artist_names2=id3.getall('TPE1')
 
     lead_artist = ''
     contributing_artist = ''
+
+    # import pdb; pdb.set_trace();
 
     try: 
         lead_artist = album_artist_names[0].text
