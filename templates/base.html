@@ -6,6 +6,7 @@
 	    <LINK REL="SHORTCUT ICON" HREF="/static/images/logo_icon.jpg">
 	    <link href='http://fonts.googleapis.com/css?family=Volkhov' rel='stylesheet' type='text/css'>
 	    <link href='http://fonts.googleapis.com/css?family=Kelly+Slab' rel='stylesheet' type='text/css'>
+	    <link href='http://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
 	    <link rel="stylesheet" type="text/css" href="/static/css/base.css" />
 	    <link rel="stylesheet" type="text/css" href="/static/css/music.css" />
 	    <link type="text/css" href="/static/css/jplayer.blue.monday.css" rel="stylesheet" />
@@ -39,12 +40,12 @@
 		    </div>
 		    <div id="navigation">
 				<div class=nav_button>
-					<div id="menu_home" onclick="location.href='/'" ><p>Home</p></div>
+					<div id="menu_home" onclick="location.href='#/'" ><p>Home</p></div>
 					<div ondblclick="location.href='#/artists/all/0/'" id="menu_artists">
 						<p>Artists</p>
 						<div class="nav_buttons nav_button_artists" style="display:none;">
 							{% for letter in letter_list %}
-								<div class="sub_menu_link" onclick="location.href='/#/artists/{{letter}}/0/'">{{letter}}</div>
+								<div class="sub_menu_link trigger_url" onclick="location.href='/#/artists/{{letter}}/0/'">{{letter}}</div>
 							{% endfor %}
 						</div>
 						</div>
@@ -52,7 +53,7 @@
 						<p>Albums</p>
 						<div class="nav_buttons nav_button_albums" style="display:none;">
 							{% for letter in albums_list %}
-								<div class="sub_menu_link" onclick="location.href='/#/albums/{{letter}}/0/'">{{letter}}</div>
+								<div class="sub_menu_link trigger_url" onclick="location.href='/#/albums/{{letter}}/0/'">{{letter}}</div>
 							{% endfor %}
 						</div>
 						</div>

@@ -461,12 +461,13 @@
 	
 table#song_table {
 	text-align	: left;
-	width: 100%;
 	border-spacing: 0px;
+	text-shadow: 1px 0px 1px #fff;
+	font-family: Roboto Condensed;
+	width: 100%;
 }
 	
 .theme_white #song_table {
-	border: 1px solid #DDD;
 }
 
 .theme_black #song_table {
@@ -479,7 +480,7 @@ table#song_table {
 }
 
 #current_album_songs #song_table_header th {
-	font-size		: 13px;
+	font-size: 15px;
 	height: 32px;
 }
 
@@ -488,8 +489,7 @@ table#song_table {
 }
 
 .theme_white #current_album_songs #song_table_header {
- 	color			: #000000;
-	background: rgb(247,247,247); /* Old browsers */
+ 	background: rgb(247,247,247); /* Old browsers */
 	background: -moz-linear-gradient(top,  rgba(247,247,247,1) 0%, rgba(229,229,229,1) 100%); /* FF3.6+ */
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(247,247,247,1)), color-stop(100%,rgba(229,229,229,1))); /* Chrome,Safari4+ */
 	background: -webkit-linear-gradient(top,  rgba(247,247,247,1) 0%,rgba(229,229,229,1) 100%); /* Chrome10+,Safari5.1+ */
@@ -533,7 +533,7 @@ table#song_table {
 }
 
 .theme_white #current_album_songs .song_table_field {
-	border-bottom	: 1px solid #cccccc;
+	/*border-bottom	: 1px solid #cccccc;*/
 }
 .theme_black #current_album_songs .song_table_field {
 	border-bottom	: 1px solid #999;
@@ -545,12 +545,12 @@ table#song_table {
 .theme_white #current_album_songs .songs{
 	cursor		: pointer;
 	color		: #888888;
-	background	: #ffffff;
+	background	: #fafafa;
 }
 
 .theme_white #current_album_songs .songs:hover {
 	color		: #333333;
-	background	: #FAFAFA;
+	background	: #f1f1f1;
 }
 
 .theme_black #current_album_songs .songs{

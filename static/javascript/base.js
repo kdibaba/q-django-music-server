@@ -71,6 +71,9 @@ $(document).ready(function(){
 	
     //HANDLE url changes
     $(window).bind( 'hashchange', function(){handle_hash()});
+    $(".trigger_url").bind('click', function(){
+    	handle_hash();
+    })
     handle_hash();
 
     //HANDLE jPlayer size
@@ -220,6 +223,9 @@ function handle_hash(){
 	var destination = location.hash.replace('#', '')
 	destination = destination.split('/')
 	if (check_session_status()){
+		// if (destination[1] == '') {
+		// 	// Do nothing for now..
+		// }
 		if (destination[1] == 'artists') {
 			if (parseInt(destination[3]) == 0){
 				display_message('Retrieving Artists....');
