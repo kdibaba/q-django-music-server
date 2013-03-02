@@ -870,50 +870,6 @@ def rename_nzbs(path_to_nzbs, albums=True):
     return problems, renamed_files
 
 @login_required
-def albums(request, letter):
-    if request.user.is_superuser or request.user.is_staff:
-        if letter == 'all':
-            all_albums = Music_Album.objects.all()
-        elif letter == '0':
-            all_albums = Music_Album.objects.filter(album__regex=r'\d')
-        else:
-            letter_albums = Music_Album.objects.filter(album__startswith=letter).exclude(album__startswith='THE ')
-            albums_with_the = Music_Album.objects.filter(album__startswith='THE '+letter)
-            all_albums = sorted(chain(letter_albums, albums_with_the),key=attrgetter('album'))
-    else:
-        if letter == 'all':
-            all_albums = Music_Album.objects.filter(access="public")
-        elif letter == '0':
-            all_albums = Music_Album.objects.filter(access="public").filter(album__regex=r'\d')
-        else:
-            letter_albums = Music_Album.objects.filter(access="public").filter(album__startswith=letter).exclude(album__startswith='THE ')
-            albums_with_the = Music_Album.objects.filter(access="public").filter(album__startswith='THE '+letter)
-            all_albums = sorted(chain(letter_albums, albums_with_the),key=attrgetter('album'))
-    
-    dictionary_albums = []
-    for album in all_albums:
-        album_info = {}
-        album_info['artist'] = album.album_artist.artist
-        album_info['artist_id'] = album.album_artist.id
-        album_info['genre'] = album.album_genre.genre
-        album_info['genre_id'] = album.album_genre.id
-        album_info['pk'] = album.id
-        album_info['album'] = album.album
-        album_info['song_count'] = album.song_count
-        album_info['letter'] = album.letter
-        album_info['drive'] = album.drive
-        album_info['folder'] = album.folder
-        album_info['album_art'] = album.album_art
-        album_info['year'] = album.year
-        album_info['album_size'] = album.get_album_size()
-        dictionary_albums.append(album_info)
-        
-    if request.is_ajax():
-        mimetype = 'application/javascript'
-        albums = simplejson.dumps(dictionary_albums)
-    return HttpResponse(albums, mimetype)
-
-@login_required
 def album_info(request, album_id):
     albuminfo = ''
     album = Music_Album.objects.get(id=album_id)
@@ -928,7 +884,7 @@ def album(request, album_id):
     songs = Music_Song.objects.filter(album=original_album, type="mp3").order_by('filename')
     all_album = []
     album = {}
-    album['pk'] = original_album.id 
+    album['id'] = original_album.id 
     album['album'] = original_album.album 
     album['genre'] = original_album.album_genre.genre 
     album['genre_id'] = original_album.album_genre.id 
@@ -944,7 +900,7 @@ def album(request, album_id):
     album['songs'] = []
     for song in songs:
         song_dict = {}
-        song_dict['pk']  =  song.id
+        song_dict['id']  =  song.id
         song_dict['filename']  =  song.filename
         song_dict['length']  =  song.length
         song_dict['title']  =  song.title
@@ -967,7 +923,7 @@ def album(request, album_id):
 def get_song(request, song_id):
     original_song = Music_Song.objects.get(id=song_id)
     song = {}
-    song['pk'] = original_song.id 
+    song['id'] = original_song.id 
     song['letter'] = original_song.letter 
     song['drive'] = original_song.drive 
     song['path'] = original_song.path 
@@ -1009,76 +965,91 @@ def share_album(request, album_id):
         mimetype = 'application/javascript'
     return HttpResponse(message, mimetype)
 
+
+@login_required
+def albums(request, letter):
+    start_time = time.time()
+    if request.user.is_superuser or request.user.is_staff:
+        if letter == 'all':
+            all_albums = Music_Album.objects.all()
+        elif letter == '0':
+            all_albums = Music_Album.objects.filter(album__regex=r'\d')
+        else:
+            letter_albums = Music_Album.objects.filter(album__istartswith=letter).exclude(album__istartswith='THE ').values('album', 'album_size', 'album_genre__genre', 
+                'album_genre_id', 'album_artist__artist', 'album_artist_id', 'drive', 'song_count', 'letter', 'year', 'folder', 'id', 'album_art') 
+            albums_with_the = Music_Album.objects.filter(album__istartswith='THE '+letter).values('album', 'album_size', 'album_genre__genre', 
+                'album_genre_id', 'album_artist__artist', 'album_artist_id', 'drive', 'song_count', 'letter', 'year', 'folder', 'id', 'album_art')
+    else:
+        if letter == 'all':
+            all_albums = Music_Album.objects.filter(access="public")
+        elif letter == '0':
+            all_albums = Music_Album.objects.filter(access="public").filter(album__regex=r'\d')
+        else:
+            letter_albums = Music_Album.objects.filter(access="public").filter(album__istartswith=letter).values('album', 'album_size', 'album_genre__genre', 
+                'album_genre_id', 'album_artist__artist', 'album_artist_id', 'drive', 'song_count', 'letter', 'year', 'folder', 'id', 'album_art')
+            albums_with_the = Music_Album.objects.filter(access="public").filter(album__istartswith='THE '+letter).values('album', 'album_size', 'album_genre__genre', 
+                'album_genre_id', 'album_artist__artist', 'album_artist_id', 'drive', 'song_count', 'letter', 'year', 'folder', 'id', 'album_art')
+        
+    dictionary_albums = list(letter_albums) + list(albums_with_the)
+    
+    print 'Time to get all albums for the letter ', letter, ' ', time.time() - start_time
+    if request.is_ajax():
+        mimetype = 'application/javascript'
+        albums = simplejson.dumps(dictionary_albums)
+    return HttpResponse(albums, mimetype)
+
 @login_required
 def albums_by_artist(request, artist_id):
-    artist = Music_Artist.objects.get(id=artist_id)
     if request.user.is_superuser or request.user.is_staff:
-        all_albums = Music_Album.objects.filter(album_artist=artist).order_by('album')
+        all_albums = Music_Album.objects.filter(album_artist__id=artist_id).order_by('album').values('album', 'album_size', 'album_genre__genre', 
+                'album_genre_id', 'album_artist__artist', 'album_artist_id', 'drive', 'song_count', 'letter', 'year', 'folder', 'id', 'album_art') 
     else:
-        all_albums = Music_Album.objects.filter(access="public").filter(album_artist=artist).order_by('album')
+        all_albums = Music_Album.objects.filter(access="public").filter(album_artist__id=artist_id).order_by('album').values('album', 'album_size', 'album_genre__genre', 
+                'album_genre_id', 'album_artist__artist', 'album_artist_id', 'drive', 'song_count', 'letter', 'year', 'folder', 'id', 'album_art') 
         
     if request.is_ajax():
         mimetype = 'application/javascript'
-        albums = simplejson.dumps(albums_by_requirement(all_albums))
-    return HttpResponse(albums, mimetype)
+    return HttpResponse(simplejson.dumps(list(all_albums)), mimetype)
 
 
 @login_required
 def albums_by_year(request, year_id):
     if request.user.is_superuser or request.user.is_staff:
-        all_albums = Music_Album.objects.filter(year=year_id).order_by('album')
+        all_albums = Music_Album.objects.filter(year=year_id).order_by('album').values('album', 'album_size', 'album_genre__genre', 
+                'album_genre_id', 'album_artist__artist', 'album_artist_id', 'drive', 'song_count', 'letter', 'year', 'folder', 'id', 'album_art') 
     else:
-        all_albums = Music_Album.objects.filter(access="public").filter(year=year_id).order_by('album')
+        all_albums = Music_Album.objects.filter(access="public").filter(year=year_id).order_by('album').values('album', 'album_size', 'album_genre__genre', 
+                'album_genre_id', 'album_artist__artist', 'album_artist_id', 'drive', 'song_count', 'letter', 'year', 'folder', 'id', 'album_art') 
         
     if request.is_ajax():
         mimetype = 'application/javascript'
-        albums = simplejson.dumps(albums_by_requirement(all_albums))
-    return HttpResponse(albums, mimetype)
+    return HttpResponse(simplejson.dumps(list(all_albums)), mimetype)
 
 
 @login_required
 def albums_by_genre(request, genre_id):
     if request.user.is_superuser or request.user.is_staff:
-        all_albums = Music_Album.objects.filter(album_genre=genre_id).order_by('album')
+        all_albums = Music_Album.objects.filter(album_genre=genre_id).order_by('album').values('album', 'album_size', 'album_genre__genre', 
+                'album_genre_id', 'album_artist__artist', 'album_artist_id', 'drive', 'song_count', 'letter', 'year', 'folder', 'id', 'album_art') 
     else:
-        all_albums = Music_Album.objects.filter(access="public").filter(album_genre=genre_id).order_by('album')
+        all_albums = Music_Album.objects.filter(access="public").filter(album_genre=genre_id).order_by('album').values('album', 'album_size', 'album_genre__genre', 
+                'album_genre_id', 'album_artist__artist', 'album_artist_id', 'drive', 'song_count', 'letter', 'year', 'folder', 'id', 'album_art') 
         
     if request.is_ajax():
         mimetype = 'application/javascript'
-        albums = simplejson.dumps(albums_by_requirement(all_albums))
-    return HttpResponse(albums, mimetype)
-
-def albums_by_requirement(all_albums):
-    dictionary_albums = []
-    for album in all_albums:
-        album_info = {}
-        album_info['artist'] = album.album_artist.artist
-        album_info['artist_id'] = album.album_artist.id
-        album_info['genre'] = album.album_genre.genre
-        album_info['genre_id'] = album.album_genre.id
-        album_info['pk'] = album.id
-        album_info['album'] = album.album
-        album_info['song_count'] = album.song_count
-        album_info['letter'] = album.letter
-        album_info['drive'] = album.drive
-        album_info['folder'] = album.folder
-        album_info['album_art'] = album.album_art
-        album_info['year'] = album.year
-        album_info['album_size'] = album.get_album_size()
-        dictionary_albums.append(album_info)
-    
-    return dictionary_albums
+    return HttpResponse(simplejson.dumps(list(all_albums)), mimetype)
 
 @login_required
 def artists(request, letter):
     if letter == 'all': get_artists = Music_Artist.objects.all().order_by('artist')
     else: get_artists = Music_Artist.objects.filter(letter=letter).order_by('artist')
-        
+    
+    start_time = time.time()
     artists = []
     for get_artist in get_artists:
         try:
             artist = {}
-            artist['pk'] = get_artist.id
+            artist['id'] = get_artist.id
             artist['name'] = get_artist.artist
             artist['song_count'] = 0
             artist['album_count'] = 0
@@ -1094,7 +1065,7 @@ def artists(request, letter):
                     album['drive'] = get_album.drive
                     album['folder'] = get_album.folder
                     album['album_art'] = get_album.album_art
-                    album['pk'] = get_album.id
+                    album['id'] = get_album.id
                     
                     artist['song_count'] += get_album.song_count
                     artist['album_count'] += 1
@@ -1102,7 +1073,8 @@ def artists(request, letter):
                 artists.append(artist)
         except:
             print 'excepted', get_artist.artist
-    
+
+    print 'Time to get all artists for the letter ', letter, ' ', time.time() - start_time
     if request.is_ajax():
         mimetype = 'application/javascript'
         artists = simplejson.dumps(artists)
@@ -1133,7 +1105,6 @@ def set_rating(request, song_id, rating):
                 audio.getall('POPM')[0].rating=SET_RATING[str(rating)]
                 audio.save()    
         if not key_found:
-            print 'Creating the key'
             audio.add(mutagen.id3.POPM(email=u'Windows Media Player 9 Series', rating=SET_RATING[str(rating)]))
             audio.save()
         song.rating = rating
@@ -1145,15 +1116,22 @@ def set_rating(request, song_id, rating):
  
 @login_required
 def get_profile_song_columns(request):
-    columns = request.user.get_profile().song_table_columns
+    columns = request.user.get_profile()
     
+    if not columns.song_table_columns:
+        columns.song_table_columns = ";"
+        columns.save()
+
     if request.is_ajax():
         mimetype = 'application/javascript'
-    return HttpResponse(simplejson.dumps(columns), mimetype)
+    return HttpResponse(simplejson.dumps(columns.song_table_columns), mimetype)
     
 @login_required    
 def set_profile_song_columns(request):
     columns = request.user.get_profile()
+    if not columns.song_table_columns:
+        columns.song_table_columns = ";"
+        columns.save()
     if request.GET['query'] in columns.song_table_columns:
         columns.song_table_columns = columns.song_table_columns.replace(';'+request.GET['query'], '')
         columns.save() 
@@ -1175,7 +1153,6 @@ def set_theme(request):
 
 @login_required    
 def search_music_artists(request):
-    start_time = time.time()
     get_artists = Music_Artist.objects.filter(artist__icontains=request.GET['query'])   
     artists = []
     for get_artist in get_artists:
@@ -1187,7 +1164,7 @@ def search_music_artists(request):
 
             if get_albums:
                 artist = {}
-                artist['pk'] = get_artist.id
+                artist['id'] = get_artist.id
                 artist['name'] = get_artist.artist
                 artist['song_count'] = 0
                 artist['album_count'] = 0
@@ -1198,7 +1175,7 @@ def search_music_artists(request):
                     album['drive'] = get_album.drive
                     album['folder'] = get_album.folder
                     album['album_art'] = get_album.album_art
-                    album['pk'] = get_album.id
+                    album['id'] = get_album.id
                     
                     artist['song_count'] += get_album.song_count
                     artist['album_count'] += 1
@@ -1210,14 +1187,13 @@ def search_music_artists(request):
     if request.is_ajax():
         mimetype = 'application/javascript'
         artists = simplejson.dumps(artists)
-        print 'Artists search completed in ', time.time() - start_time
+    else:
+        return music(request)
     return HttpResponse(artists, mimetype)
     
         
 @login_required
 def search_music_albums(request):
-    start_time = time.time()
-             
     if request.user.is_superuser or request.user.is_staff:           
         all_albums = Music_Album.objects.filter(album__icontains=request.GET['query'])   
     else:
@@ -1230,7 +1206,7 @@ def search_music_albums(request):
         album_info['artist_id'] = album.album_artist.id
         album_info['genre'] = album.album_genre.genre
         album_info['genre_id'] = album.album_genre.id
-        album_info['pk'] = album.id
+        album_info['id'] = album.id
         album_info['album'] = album.album
         album_info['song_count'] = album.song_count
         album_info['letter'] = album.letter
@@ -1244,26 +1220,16 @@ def search_music_albums(request):
     if request.is_ajax():
         mimetype = 'application/javascript'
         albums = simplejson.dumps(dictionary_albums)
-        print 'Albums search completed in ', time.time() - start_time
     return HttpResponse(albums, mimetype)
       
       
 @login_required
 def search_music_songs(request):
-    start_time = time.time()    
-#    get_songs = Music_Song.objects.all()
-#    all_songs = []
-#    for items in get_songs:
-#        if items.title:
-#            if request.GET['query'].upper() in items.title.upper():
-#                all_songs.append(items)
-                      
-                      
     all_songs = Music_Song.objects.filter(title__icontains=request.GET['query'])  
     dictionary_songs = []
     for song in all_songs:
         song_dict = {}
-        song_dict['pk']  =  song.id
+        song_dict['id']  =  song.id
         song_dict['filename']  =  song.filename
         song_dict['length']  =  song.length
         song_dict['title']  =  song.title
@@ -1280,7 +1246,6 @@ def search_music_songs(request):
     if request.is_ajax():
         mimetype = 'application/javascript'
         albums = simplejson.dumps(dictionary_songs)
-        print 'Songs search completed in ', time.time() - start_time
     return HttpResponse(albums, mimetype)
 
 

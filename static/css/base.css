@@ -2,7 +2,7 @@ body {
 	margin:0; 
 	padding:0; 
 	font-size:12px; 
-	font-family:Volkhov; 
+	font-family: Roboto Condensed; 
     height	: 100%;
     width	: 100%;
     
@@ -26,15 +26,15 @@ body.theme_black {
 }
 
 body.theme_red { 
-	color: #ffffff;
-	background: #a90329; /* Old browsers */
-	background: -moz-radial-gradient(center, ellipse cover,  #a90329 0%, #8f0222 44%, #6d0019 100%); /* FF3.6+ */
-	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,#a90329), color-stop(44%,#8f0222), color-stop(100%,#6d0019)); /* Chrome,Safari4+ */
-	background: -webkit-radial-gradient(center, ellipse cover,  #a90329 0%,#8f0222 44%,#6d0019 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-radial-gradient(center, ellipse cover,  #a90329 0%,#8f0222 44%,#6d0019 100%); /* Opera 12+ */
-	background: -ms-radial-gradient(center, ellipse cover,  #a90329 0%,#8f0222 44%,#6d0019 100%); /* IE10+ */
-	background: radial-gradient(center, ellipse cover,  #a90329 0%,#8f0222 44%,#6d0019 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a90329', endColorstr='#6d0019',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+	color: #fff;
+	background: rgb(143,2,34); /* Old browsers */
+	background: -moz-radial-gradient(center, ellipse cover,  rgba(143,2,34,1) 0%, rgba(14,14,14,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(143,2,34,1)), color-stop(100%,rgba(14,14,14,1))); /* Chrome,Safari4+ */
+	background: -webkit-radial-gradient(center, ellipse cover,  rgba(143,2,34,1) 0%,rgba(14,14,14,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-radial-gradient(center, ellipse cover,  rgba(143,2,34,1) 0%,rgba(14,14,14,1) 100%); /* Opera 12+ */
+	background: -ms-radial-gradient(center, ellipse cover,  rgba(143,2,34,1) 0%,rgba(14,14,14,1) 100%); /* IE10+ */
+	background: radial-gradient(ellipse at center,  rgba(143,2,34,1) 0%,rgba(14,14,14,1) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#8f0222', endColorstr='#0e0e0e',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 }
 
 body a{ 
@@ -79,15 +79,15 @@ body.theme_red a{
 
 
 .theme_red h1 {
-	color	: #FFFFFF;
+	color	: #fff;
 }
 
 .theme_red h2 {
-	color 	: #dddddd;
+	color 	: #ddd;
 }
 
 .theme_red h3 {
-	color	: #bbbbbb;
+	color	: #bbb;
 }
 
 #site_header_wrapper { 
@@ -100,7 +100,7 @@ body.theme_red a{
 }
 
 #site_header {
-    height: 38px;
+    height: 40px;
 }
 
 .theme_white #site_header{
@@ -181,20 +181,7 @@ body.theme_red a{
 #theme_wrapper {
 	display	: inline-block;
 	padding: 4px;
-	border: 1px solid #999999;
 	margin-top	: -2px;
-}
-
-.theme_white #theme_wrapper {
-	background	: #ffffff;
-}
-
-.theme_black #theme_wrapper {
-	background	: #555555;
-}
-
-.theme_red #theme_wrapper {
-	background	: #a90329;
 }
 
 .toggleButton {
@@ -240,15 +227,14 @@ body.theme_red a{
 	height: 15px;
 }
 
-
 #logout {
 	margin-right: 20px;
 	text-align: right;
-	padding-top: 6px;
+	padding-top: 10px;
 }
 
 #site_title {
-	font-size: 25px;
+	font-size: 26px;
 	float: left;
 }
 
@@ -552,6 +538,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b5b5b5', end
 	width: 920px;
 	text-align	: center;
 	font-size: 12px;
+	color: #fff;
 }
 
 .theme_red .nav_button a:hover {  
@@ -644,7 +631,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b5b5b5', end
 
 #welcome {
 	font-size: 350px;
-	font-family: 'Kelly Slab';
+	font-family: Roboto Condensed;
 	color: #FFFFFF;
 	text-shadow: 0 0 12px black;
 }
@@ -800,6 +787,58 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b5b5b5', end
 	background	: #eeeeee;
 	color		: #6d0019;
 }
+
+button {
+	font-family: Roboto Condensed;
+	border: none;
+	padding: 4px;
+	cursor: pointer;
+	width: 200px
+}
+
+button:hover {
+	box-shadow: 0 0 5px #999999;
+}
+
+.theme_white button {
+	background: #cccccc; /* Old browsers */
+	background: -moz-linear-gradient(top,  #cccccc 0%, #dddddd 49%, #cccccc 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#cccccc), color-stop(49%,#dddddd), color-stop(100%,#cccccc)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #cccccc 0%,#dddddd 49%,#cccccc 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #cccccc 0%,#dddddd 49%,#cccccc 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #cccccc 0%,#dddddd 49%,#cccccc 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #cccccc 0%,#dddddd 49%,#cccccc 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cccccc', endColorstr='#cccccc',GradientType=0 ); /* IE6-9 */
+}
+
+.theme_white button:hover {
+	box-shadow: 0 0 3px #555555;	
+}
+
+.theme_black button {
+	background: #555555; /* Old browsers */
+	background: -moz-linear-gradient(top,  #555555 0%, #333333 49%, #555555 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#555555), color-stop(49%,#333333), color-stop(100%,#555555)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #555555 0%,#333333 49%,#555555 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #555555 0%,#333333 49%,#555555 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #555555 0%,#333333 49%,#555555 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #555555 0%,#333333 49%,#555555 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#555555', endColorstr='#555555',GradientType=0 ); /* IE6-9 */
+	color: #ffffff;
+}
+
+.theme_black button:hover {
+	box-shadow: 0 0 15px #000000;	
+}
+
+.theme_red button {
+	background: linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -o-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -moz-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -webkit-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+	background: -ms-linear-gradient(bottom, #EEEEEE 7%, #f7f7f7 54%);
+}
+
 .header_button {
     height: 100%;
 }
