@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	<head>
+		<!-- I added a little style to make the forms readable -->
+	    <style type="text/css" >
+			label { float : left; width : 200px;}
+			input {  width : 300px;}
+			div.objects {padding : 10px 20px}
+		</style>
+		
+		<!-- Please include any jquery library available to make this work -->
+	    <script src="/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+	    <script>
+
+    	// This save function takes all the form data and puts into a string that can be parsed into a JSON object
+    	function save_data(){
+			var recovered_data = '[{'
+    		var counter = 1;
+    		while (counter != 0){
+	    		var object = $('body > #object_'+counter+' > div')
+	    		if (object.length){
+	    			if (counter != 1){recovered_data += ', '}
+		    		$.each(object, function(i,items){
+			    		if (i != 0){recovered_data += ', '}
+		    			recovered_data += '"' + $(items).children("label").html()+'": '
+		    			recovered_data += '"' + $(items).children("input").attr("value")+'"'
+		        	})
+		        	recovered_data += '}'
+			        counter += 1
+    			}
+    			else {
+        			counter = 0;
+    			}
+    		}
+    		recovered_data += ']'
+        	alert(recovered_data)
+    	}
+
+    	// These forms are built onload. no matter how this data is made available to this page, either by
+    	// a page request or via ajax this same method can be used since I am building the form from scratch.
+	    $(document).ready(function(){
+		    data = [{
+		    	"id": "a28fcb12",
+		    	"workflowType": "collection",
+		    	"profileId": "php-crs-reports",
+		    	"state": "collected",
+		    	"stateType": "terminal",
+		    	"timestamp": "2012-02-01T12:34:21Z",
+		    	"duration": 825
+		    	},
+		    	{
+		    	"id": "g122fb97",
+		    	"workflowType": "collection",
+		    	"profileId": "gpo-bill-digest",
+		    	"state": "invalid",
+		    	"stateType": "wait",
+		    	"message": "The identical file has been collected",
+		    	"timestamp": "2012-02-03T12:32:21Z",
+		    	"duration": 21
+		    	},
+		    	{
+		    	"id": "c82b2d12",
+		    	"workflowType": "collection",
+		    	"profileId": "gpo-bill-digest",
+		    	"state": "invalid",
+		    	"stateType": "wait",
+		    	"message": "The identical file has been collected",
+		    	"timestamp": "2012-02-01T11:14:21Z",
+		    	"duration": 12
+		    	},
+		    	{
+		    	"id": "2d3efada",
+		    	"workflowType": "delivery",
+		    	"profileId": "cq-bill-digest",
+		    	"state": "invalid",
+		    	"stateType": "wait",
+		    	"message": "The content of element type 'summary' must match (p)+'",
+		    	"timestamp": "2012-01-12T12:34:21Z",
+		    	"duration": 825
+		    	},
+		    	{
+		    	"id": "2fcb84a9",
+		    	"workflowType": "collection",
+		    	"profileId": "php-crs-reports",
+		    	"state": "collected",
+		    	"stateType": "terminal",
+		    	"timestamp": "2012-03-01T17:34:21Z",
+		    	"duration": 825
+		    	}];
+
+	    		// Loop through the data and build the form.
+				var counter = 1;
+		    	$.each(data, function(i,items){
+		    		$('body').append('<div class="objects" id="object_'+counter+'"></div>')
+			    	$.each(items, function(j,item){
+			    		$('#object_'+counter+'').append('<div><label class="label">'+j+'</label><input class="input" value="'+item+'"></input></div>');
+			    	})
+			    	counter += 1;
+		    	})
+		    	// The save button is simply a function call to save_data that saves any changed input fields
+		    	$('body').append('<button onclick="save_data()" type="submit">Save</button>')
+
+	    })
+	    </script>
+	</head>
+	<body>
+	</body>
+</html>

@@ -39,8 +39,12 @@ def move_new_folders(drive, letter):
             letter = 'OST'
         
         if original_letter != letter:
-            if letter in DRIVES['X:/']: drive = 'X:/'
-            else: drive = 'Y:/'
+            if letter in DRIVES['X:/']: 
+                drive = 'X:/'
+            elif letter in DRIVES['Y:/']: 
+                drive = 'Y:/'
+            else: 
+                drive = 'Z:/'
             try:
                 if original_drive == drive:
                     win32file.MoveFile(original_drive+original_letter+'/'+folder, drive+letter+'/'+folder)
@@ -158,3 +162,5 @@ def removeEmptyFolders(path):
         print "Removing empty folder:", path
         os.rmdir(path)
         
+
+################################# Cataloging utils ############################

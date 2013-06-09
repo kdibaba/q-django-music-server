@@ -115,14 +115,6 @@ body.theme_red a{
 	background: #000000;
 }
 .theme_red #site_header{
-	background: #a90329; /* Old browsers */
-	background: -moz-linear-gradient(top,  #a90329 0%, #8f0222 44%, #6d0019 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#a90329), color-stop(44%,#8f0222), color-stop(100%,#6d0019)); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top,  #a90329 0%,#8f0222 44%,#6d0019 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(top,  #a90329 0%,#8f0222 44%,#6d0019 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(top,  #a90329 0%,#8f0222 44%,#6d0019 100%); /* IE10+ */
-	background: linear-gradient(top,  #a90329 0%,#8f0222 44%,#6d0019 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a90329', endColorstr='#6d0019',GradientType=0 ); /* IE6-9 */
 }
 
 #site_header text{
@@ -273,8 +265,9 @@ body.theme_red a{
 }
 
 .theme_red #navigation {
-	background: #6d0019;
+	
 }
+
 #menu_home,#menu_albums,#menu_artists,#menu_add,#menu_search {
 	display: inline-block;
 	text-decoration: none;
@@ -603,9 +596,9 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#b5b5b5', end
 	
 .theme_red #stats {
 	color: #ffffff;
-	background: #A90329 ;
-	border: 1px solid #6D0019;
-	box-shadow: 0 17px 60px #000000;
+	background: rgba(58, 18, 27, 0.53);
+	border: 1px solid rgb(32, 23, 25);
+	box-shadow: 0 2px 25px #000000;
 	}
 		
 .theme_red #stats h1 {
@@ -997,7 +990,8 @@ input:-webkit-autofill {
 }
 
 #status_message {
-	background: #FFC;
+	background: #DEFFCC;
+	color		: #555555;
 	width: 1024px;
 	margin-top: 10px;
 	font-size: 18px;
@@ -1009,13 +1003,12 @@ input:-webkit-autofill {
 }
 
 #status_message.good {
-	background: #FFC;
+	background: #DEFFCC;
 }
-
 #status_message.bad {
 	background: #f26c4f;
-	color		: #FFFFFF;
 }
+
 .confirmation p {
 	margin-top: 200px;
 	padding: 80px;

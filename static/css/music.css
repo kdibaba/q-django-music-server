@@ -387,10 +387,12 @@ table#song_table {
 
 .theme_black #song_table {
 	text-shadow: 0 0 1px #000;
+	background: rgba(22, 22, 22, 0.46);
 }
 
 .theme_red #song_table {
 	text-shadow: 1px 0px 1px #fff;
+	background: rgba(14, 14, 14, 0.33);
 }
 
 #current_album_songs #song_table_header th {
@@ -467,13 +469,13 @@ table#song_table {
 }
 
 .theme_black #current_album_songs .songs{
-	cursor		: pointer;
-	color: #fff;
+	cursor: pointer;
+	color: rgb(201, 201, 201);
 }
 
 .theme_black #current_album_songs .songs:hover {
-	color: #fff;
-	background: #111;
+	color: rgb(255, 255, 255);
+	background: rgba(17, 17, 17, 0.48);
 }
 
 
@@ -485,9 +487,8 @@ table#song_table {
 }
 
 .theme_red #current_album_songs .songs:hover {
-	color: #6D0019;
-	background: #dddddd;
-	text-shadow: 0 0 1px #fff;
+	color: rgb(248, 108, 140);
+	background: rgba(22, 2, 2, 0.37);
 }
 
 

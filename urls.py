@@ -11,6 +11,7 @@ urlpatterns = patterns('',
     
     (r'^$',                                         'media.music.views.music'),
     (r'^music/$',                                   'media.music.views.music'),
+    (r'^home/$',                                    'media.music.views.music'),
     (r'^music_admin/$',                             'media.music.views.music_admin'),
     (r'^test/$',                                    'media.music.views.catalog_drive_music'),
     (r'^login/$',                                   'media.views.user_login' ),
@@ -135,6 +136,20 @@ urlpatterns = patterns('',
     (r'^rebuild/Y/$',                           'media.music.views.rebuild', {'letter': 'Y'}),
     (r'^rebuild/Z/$',                           'media.music.views.rebuild', {'letter': 'Z'}),
     (r'^rebuild/all/$',                           'media.music.views.rebuild', {'letter': 'all'}),    
+
+    
+    (r'^handle_tv_drive/$',                     'media.tv_shows.views.handle_tv_drive'),
+    (r'^view_tv_shows/$',                       'media.tv_shows.views.view_tv_shows'),
+    (r'^view_tv_show/(?P<show_id>\d+)/$',       'media.tv_shows.views.view_tv_show'),
+    (r'^search_tv_shows/$',                     'media.tv_shows.views.search_tv_shows'),
+    (r'^add_episodes/(?P<show_id>\d+)/$',       'media.tv_shows.views.add_episodes'),
+    (r'^fix_eps/$',                             'media.tv_shows.views.fix_eps'),
+    (r'^delete_episode/$',                     'media.tv_shows.views.delete_episode'),
+
+    # Movies
+    (r'^handle_movies_drive/$',                 'media.movies.views.handle_movies_drive'),
+    (r'^view_movies/$',                         'media.movies.views.view_movies'),
+    (r'^search_movies/$',                       'media.movies.views.search_movies'),
 )
 
 if settings.DEBUG:

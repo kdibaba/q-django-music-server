@@ -39,7 +39,7 @@
 		    </div>
 		    <div id="navigation">
 				<div class=nav_button>
-					<div id="menu_home" onclick="location.href='#/'" ><p>Home</p></div>
+					<div id="menu_home" onclick="location.href='#/home'" ><p>Home</p></div>
 					<div ondblclick="location.href='#/artists/all/0/'" id="menu_artists">
 						<p>Artists</p>
 						<div class="nav_buttons nav_button_artists" style="display:none;">
@@ -83,7 +83,6 @@
 		<div id="site_body">
 			{% block content %}
 			<div id=content>
-				<!-- <center><text id="welcome">Q</text></center> -->
 				
 				<div id="welcome_message">
 					<p class="hello_msg">Hello {{ request.user.first_name }}!</p>
@@ -91,11 +90,11 @@
 				
 					<table id="stats">
 						<tr><td colspan="0"><h1>Status Report</h1></td></tr>
-						<tr><td>Artists : </td><td>{{artists_count}}</td></tr>
-						<tr><td>Albums : </td><td>{{albums_count}}</td></tr>
-						<tr><td>Songs : </td><td>{{songs_count}}</td></tr>
-						<tr><td>Albums with Art : </td><td>{{album_art}}</td></tr>
-						<tr><td>Albums without Art : </td><td>{{missing_album_art}}</td></tr>
+						<tr><td>Artists : </td><td>{{home_data.artists_count}}</td></tr>
+						<tr><td>Albums : </td><td>{{home_data.albums_count}}</td></tr>
+						<tr><td>Songs : </td><td>{{home_data.songs_count}}</td></tr>
+						<tr><td>Albums with Art : </td><td>{{home_data.album_art}}</td></tr>
+						<tr><td>Albums without Art : </td><td>{{home_data.missing_album_art}}</td></tr>
 					</table>
 			   	
 			</div>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	<head>
+	    <title>{% block title %}The Catalog{% endblock %}</title>
+	    <link rel="stylesheet" type="text/css" href="/static/css/tv_base.css" />
+	    <link rel="stylesheet" type="text/css" href="/static/css/form.css" />
+	    <link href='http://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
+	    {% block head %}{% endblock %}
+	</head>
+	<body>
+		<div class=site-header>
+			<h1>The Catalog</h1>
+		</div>
+			<div class=nav_button>
+				<p class="nav_header">TV Shows</p>
+				<a href="/handle_tv_drive">TV Drive</a>
+				<a href="/view_tv_shows">Show TV Shows</a>
+				<a href="/search_tv_shows">Search TV Shows</a>
+				<a href="/fix_eps">Fix Episodes</a>
+				<p class="nav_header">Movies</p>
+				<a href="/handle_movies_drive">Movies Drive</a>
+				<a href="/view_movies">Show Movies</a>
+				<a href="/search_movies">Search Movies</a>
+			</div>
+			<div id=content>
+				{% block content %}{% endblock %}
+			</div>
+	</body>
+</html>

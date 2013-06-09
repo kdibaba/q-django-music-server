@@ -1,0 +1,76 @@
+{% extends "tv_base.html" %}
+
+{% block head %}
+    <script src="/static/javascript/lib/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/static/javascript/tv_shows.js" type="text/javascript" charset="utf-8"></script>
+{% endblock %}
+
+
+{% block content %}
+
+	<div id="page_header"> TV Shows </div>
+		<div id="show_hide_drives_list">
+			<span id="hide_drive_list" onclick="hide_drives()">Hide Drives</span> |<span id="show_drive_list" onclick="show_drives()">Show Drives</span>
+		</div> 
+	<form method="post" action="">
+	
+	<table cellspacing="0" cellpadding="0" id="drive_list">
+	{% if drives %}
+		<tr style="background: #EEEEEE"><th>Drive Name</th><th>Drive Capacity</th><th>Drive Free Space</th>
+										<th>Drive Date</th><th>Get Shows</th>
+										<th id="delete_option">
+										Delete [<span style="color:#10448C" onclick="show_delete_option()">Show</span> | 
+												<span style="color:#10448C" onclick="hide_delete_option()">Hide</span>]</th>
+		<tr style="background-color: #ccc"><td>{{drives.count}} Drives</td><td>{{ capacity|filesizeformat }}</td><td>{{ free_space|filesizeformat }}</td><td></td><td></td><td></td></tr>
+		{% for drive in drives %}
+			<tr class="{% cycle odd,even %}"><td>{{ drive.drive }}</td>
+				<td>{{ drive.drive_capacity|filesizeformat }}</td>
+				<td>{{ drive.drive_free_space|filesizeformat }}</td>
+				<td>{{ drive.drive_date|date:"m/d/Y"|lower }}</td>
+			<td><input type="submit" id="submit_button" name="{{ drive.drive }}" value="Get Shows" /><br /></td>
+			<td><input class="delete_option" type="submit" id="submit_button" name="{{ drive.drive }}" value="Delete Drive" /><br /></td>
+		{% endfor %}</tr>
+	{% endif %}
+	</table>
+	{% if shows %}
+	<div id="drive_shows">
+		<h2>{{ shows.count }} Shows</h2>
+		{% for show in shows%}
+			<a href="/view_tv_show/{{ show.id }}">{{ show.show }}</a><br />
+		{% endfor %}
+	</div>
+	{% endif %}
+<!-- 	
+	{% if all_duplicates %}
+		<h2>Duplicates found</h2>
+		<table cellspacing="0" cellpadding="0">
+		<tr><th>Show Name</th><th>Season</th><th>Episode</th></tr>
+		{% for duplicates in all_duplicates%}
+			{% for duplicate in duplicates %}
+	    		<tr><td>{{ duplicate.Show }}</td><td>{{ duplicate.Season }}</td><td>{{ duplicate.Episode }}</td><td>{{ duplicate.Path }}</td></tr>
+			{% endfor %}
+		{% endfor %}
+		</table> 
+	{% endif %}-->
+
+	{% if qduplicates %}
+		<h2>Duplicates found</h2>
+		<input id="id_drive_letter" type="text" name="drive_letter" size="10">
+		<table cellspacing="0" cellpadding="0">
+		<tr><th>Show</th><th>Season</th><th>Episode</th><th>Filename</th></tr>
+		{% for duplicates in qduplicates %}
+			{% for duplicate in duplicates %}
+    			<tr id="{{ duplicate.id }}" style="height: 25px;">
+    				<td>{{ duplicate.show__show }}</td>
+    				<td>{{ duplicate.season__season }}</td>
+    				<td>{{ duplicate.episode }}</td>
+    				<td>{{ duplicate.file_size }}</td>
+					<td><a href="#" class="delete_episode" value="Delete Episode" onclick="delete_episode({{ duplicate.id }}); return false;">Delete</a></td>
+    				<td>{{ duplicate.file_name }}</td>
+				</tr>
+			{% endfor %}
+		{% endfor %}
+		</table>
+	{% endif %}
+	
+{% endblock %}
