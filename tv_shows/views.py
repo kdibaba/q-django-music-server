@@ -43,9 +43,12 @@ VALID_FILE_TYPES = ['mkv', 'avi', 'mpg', 'm4a', 'ts', 'mp4']
 EXCLUDE = ['ANIMANIACS']
 IGNORE_FILES = ['ehthumbs_vista.db', 'recycle.bin', 'system volume information', 'desktop.ini', 'thumbs.db']
 
+
+@login_required  
 def index(request):
     return render_to_response('base.html')
     
+@login_required    
 def handle_tv_drive(request):
     msg = ''
     directory = ''
@@ -601,6 +604,7 @@ def catalog_drive (files, drive, directory):
         
     return cataloged, problems
 
+@login_required  
 def view_tv_shows(request):
     msg = ''
     duplicate = {}
@@ -660,6 +664,7 @@ def view_tv_shows(request):
 
 
 
+@login_required  
 def delete_episode(request):
     episode_id = request.GET['episode_id']
     drive_letter = request.GET['drive']
@@ -677,6 +682,8 @@ def delete_episode(request):
     episode.delete()
     return HttpResponse(mimetype)
 
+
+@login_required
 def view_tv_show(request, show_id):
     
     msg = ''
@@ -691,8 +698,7 @@ def view_tv_show(request, show_id):
                                                     'msg'       : msg, 
                                                     'episodes'  : episodes,})
 
-
-
+@login_required  
 def search_tv_shows(request):
     results = []
     num_of_results = 0
@@ -710,8 +716,8 @@ def search_tv_shows(request):
                                                       'num_of_results'  : num_of_results,
                                                       'search'          : search})
 
+@login_required  
 def add_episodes(request, show_id):
-    
     msg = ''
     episodes = {}
     drive = TV_Shows_Drive.objects.get(id=1)
@@ -798,8 +804,8 @@ def check_existing_files():
     
     return
 
+@login_required  
 def fix_eps(request):
-        
     msg = ''
     all_missing_shows = []
     missing_shows_counter = 0

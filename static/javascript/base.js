@@ -187,12 +187,21 @@ $(document).ready(function(){
 	    		NOW_PLAYING = true
 		  	}
 		}
-		else if (event.keyCode == 78) {
+		else if (event.keyCode == 37) {
+    		if(PLAYLIST){
+    		    PLAYLIST.previous();
+    		}
+		}
+		else if (event.keyCode == 39) {
     		if(PLAYLIST){
     		    PLAYLIST.next();
     		}
 		}
-		});
+		else if (event.keyCode == 191) {
+    		$('#menu_search').click();
+    		$('#searchBox').focus();
+		}
+	});
 
 });
 
@@ -326,7 +335,7 @@ function go_home() {
 function add_music(type, message) {
 	jQuery.ajax({
 		url: "/add_music/"+type+"/", 
-		success: function() {
+		success: function(message) {
 			display_message_alert(message, true);
 		},
 		async	: true
@@ -338,10 +347,11 @@ function add_music(type, message) {
 function share_album(album_id) {
 	jQuery.ajax({
 		url: "/album_share/" + album_id + "/", 
-		success: function() {
-			display_message_alert(message, true);
+		success: function(response) {
+			var response_object = jQuery.parseJSON(response);
+			display_message_alert(response_object.message, response_object.success);
 		},
-		async	: false
+		async	: true
 	});
 };
 
@@ -628,7 +638,7 @@ function build_artist_page() {
 				//$('.album_' + item.id).hover(function(){$(this).css('width',  '125px')}, function(){$(this).css('width',  '44px')});
 				if (item.album_art){
 					//cover_count += 1;
-					$('.album_'+item.id).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/albums_by_artist/'+items.id+'\'"><img src="/'+ item.drive + '/'+ item.letter +'/' + item.folder + '/Folder.jpg' + '" /></div>' )}
+					$('.album_'+item.id).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/albums_by_artist/'+items.id+'\'"><img src="/'+ item.drive + '/'+ item.letter +'/' + item.folder + '/Folder.jpg?v=' + Math.floor(Math.random()*11032)  + '" /></div>' )}
 				else {
 					//missing_cover_count += 1
 					$('.album_'+item.id).prepend( '<div id="img_div"' + ' onclick="location.href=\'/#/albums_by_artist/'+items.id+'\'"><img src="/static/images/default_album_art.jpg" /></div>' )}
@@ -812,8 +822,29 @@ function get_album_show(album_id) {
 function delete_album(album_id) {
 	jQuery.ajax({
 		url: "/album_delete/" + album_id + "/", 
-		success: function(message) {get_albums_by_artist(message);},
+		success: function(response) {
+			var response_object = jQuery.parseJSON(response);
+			display_message_alert(response_object.message, response_object.success);
+			if (response_object.success === true){
+				get_albums_by_artist(response_object.artist_id);
+			}			
+		},
 		async	: false
+	});
+};
+
+function get_single_album_art(album_id) {
+	display_message_alert('Geting art for this album.', true)
+	jQuery.ajax({
+		url: "/album_get_art/" + album_id + "/", 
+		success: function(response) {
+			var response_object = jQuery.parseJSON(response);
+			display_message_alert(response_object.message, response_object.success);
+			if (response_object.success === true){
+				get_album_show(album_id);
+			}			
+		},
+		async	: true
 	});
 };
 
@@ -844,8 +875,9 @@ function show_album(jsonAlbum, show_or_play) {
 	$('#album').append('<div id="current_album_songs"></div>')
 	$('#current_album_songs').append( '<button class="playlist_button" style="float:right;" onclick="share_album('+all_album[0].id+')">SHARE ALBUM</button>')
 	$('#current_album_songs').append( '<button id="delete_album_button" style="float:right;" onclick="delete_album('+all_album[0].id+')">DELETE ALBUM</button>')
+	$('#current_album_songs').append( '<button class="playlist_button" style="float:right;" onclick="get_single_album_art('+all_album[0].id+')">GET ALBUM ART</button>')
 	$.each(all_album, function(i,album){
-		if (album.album_art){$('.current_album').append( '<div id="curr_album_img_div"><img src="/' + album.drive + '/' +album.letter+ '/' + album.folder + '/Folder.jpg' + '" /></div>' )}
+		if (album.album_art){$('.current_album').append( '<div id="curr_album_img_div"><img src="/' + album.drive + '/' +album.letter+ '/' + album.folder + '/Folder.jpg?v=' + Math.floor(Math.random()*11032)  + '" /></div>' )}
 		else {$('.current_album').append( '<div id="curr_album_img_div"><img src="/static/images/default_album_art.jpg" /></div>' )}
 		$('.current_album').append( '<button id="play_album_button" onclick="get_album_play('+album.id+')">PLAY ALBUM</button>')
 		$('.current_album').append( '<h2 onclick="location.href=\'/#/albums_by_artist/'+album.artist_id+'\'">'+ album.artist+'</h2>')
@@ -860,7 +892,7 @@ function show_album(jsonAlbum, show_or_play) {
 			$('#song_table').append("<tr class='songs' id='song_" + item.id + "'><td class=\"title_column song_table_field\" ondblclick=\"get_song(" + item.id + 
 					", 'play')\">" + item.title + "</td><td class='artist_column song_table_field'>" + item.artist + "</td><td class='genre_column song_table_field'>" + item.genre + "</td><td  class=\"play_column song_table_field\" title='Click here to play song.' onclick=\"get_song(" + 
 					item.id + ", 'play')\"><div class=\"play_song_button\"></div></td><td  class=\"add_column song_table_field\" title='Click here to add to playlist.' onclick=\"get_song(" + item.id + 
-					", 'add')\"><div class=\"add_song_button\"></div></td><td  class=\"download_column song_table_field\" title='Right click and Save link as to download the song.'><div class=\"download_song_button\"><a target=\"_blank\" href=\"/" + item.drive + "/" + item.letter + "/" + item.path + "/"+item.filename+"\"><img src=\"/static/images/download_button.png\" /></a></div></td>" + 
+					", 'add')\"><div class=\"add_song_button\"></div></td><td  class=\"download_column song_table_field\" title='Right click and Save link as to download the song.'><div class=\"download_song_button\"><a target=\"_blank\" href=\"/" + item.drive + "/" + item.letter + "/" + item.path + "/"+item.filename+"\" download><img src=\"/static/images/download_button.png\"></a></div></td>" + 
 					"<td class='length_column song_table_field'>" + item.length +  "</td><td class='file_size_column song_table_field'>" + item.file_size + "</td><td class='bitrate_column song_table_field'>" + item.bitrate + "</td><td id='rating_td' class='rating_column song_table_field'>" + get_rating_html(item.rating, item.id) + 
 					"</td></tr>");
 		})

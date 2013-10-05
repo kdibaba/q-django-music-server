@@ -35,9 +35,6 @@ import requests
 from StringIO import StringIO
 from requests.exceptions import ConnectionError
 
-DRIVES = {'X:/': ['0', 'A', 'B', 'C', 'D', 'E', 'F', 'G'],
-          'Y:/': ['H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-          'Z:/': ['OST', 'VA']}
 LETTERS = ['0', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'VA', 'OST']
 ALBUMS_HEAD = ['0', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
@@ -206,7 +203,7 @@ def catalog_drive_music(catalog_type):
         unknown_artist = Music_Artist.objects.create(artist='UNKNOWN')
 
     start_time = time.time()
-    loops = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    loops = [1, 2, 3, 4]
 
     loop_counter = 0
     for loop in loops:
@@ -364,7 +361,7 @@ def catalog_drive_music(catalog_type):
 
                             id3_artist = get_artist_from_id3(id3)
                             if id3_artist:
-                                get_song_artist = Music_Artist.objects.filter(artist=id3_artist.replace('-', '.'))
+                                get_song_artist = Music_Artist.objects.filter(artist__iexact=id3_artist.replace('-', '.'))
                                 if not get_song_artist:
                                     song_artist = Music_Artist.objects.create(artist=id3_artist.replace('-', '.'))
                                     song_artist.save()
@@ -653,7 +650,7 @@ def catalog_drive_music(catalog_type):
                             except:
                                 pass
 
-                print 'Took ', time.time() - start_time, ' to finish one iteration.'
+                # print 'Took ', time.time() - start_time, ' to finish one iteration.'
     return  # render_to_response('confirmation.html', locals())
 
 
@@ -665,7 +662,6 @@ def get_album_art(query, path):
 
     try:
         picture = requests.get(BASE_URL % 1)
-        print picture
         image_info = json.loads(picture.text)['responseData']['results']
     except:
         return 'Excepted'
@@ -684,7 +680,7 @@ def get_album_art(query, path):
     except ConnectionError, e:
         print 'could not download %s' % url
     except:
-        pass
+        return 'Failure'
 
     return 'Success'
 
@@ -741,8 +737,8 @@ def update_album_art(request):
     # update_front_jpg()
 
     for drive in DRIVES.keys():
-        for letter in ['F', 'G', 'H']:# DRIVES[drive]:
-            if letter in LETTERS:
+        for letter in DRIVES[drive]:
+            if letter in ['T', 'U', 'V']:#LETTERS:
                 albums = Music_Album.objects.filter(letter=letter).filter(
                     album_art=False).order_by('album_artist__artist')
                 print 'In letter ', letter, ' Processing %d albums' % len(albums)
@@ -753,7 +749,7 @@ def update_album_art(request):
                     counter += 1
                     query = album.album_artist.artist.replace('.', ' ').replace('_', ' ') + ' ' + str(
                         album.album.replace('.', ' ').replace('_', ' ')) + ' album cover'
-                    path = drive + letter + '/' + album.folder
+                    path = drive + letter + '/' + album.folder + '/'
                     print album.folder, query, path
                     success = get_album_art(query, path)
                     if success == 'Success':
@@ -1098,35 +1094,83 @@ def get_song(request, song_id):
 
 @login_required
 def delete_album(request, album_id):
-    album = Music_Album.objects.get(id=album_id)
-    message = album.album_artist.id
-    songs = Music_Song.objects.filter(album=album)
-    shutil.move(album.drive + ':/' + album.letter + '/' + album.folder, album.drive + 'DELETED/')
-    for song in songs:
-        song.delete()
-    album.delete()
+    response = {}
+    if not request.user.username == 'kdibaba':
+        response['success'] = False
+        response['message'] = 'You don\'t have sufficient previleges to take this action. Nice try ' + request.user.username 
+    else:
+        album = Music_Album.objects.get(id=album_id)
+        songs = Music_Song.objects.filter(album=album)
+        shutil.move(album.drive + ':/' + album.letter + '/' + album.folder, album.drive + ':/' + 'DELETED/')
+        for song in songs:
+            song.delete()
+        album.delete()
+        response['success'] = True
+        response['message'] = 'Album successfully Deleted'
+        response['artist_id'] = album.album_artist.id
+    
+    return HttpResponse(simplejson.dumps(response), 'application/javascript')
+
+
+def call_local_album_art(request, album_id):
+    urllib.urlopen('http://127.0.0.1:9000/album_get_single_art/'+str(album_id))
+    time.sleep(7)
     if request.is_ajax():
         mimetype = 'application/javascript'
-    return HttpResponse(message, mimetype)
+    return HttpResponse(mimetype)
 
+def get_single_album_art(request, album_id):
+    response = {}
+    if not request.user.username == 'kdibaba':
+        response['success'] = False
+        response['message'] = 'You don\'t have sufficient previleges to take this action. Nice try ' + request.user.username 
+
+    else:
+        album = Music_Album.objects.get(id=album_id)
+        query = album.album_artist.artist.replace('.', ' ').replace('_', ' ') + ' ' + str(
+                            album.album.replace('.', ' ').replace('_', ' ')) + ' album cover'
+        print query
+        path = album.drive + ':/' + album.letter + '/' + album.folder + '/'
+        mimetype=''
+        try:
+            win32file.DeleteFile(path+'Folder.jpg')
+        except:
+            print 'Unable to delete existing Folder.jpg'
+            pass
+        success = get_album_art(query, path)    
+        if success == 'Success':
+            album.album_art = True
+            album.save()
+            response['success'] = True
+            response['message'] = 'Album Art has been updated'
+        else:
+            response['success'] = False
+            response['message'] = 'Album Art failed to update'
+
+    return HttpResponse(simplejson.dumps(response), 'application/javascript')
 
 @login_required
 def share_album(request, album_id):
-    album = Music_Album.objects.get(id=album_id)
-    album_path = album.drive + ':/' + album.letter + '/' + album.folder
-    share_path = album.drive + ':/' + 'SHARED/' + album.folder
-    try:
-        os.makedirs(share_path)
-        files = os.listdir(album_path)
-        for file in files:
-            win32file.CopyFile(album_path + '/' + file, share_path + '/' + file, 0)
-        message = 'Successfully shared album - ' + album.folder
-    except:
-        message = 'That album is already shared'
+    response = {}
+    if not request.user.username == 'kdibaba':
+        response['success'] = False
+        response['message'] = 'You don\'t have sufficient previleges to take this action. Nice try ' + request.user.username 
+    else:
+        album = Music_Album.objects.get(id=album_id)
+        album_path = album.drive + ':/' + album.letter + '/' + album.folder
+        share_path = album.drive + ':/' + 'SHARED/' + album.folder
+        try:
+            os.makedirs(share_path)
+            files = os.listdir(album_path)
+            for file in files:
+                win32file.CopyFile(album_path + '/' + file, share_path + '/' + file, 0)
+            response['message'] = 'Successfully shared album - ' + album.folder
+            response['success'] = True
+        except:
+            response['success'] = False
+            response['message'] = 'That album is already shared'
 
-    if request.is_ajax():
-        mimetype = 'application/javascript'
-    return HttpResponse(message, mimetype)
+    return HttpResponse(simplejson.dumps(response), 'application/javascript')
 
 
 @login_required
@@ -1262,7 +1306,7 @@ def artists(request, letter):
                 artist['albums'].append(album)
             artists.append(artist)
 
-    print '\nTook ', time.clock() - start, ' get all artists in the letter ', letter
+    # print '\nTook ', time.clock() - start, ' get all artists in the letter ', letter
     if request.is_ajax():
         mimetype = 'application/javascript'
         artists = simplejson.dumps(artists)
@@ -1476,7 +1520,7 @@ def copy_favs(request):
         for file in files:
             existing_favs.append(file)
 
-    print 'Took ', time.clock() - start, ' to walk and find the files.'
+    # print 'Took ', time.clock() - start, ' to walk and find the files.'
 
     five_star_songs = Music_Song.objects.filter(rating__gte=4)
 
@@ -1498,7 +1542,7 @@ def copy_favs(request):
                                DEFAULT_DIRECTORY + '/' + 'FAVS' + '/' + songs.album.album_artist.artist.upper().replace('.', ' ') + '/' + songs.filename, 0)
         except:
             print songs.album.folder
-    print 'Took ', time.clock() - start, ' to copy files.'
+    # print 'Took ', time.clock() - start, ' to copy files.'
     return music(request)
 
 
