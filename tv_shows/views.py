@@ -12,7 +12,8 @@ Seasons = ['S2000','S2001','S2002','S2003','S2004','S2005','S2006','S2007','S200
            'S00', 'S01','S02','S03','S04','S05','S06','S07','S08','S09', 'S10', 'S11', 'S12',
            'S13','S14','S15','S16','S17','S18','S19','S20','S21', 'S22', 'S23', 'S24',
            'S25','S26','S27','S28','S29','S30','S31', 'S32', 'S33', 'S34','S35','s36',
-           'S37','S38','S39','S40','S41', 'S42', 'S43', 'S44','S45','S46','S47','S48'
+           'S37','S38','S39','S40','S41', 'S42', 'S43', 'S44','S45','S46','S47','S48',
+           'S49','S50','S51','S52','S53', 'S54', 'S55', 'S56','S57','S58','S59','S60'
            ]
 
 QUALITIES = {
@@ -23,7 +24,7 @@ QUALITIES = {
              'HDTV'     :['HDTV'],
              'PDTV'     :['PDTV'],
              'DIGITAL'  :['DSR'],
-             'TV'       :['TVRIP'],
+             'TV'       :['TVRIP', '.TV.RIP'],
              'VCD'      :['VCD'],
              }
 
@@ -451,15 +452,18 @@ def rename_files_complex (directory):
     counter = 0
     counter_match_three_numbers = 0
     counter_match_three_numbers_x = 0
+    # counter_match_four_numbers = 0
     match_three_numbers = '\.[0-9][0-9][0-9]\.'
     match_three_numbers_x = '\.[0-9][X][0-9][0-9]\.'
     match_three_numbers_x2 = '\.[0-9][0-9][X][0-9][0-9]\.'
+    # match_four_numbers = '\.[0-9][0-9][0-9][0-9]\.'
     files = os.listdir(directory)
     for file in files:
         string = str(file)
         match  = re.search(match_three_numbers, string)
         match2 = re.search(match_three_numbers_x, string)
         match3 = re.search(match_three_numbers_x2, string)
+        # match4 = re.search(match_four_numbers, string)
         string2 = string
         if match and 'RENO' not in string and '442' not in string and '360' not in string:
             match = match.group()
@@ -481,6 +485,13 @@ def rename_files_complex (directory):
             money = match[0]+'S'+match[1]+match[2]+'E'+match[4]+match[5]+match[6]
             string2 = string3[0] + money + string3[1]
             counter_match_three_numbers_x += 1
+        # elif match4:
+        #     match = match4
+        #     match = match.group()
+        #     string3 = string.split(match)
+        #     money = match[0]+'S'+match[1]+match[2]+'E'+match[3]+match[4]+match[5]
+        #     string2 = string3[0] + money + string3[1]
+        #     counter_match_four_numbers += 1
             
         if string != string2 and 'RECYCLE' not in string:
             #check if there is already a season tag on the filename
@@ -499,6 +510,7 @@ def rename_files_complex (directory):
     problems.append( '\nAll Counter is ' + str(counter))
     problems.append( 'match_three_numbers Counter is ' + str(counter_match_three_numbers))
     problems.append( 'match_three_numbers_x Counter is ' + str(counter_match_three_numbers_x))    
+    # problems.append( 'counter_match_four_numbers Counter is ' + str(counter_match_four_numbers))    
     
     return renamed_files, problems
 
@@ -508,9 +520,12 @@ def catalog_drive (files, drive, directory):
     problem_counter = 0
     counter = 0
     
+    os.makedirs(directory+'DuplicateFiles')
+
     #Delete all records for this drive
     TV_Shows_Drive.objects.filter(drive=drive).delete()
-    
+
+        
     #Save the drive data
     drive_info = win32file.GetDiskFreeSpaceEx(directory)
     drive = TV_Shows_Drive.objects.create(drive=drive, drive_capacity=int(drive_info[1]) , drive_free_space=int(drive_info[0]))
@@ -548,7 +563,7 @@ def catalog_drive (files, drive, directory):
                     #Save the season and episode data  
                     season = int(season_nums.replace('S', ''))
                     season_object = TV_Shows_Season.objects.filter(drive=drive).filter(show=show_object).filter(season=season)
-                    if not season_object: 
+                    if not season_object:
                         season_object = TV_Shows_Season.objects.create(drive=drive, show=show_object, season=season)
                     else:
                         for seas in season_object:
@@ -599,10 +614,81 @@ def catalog_drive (files, drive, directory):
                               file_name=file,
                               file_size=str(os.path.getsize(file_object)))
                 
-                                
             cataloged.append(row)
-        
+            check_for_duplicate_episode(directory, row)
+    
+    shutil.rmtree(directory+'DuplicateFiles')
     return cataloged, problems
+
+def check_for_duplicate_episode(directory, tv_show):
+    episodes = TV_Shows.objects.filter(drive=tv_show.drive, 
+                      show=tv_show.show, 
+                      season=tv_show.season,
+                      episode=tv_show.episode)
+
+    if len(episodes) == 2:
+        #First make sure they are not the same episode cataloged twice like episodes with e01e02 in them
+        if episodes[0].file_name.lower() != episodes[1].file_name.lower():
+            
+            #Make sure they both have qualities that are known
+            if QUALITIES_VALUE[episodes[0].quality] != 10 and QUALITIES_VALUE[episodes[1].quality] != 10:
+                # check if the word part is in the file name
+                if 'part' not in episodes[0].file_name.lower() or 'part' not in episodes[1].file_name.lower() or \
+                    'cd' not in episodes[0].file_name.lower() or 'cd' not in episodes[1].file_name.lower():
+                    if QUALITIES_VALUE[episodes[0].quality] == QUALITIES_VALUE[episodes[1].quality]:
+                        if 'real' in episodes[0].file_name.lower() and 'real' not in episodes[1].file_name.lower():
+                            move_duplicate_episode(directory, episodes[1])
+                        elif 'real' in episodes[1].file_name.lower() and 'real' not in episodes[0].file_name.lower():
+                            move_duplicate_episode(directory, episodes[0])
+                        elif 'proper' in episodes[0].file_name.lower() and 'proper' not in episodes[1].file_name.lower():
+                            move_duplicate_episode(directory, episodes[1])
+                        elif 'proper' in episodes[1].file_name.lower() and 'proper' not in episodes[0].file_name.lower():
+                            move_duplicate_episode(directory, episodes[0])
+                        elif 'bluray' in episodes[0].file_name.lower() and 'bluray' not in episodes[1].file_name.lower():
+                            move_duplicate_episode(directory, episodes[1])
+                        elif 'bluray' in episodes[1].file_name.lower() and 'bluray' not in episodes[0].file_name.lower():
+                            move_duplicate_episode(directory, episodes[0])
+                        elif 'web' in episodes[0].file_name.lower() and 'web' not in episodes[1].file_name.lower():
+                            move_duplicate_episode(directory, episodes[1])
+                        elif 'web' in episodes[1].file_name.lower() and 'web' not in episodes[0].file_name.lower():
+                            move_duplicate_episode(directory, episodes[0])
+                        # elif '.ws.' in episodes[0].file_name.lower() and '.ws.' not in episodes[1].file_name.lower():
+                        #     move_duplicate_episode(directory, episodes[1])
+                        # elif '.ws.' in episodes[1].file_name.lower() and '.ws.' not in episodes[0].file_name.lower():
+                        #     move_duplicate_episode(directory, episodes[0])
+                        # elif '.ac3.' in episodes[0].file_name.lower() and '.ac3.' not in episodes[1].file_name.lower():
+                        #     move_duplicate_episode(directory, episodes[1])
+                        # elif '.ac3.' in episodes[1].file_name.lower() and '.ac3.' not in episodes[0].file_name.lower():
+                        #     move_duplicate_episode(directory, episodes[0])
+                        elif 'internal' in episodes[0].file_name.lower() and 'internal' not in episodes[1].file_name.lower():
+                            move_duplicate_episode(directory, episodes[0])
+                        elif 'internal' in episodes[1].file_name.lower() and 'internal' not in episodes[0].file_name.lower():
+                            move_duplicate_episode(directory, episodes[1])
+                        else:
+                            if episodes[0].file_size == episodes[1].file_size:
+                                move_duplicate_episode(directory, episodes[1])
+                            # elif (episodes[0].file_size - episodes[1].file_size) > 200000000:
+                            #     move_duplicate_episode(directory, episodes[1])
+                            # elif (episodes[1].file_size - episodes[0].file_size) > 200000000:
+                            #     move_duplicate_episode(directory, episodes[0])
+
+                    elif QUALITIES_VALUE[episodes[0].quality] > QUALITIES_VALUE[episodes[1].quality]:
+                            move_duplicate_episode(directory, episodes[0])
+                    else:
+                            move_duplicate_episode(directory, episodes[1])
+    return
+
+def move_duplicate_episode(directory, episode):    
+    path_to_file = directory + episode.show.show.rstrip(' ') + '/SEASON ' + str(episode.season.season).zfill(2) + '/' + episode.file_name
+    path_to_duplicate = directory + 'DuplicateFiles/' + episode.file_name
+
+    try:
+        win32file.MoveFile(path_to_file, path_to_duplicate)
+        episode.delete()
+        print 'Moved episodes: ', episode.file_name
+    except:
+        print 'Couldnt move episode: ', episode.file_name
+    return
 
 @login_required  
 def view_tv_shows(request):
@@ -955,18 +1041,22 @@ def cleanup_new_files(directory):
             if os.path.isdir(directory+str(file)) == True :
                 file_list = []
                 file_list = os.listdir(directory+str(file))
-                
                 if file_list:
                     filetype_counter = 0
                     filetype_file = ''
                     for items in file_list:
                         if os.path.isdir(directory+str(file)+'/'+str(items)) == True:
-                            items_files = os.listdir(directory+str(file)+'/'+str(items))
-                            for items_file in items_files:
-                                try:
-                                    win32file.MoveFile(str(directory+str(file)+'/'+str(items)+'/'+str(items_file)), str(directory+str(file)+'/'+str(items_file)))
-                                except:
-                                    problems.append(str(counter)+' '+items_file)
+                            if items.lower() == 'sample' or items.lower() == 'proof' or items.lower() == 'subs' or items.lower() == 'nfos':
+                                shutil.rmtree(str(directory+str(file)+'/'+str(items)))
+                            else:
+                                items_files = os.listdir(directory+str(file)+'/'+str(items))
+                                if items_files:
+                                    try:
+                                        win32file.MoveFile(str(directory+str(file)+'/'+str(items)), str(directory+'/'+str(items)))
+                                    except:
+                                        problems.append(str(counter)+' '+str(items))
+                                else:
+                                    shutil.rmtree(str(directory+str(file)+'/'+str(items)))
                         elif items.lower().split('.')[-1] in VALID_FILE_TYPES:
                             if os.path.getsize(str(directory+str(file)+'/'+str(items))) > 40000000:
                                 if '.sample.' not in items and '-sample-' not in items and '.sample-' not in items and '-sample.' not in items and 'sample-' not in items:
@@ -1025,6 +1115,12 @@ def move_new_files(directory):
                             win32file.MoveFile(str(directory+str(file)+'/'+str(items)), str(main_directory+'/'+str(items)))
                         except:
                             problems.append(str(counter)+' '+items)
+            else:
+                try:
+                    win32file.MoveFile(str(directory+str(file)), str(main_directory+'/'+str(file)))
+                except:
+                    problems.append(str(counter)+' '+str(file))
+
     
     return problems
 

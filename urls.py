@@ -157,6 +157,7 @@ urlpatterns = patterns('',
 if settings.DEBUG:
     urlpatterns += patterns( '',
         url( r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.MEDIA_ROOT} ),
+        url( r'^W/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.DRIVE_W} ),
         url( r'^X/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.DRIVE_X} ),
         url( r'^Y/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.DRIVE_Y} ),
         url( r'^Z/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.DRIVE_Z} ),

@@ -30,6 +30,7 @@ class Music_Album(models.Model):
     access = models.CharField(max_length=100, null=True, blank=True)
     album_art = models.BooleanField()
     album_bitrate = models.IntegerField(null=True, blank=True)
+    album_art_attempted = models.BooleanField(default=False)
 
     def get_album_size(self):
         if self.album_size:

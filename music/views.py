@@ -46,7 +46,6 @@ BAD_FILE_EXTENSIONS = ['RAR', 'SFV', 'PAR2', 'PAR']
 
 DEFAULT_DIRECTORY = 'Y:/'
 
-
 @login_required
 def music(request):
     theme = 'theme_white'
@@ -734,15 +733,17 @@ def update_album_art(request):
     new_album_art = 0
     fail_count = 0
     counter = 0
-    # update_front_jpg()
+    update_front_jpg()
 
     for drive in DRIVES.keys():
         for letter in DRIVES[drive]:
-            if letter in ['T', 'U', 'V']:#LETTERS:
+            if letter in LETTERS:
                 albums = Music_Album.objects.filter(letter=letter).filter(
-                    album_art=False).order_by('album_artist__artist')
+                    album_art=False, album_art_attempted=False).order_by('album_artist__artist')
                 print 'In letter ', letter, ' Processing %d albums' % len(albums)
                 for album in albums:
+                    album.album_art_attempted = True
+                    album.save()
                     if counter >= 100:
                         time.sleep(1000)
                         counter = 0

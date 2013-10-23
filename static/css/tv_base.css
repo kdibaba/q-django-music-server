@@ -121,12 +121,17 @@ table td {
     border-bottom: 1px solid #dddddd;
 }
  
-table tr:hover {
-    background      : #FFFFCC;
+table tr:nth-child(even) {
+    background: #eeeeee
+}
+table tr:nth-child(odd) {
+    background: #fafafa
 }
 
-table tr:nth-child(even) {background: #eeeeee}
-table tr:nth-child(odd) {background: #fafafa}
+table tr:nth-child(even):hover,
+table tr:nth-child(odd):hover {
+    background: #FFFFCC;
+}
 
 #submit_button{
     background: #CCC;
