@@ -12,15 +12,7 @@ from media.music.forms import *
 from media.music.models import *
 from media.music.utils import *
 
-import os
-import sys
-import shutil
-import win32file
-import re
-import time
-import unicodedata
-import random
-import pdb
+import os, sys, shutil, win32file, re, time, unicodedata, random, pdb, zipfile
 sys.stdout = sys.stderr
 
 from mutagen.id3 import ID3
@@ -202,7 +194,7 @@ def catalog_drive_music(catalog_type):
         unknown_artist = Music_Artist.objects.create(artist='UNKNOWN')
 
     start_time = time.time()
-    loops = [1, 2, 3, 4]
+    loops = [1, 2, 3, 4, 5, 6, 7]
 
     loop_counter = 0
     for loop in loops:
@@ -287,15 +279,19 @@ def catalog_drive_music(catalog_type):
                         continue
 
                     album_art = True
+                    album_art_attempted = True
                     if 'Folder.jpg' not in songs:
                         album_art = False
+                        album_art_attempted = False
 
                     album = Music_Album.objects.create(
                         album_genre=unknown_genre,
                         album_artist=unknown_artist,
                         album='', folder=file_object,
                         album_art=album_art,
+                        album_art_attempted=album_art_attempted,
                         letter=letter,
+                        album_type='MP3',
                         drive=drive[0],
                         album_bitrate=album_bitrate)
                     unknown_artist.letter = letter
@@ -459,7 +455,7 @@ def catalog_drive_music(catalog_type):
                                 song_genre = unknown_genre
 
                             # bitrate
-                            song_bitrate = (file_size * 8) / (song_length * 1000)
+                            song_bitrate = (file_size * 8) / (song_length)
 
                             song_artist = unknown_artist
 
@@ -733,7 +729,7 @@ def update_album_art(request):
     new_album_art = 0
     fail_count = 0
     counter = 0
-    update_front_jpg()
+    # update_front_jpg()
 
     for drive in DRIVES.keys():
         for letter in DRIVES[drive]:
@@ -1052,6 +1048,7 @@ def album(request, album_id):
     album['artist'] = original_album.album_artist.artist
     album['artist_id'] = original_album.album_artist.id
     album['album_art'] = original_album.album_art
+    album['album_type'] = original_album.album_type
     album['album_size'] = original_album.get_album_size()
     album['songs'] = []
     for song in songs:
@@ -1175,6 +1172,30 @@ def share_album(request, album_id):
 
 
 @login_required
+def download_album(request, album_id):
+    response = {}
+    album = Music_Album.objects.get(id=album_id)
+    album_path = album.drive + ':/' + album.letter + '/' + album.folder
+    path_to_zipped_album = album.drive + ':/' + 'TEMP/' + album.folder.lower() + '.zip'
+
+    try:
+        zipped_album = zipfile.ZipFile(path_to_zipped_album , "w")
+        for dirname, subdirs, files in os.walk(album_path):
+            zipped_album.write(dirname)
+            for filename in files:
+                zipped_album.write(os.path.join(dirname, filename))
+        zipped_album.close()
+        response['message'] = 'Successfully zipped album - ' + album.folder
+        response['success'] = True
+        response['path_to_zipped_album'] = '/'+path_to_zipped_album.replace(':/','/')
+    except:
+        response['success'] = False
+        response['message'] = 'Sorry.. something went wrong when I tried to zip the file. Just download each song.'
+
+    return HttpResponse(simplejson.dumps(response), 'application/javascript')
+
+
+@login_required
 def albums(request, letter):
     letter_albums = ''
     albums_with_the = ''
@@ -1226,11 +1247,11 @@ def albums(request, letter):
 def albums_by_artist(request, artist_id):
     if request.user.is_superuser or request.user.is_staff:
         all_albums = Music_Album.objects.filter(
-            album_artist__id=artist_id).order_by('album').values('album', 'album_size', 'album_genre__genre',
+            album_artist__id=artist_id).order_by('-year').values('album', 'album_size', 'album_genre__genre',
                                                                  'album_genre_id', 'album_artist__artist', 'album_artist_id', 'drive', 'song_count', 'letter', 'year', 'folder', 'id', 'album_art')
     else:
         all_albums = Music_Album.objects.filter(
-            access="public").filter(album_artist__id=artist_id).order_by('album').values('album', 'album_size', 'album_genre__genre',
+            access="public").filter(album_artist__id=artist_id).order_by('-year').values('album', 'album_size', 'album_genre__genre',
                                                                                          'album_genre_id', 'album_artist__artist', 'album_artist_id', 'drive', 'song_count', 'letter', 'year', 'folder', 'id', 'album_art')
 
     if request.is_ajax():

@@ -344,6 +344,19 @@ function add_music(type, message) {
 }
 
 
+function download_album(album_id) {
+	jQuery.ajax({
+		url: "/download_album/" + album_id + "/", 
+		success: function(response) {
+			var response_object = jQuery.parseJSON(response);
+			display_message_alert(response_object.message, response_object.success);
+			$('#content').prepend("<a id='download_zipped_album' target='_blank' href='" + response_object.path_to_zipped_album + "' download></a>")
+			$('#download_zipped_album')[0].click();
+		},
+		async	: true
+	});
+};
+
 function share_album(album_id) {
 	jQuery.ajax({
 		url: "/album_share/" + album_id + "/", 
@@ -876,6 +889,7 @@ function show_album(jsonAlbum, show_or_play) {
 	$('#current_album_songs').append( '<button class="playlist_button" style="float:right;" onclick="share_album('+all_album[0].id+')">SHARE ALBUM</button>')
 	$('#current_album_songs').append( '<button id="delete_album_button" style="float:right;" onclick="delete_album('+all_album[0].id+')">DELETE ALBUM</button>')
 	$('#current_album_songs').append( '<button class="playlist_button" style="float:right;" onclick="get_single_album_art('+all_album[0].id+')">GET ALBUM ART</button>')
+	$('#current_album_songs').append( '<button class="playlist_button" style="float:right;" onclick="download_album('+all_album[0].id+')">DOWNLOAD ALBUM</button>')
 	$.each(all_album, function(i,album){
 		if (album.album_art){$('.current_album').append( '<div id="curr_album_img_div"><img src="/' + album.drive + '/' +album.letter+ '/' + album.folder + '/Folder.jpg?v=' + Math.floor(Math.random()*11032)  + '" /></div>' )}
 		else {$('.current_album').append( '<div id="curr_album_img_div"><img src="/static/images/default_album_art.jpg" /></div>' )}
@@ -884,7 +898,7 @@ function show_album(jsonAlbum, show_or_play) {
 		$('.current_album').append( '<h3> <item class="year" onclick="location.href=\'/#/albums_by_year/'+album.year+'/0/\'">' + album.year + '</item> | '+album.song_count+' SONGS | ' + album.album_size + '</h3>')
 		
 		CURRENT_ALBUM = ''
-		$('#current_album_songs').append('<h1>'+ all_album[0].album +'</h1>')
+		$('#current_album_songs').append('<h1>'+ all_album[0].album + ' (' + all_album[0].album_type + ')</h1>')
 		$('#current_album_songs').append('<div id="song_table_wrapper"><table id="song_table" class="rounder-top"></table></div>')
 		$('#song_table').append('<tr id="song_table_header" class="rounder-top"></tr>')
 		$('#song_table_header').append('<th class="title_column">Title</th><th class="artist_column">Artist</th><th class="genre_column">Genre</th><th class="play_column">Play</th><th class="add_column">Add</th><th class="download_column">Download</th><th class="length_column">Length</th><th class="file_size_column">File Size</th><th class="bitrate_column">Bitrate</th><th class="rating_column">Rating</th>')

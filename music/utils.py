@@ -8,8 +8,8 @@ import mutagen.id3
 
 from django.conf import settings
 
-DRIVES = {'W:/': ['0', 'A', 'B', 'C', 'D', 'E', 'F', 'G',],
-          'X:/': ['H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',],
+DRIVES = {'W:/': ['0', 'A', 'B', 'C', 'D', 'E', 'F',],
+          'X:/': ['G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',],
           'Y:/': ['P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
           'Z:/': ['OST', 'VA']}
 
@@ -40,7 +40,9 @@ def move_new_folders(drive, letter):
             letter = 'OST'
         
         if original_letter != letter:
-            if letter in DRIVES['X:/']: 
+            if letter in DRIVES['W:/']: 
+                drive = 'W:/'
+            elif letter in DRIVES['X:/']: 
                 drive = 'X:/'
             elif letter in DRIVES['Y:/']: 
                 drive = 'Y:/'
