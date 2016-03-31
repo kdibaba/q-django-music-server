@@ -11,9 +11,11 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+import manage
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SITE_ROOT = os.path.dirname(os.path.realpath(manage.__file__))
 
 
 # Quick-start development settings - unsuitable for production
@@ -74,7 +76,7 @@ WSGI_APPLICATION = 'music_server.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'music.db.sqlite3'),
+        'NAME': os.path.join(SITE_ROOT, 'music.db.sqlite3'),
     }
 }
 
@@ -116,5 +118,5 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
-DRIVE = '/home/qma/music/'
+DRIVE = SITE_ROOT + '/music_server//static/music/'
 AUTH_PROFILE_MODULE = "music.UserProfile"

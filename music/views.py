@@ -202,7 +202,6 @@ def catalog_drive_music(catalog_type):
         for drive in DRIVES.keys():
             for letter in DRIVES[drive]:
                 print '\nProcessing albums in directory - ', letter
-                #import ipdb; ipdb.set_trace();
                 directory = drive + letter + "/"
 
                 if loop_counter == loops[-2]:
@@ -215,6 +214,7 @@ def catalog_drive_music(catalog_type):
                     files = os.listdir(directory)
                 except OSError:
                     os.makedirs(directory)
+                    files = os.listdir(directory)
 
                 current_albums_in_letter = Music_Album.objects.filter(letter=letter)
 
@@ -296,7 +296,7 @@ def catalog_drive_music(catalog_type):
                         album_art_attempted=album_art_attempted,
                         letter=letter,
                         album_type='MP3',
-                        drive=drive[0],
+                        drive=drive,
                         album_bitrate=album_bitrate)
                     unknown_artist.letter = letter
                     unknown_artist.save()
@@ -419,7 +419,7 @@ def catalog_drive_music(catalog_type):
                                                                        title=title,
                                                                        length=song_length,
                                                                        letter=letter,
-                                                                       drive=drive[0],
+                                                                       drive=drive,
                                                                        rating=song_rating,
                                                                        file_size=str(file_size),
                                                                        bitrate=song_bitrate
@@ -520,7 +520,7 @@ def catalog_drive_music(catalog_type):
                                                                        title=title,
                                                                        length=song_length,
                                                                        letter=letter,
-                                                                       drive=drive[0],
+                                                                       drive=drive,
                                                                        rating=song_rating,
                                                                        file_size=str(file_size),
                                                                        bitrate=song_bitrate
@@ -1070,6 +1070,7 @@ def album(request, album_id):
         song_dict['rating'] = song.rating
         song_dict['bitrate'] = song.get_bitrate()
         song_dict['file_size'] = song.get_file_size()
+        song_dict['host'] = 'http://' + request.get_host() + '/static/music'
         album['songs'].append(song_dict)
     all_album.append(album)
     if request.is_ajax():
@@ -1089,6 +1090,7 @@ def get_song(request, song_id):
     song['filename'] = original_song.filename
     song['title'] = original_song.title
     song['artist'] = original_song.song_artist.artist
+    song['host'] = 'http://' + request.get_host() + '/static/music'
     if request.is_ajax():
         mimetype = 'application/javascript'
     return HttpResponse(simplejson.dumps(song), mimetype)

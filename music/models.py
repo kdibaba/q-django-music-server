@@ -8,7 +8,7 @@ import time
 class Music_Artist(models.Model):
     artist = models.CharField(max_length=200)
     letter = models.CharField(max_length=3)
-    drive = models.CharField(max_length=3)
+    drive = models.CharField(max_length=200)
 
 
 class Music_Genre(models.Model):
@@ -21,7 +21,7 @@ class Music_Album(models.Model):
     album = models.CharField(max_length=200)
     folder = models.CharField(max_length=200)
     album_size = models.CharField(max_length=200)
-    drive = models.CharField(max_length=3)
+    drive = models.CharField(max_length=200)
     letter = models.CharField(max_length=3)
     year = models.IntegerField(null=True, blank=True)
     song_count = models.IntegerField(null=True, blank=True)
@@ -57,7 +57,7 @@ class Music_Song(models.Model):
     type = models.CharField(max_length=200)
     path = models.CharField(max_length=400)
     letter = models.CharField(max_length=3)
-    drive = models.CharField(max_length=3)
+    drive = models.CharField(max_length=200)
     rating = models.IntegerField(null=True, blank=True)
     bitrate = models.IntegerField(null=True, blank=True)
     encoding = models.CharField(max_length=200, null=True, blank=True)
@@ -75,6 +75,9 @@ class Music_Song(models.Model):
     def get_song_length(self):
         if self.length:
             return time.strftime('%M:%S', time.gmtime(float(self.length)))            
+
+    def __unicode__(self):
+        return self.song_artist.artist + ' - ' + self.title
 
 
 class UserProfile(models.Model):

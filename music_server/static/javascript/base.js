@@ -1029,7 +1029,8 @@ function play_song(jsonSong) {
 	//If playlist is being displayed when some	one wants to play a single song,
 	//Hide the playlist.
 	if (PLAYLIST){hide_playlist()}
-	var destiny = "/"+ song.drive + "/"+song.letter+"/"+song.path+"/"+song.filename;
+	var destiny = song.host+"/"+song.letter+"/"+song.path+"/"+song.filename;
+    console.log(destiny)
 	
 	recreate_playlist();
 	PLAYLIST = new jPlayerPlaylist({
@@ -1051,7 +1052,7 @@ function play_song(jsonSong) {
 function add_song(jsonSong) {
 	song = jQuery.parseJSON(jsonSong);
 	
-	var destiny = "/"+ song.drive + "/"+song.letter+"/"+song.path+"/"+song.filename;
+	var destiny = song.host+"/"+song.letter+"/"+song.path+"/"+song.filename;
 	if(!jQuery.isEmptyObject(PLAYLIST.playlist)){
 		PLAYLIST.add({
 			title: song.title,
@@ -1083,7 +1084,7 @@ function play_album(jsonAlbum){
 	recreate_playlist();
 	var album_songs = [];
 	$.each(album[0].songs, function(i,item){
-		album_songs.push({title: item.title, artist: item.artist, 'mp3': "/"+ item.drive + "/"+item.letter+"/"+item.path+"/"+item.filename})
+		album_songs.push({title: item.title, artist: item.artist, 'mp3': item.host + "/"+item.letter+"/"+item.path+"/"+item.filename})
 		NOW_PLAYING_LIST.push(item.id)
 	})	
 	PLAYLIST = new jPlayerPlaylist({

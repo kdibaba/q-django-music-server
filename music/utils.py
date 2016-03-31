@@ -8,7 +8,8 @@ import mutagen.id3
 
 from django.conf import settings
 
-DRIVES = {'/home/qma/music/': ['0', 'A', 'B', 'C', 'D', 'E', 'F','G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O','P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z','OST', 'VA']}
+DRIVES = { settings.DRIVE : ['0', 'A', 'B', 'C', 'D', 'E', 'F','G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O','P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z','OST', 'VA']}
+print settings.DRIVE
 
 def move_new_folders(drive, letter):
     problems = []
@@ -17,8 +18,6 @@ def move_new_folders(drive, letter):
     original_letter = letter
     original_drive = drive
 
-    if letter == 'M':
-        import ipdb; ipdb.set_trace();
     folders = os.listdir(drive + letter + '/')
     for folder in folders:
         letter = folder[0].upper()
@@ -37,39 +36,30 @@ def move_new_folders(drive, letter):
             letter = 'VA'
         elif str(folder).startswith('SOUNDTRACK') or str(folder).startswith('OST') or str(folder).startswith('ORIGINAL.SOUNDTRACK'):
             letter = 'OST'
-        
+
         if original_letter != letter:
-            if letter in DRIVES['W:/']: 
-                drive = 'W:/'
-            elif letter in DRIVES['X:/']: 
-                drive = 'X:/'
-            elif letter in DRIVES['Y:/']: 
-                drive = 'Y:/'
-            else: 
-                drive = 'Z:/'
             try:
                 if original_drive == drive:
-                    win32file.MoveFile(original_drive+original_letter+'/'+folder, drive+letter+'/'+folder)
+                    shutil.move(original_drive+original_letter+'/'+folder, drive+letter+'/'+folder)
                     #print original_drive+original_letter+'/'+folder, 'moved to\n', drive+letter+'/'+folder
                     moved.append(folder)
                 else:
-                    win32file.MoveFile(original_drive+original_letter+'/'+folder, original_drive+'MOVE/'+folder)
+                    shutil.move(original_drive+original_letter+'/'+folder, original_drive+'MOVE/'+folder)
                     moved.append(folder)
 
             except:
                 #print 'FAILED ',original_drive+original_letter+'/'+folder, 'moved to\n', drive+letter+'/'+folder
                 try:
                     if original_drive == drive:
-                        win32file.MoveFile(original_drive+original_letter+'/'+folder, drive+letter+'/'+folder+str(random.randrange(1, 100000)))
+                        shutil.move(original_drive+original_letter+'/'+folder, drive+letter+'/'+folder+str(random.randrange(1, 100000)))
                         moved.append(folder)
                     else:
-                        win32file.MoveFile(original_drive+original_letter+'/'+folder, original_drive+'MOVE/'+folder+str(random.randrange(1, 100000)))
+                        shutil.move(original_drive+original_letter+'/'+folder, original_drive+'MOVE/'+folder+str(random.randrange(1, 100000)))
                         moved.append(folder)
                 except:
                     problems.append(folder)
-                            
     return problems, moved
-       
+
 def is_number(s):
     try:
         float(s)
@@ -92,16 +82,13 @@ def folder_has_rated_music(folder):
         id3 = ID3(folder+'/'+song)
         if get_rating(id3) > 1:
             return True
-    
     return False
 
 def get_song_files(file_list):
     song_list = []
-    
     for song in file_list:
         if song.rsplit('.')[-1].lower() == 'mp3' or song.rsplit('.')[-1].lower() == 'flac':
             song_list.append(song)
-    
     return song_list
 
 
@@ -119,7 +106,6 @@ def get_rating(id3):
 
 
 def get_artist_from_id3(id3):
-    
     album_artist_names=id3.getall('TPE2')
     album_artist_names2=id3.getall('TPE1')
 
@@ -128,7 +114,7 @@ def get_artist_from_id3(id3):
 
     # import pdb; pdb.set_trace();
 
-    try: 
+    try:
         lead_artist = album_artist_names[0].text
     except:
         pass
@@ -136,7 +122,7 @@ def get_artist_from_id3(id3):
     if lead_artist:
         return lead_artist[0].encode('ascii','ignore')
 
-    try: 
+    try:
         contributing_artist = album_artist_names2[0].text
     except:
         pass
@@ -163,6 +149,5 @@ def removeEmptyFolders(path):
     if len(files) == 0:
         print "Removing empty folder:", path
         os.rmdir(path)
-        
 
 ################################# Cataloging utils ############################
