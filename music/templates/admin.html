@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<div id="content">
+		<div id="music_admin">
+			<form method="post" action="">
+			<table>
+				<tr><td>{{ form.nzbs.label_tag }}:</td><td>{{ form.nzbs }}</td><td>Enter path to nzb files.</td></tr>
+				<tr><td></td><td><input type="submit" id="submit_button" name="rename_nzbs" value="Rename NZBs" /></td><td>Nzb Files will be renamed to the standard.</td></tr>
+				<tr><td></td><td><input type="submit" id="submit_button" name="filter_nzbs" value="Filter NZBs" /></td><td>Files will be filtered for duplicates.</td></tr>
+				<tr><td>{{ form.albums.label_tag }}:</td><td>{{ form.albums }}</td><td>Enter path to albums.</td></tr>
+				<tr><td></td><td><input type="submit" id="submit_button" name="rename_albums" value="Rename Albums" /></td><td>Albums will be renamed to the standard.</td></tr>
+			</table>
+			<input type=submit name="move_new_folders" value="Move New Albums">New Albums will be moved to the correct letter directory.<br/>
+			<input type=button onclick="location.href='/update_album_art/'" value="Update Album Art"></input> Updates the albums for which art has been added.<br/>
+			<input type=button onclick="location.href='/copy_favs/'" value="Copy Favorites"></input> Copies rated music to the favs folder.<br/>
+			
+			</form>
+			
+			{% if copies %}
+				<h2>{{ num_of_copies }} Copies found</h2>
+				{% for files in copies %}
+					{{ files }}<br />
+				{% endfor %}
+			{% endif %}
+			
+			{% if problems %}
+				<h2>Problem</h2>
+				{% for files in problems %}
+					{{ files }}<br />
+				{% endfor %}
+			{% endif %}
+			
+			{% if duplicates_count %}
+				<h2>Duplicates found</h2>
+					Exact Duplicates - {{ duplicates_count.exact }}<br />
+					Partial Duplicates - {{ duplicates_count.partial }}<br />
+			{% endif %}	
+			
+			{% if renamed_files %}
+				<h2>Renamed found</h2>
+				{% for files in renamed_files %}
+					{{ files }}<br />
+				{% endfor %}
+			{% endif %}	
+			
+			{% if moved %}
+				<h2>Moved Albums</h2>
+				{% for files in moved %}
+					{{ files }}<br />
+				{% endfor %}
+			{% endif %}	
+		</div>	
+	</div>
+{% endblock %}

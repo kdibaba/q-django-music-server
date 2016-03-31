@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<div class="confirmation">
+   	<center><p>{%if message%}{{message|safe}}{%else%} There is no message to display. {% endif %}</p></center>
+</div>
+			
+			
+{% block content2%}{% endblock%}
+	
+{% endblock %}

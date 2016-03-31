@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+	<div id="page_header"> Search For Music </div>
+	<form method="post" action="">
+	<input id="search" type="text" name="search"/><input type="submit" id="submit_button" value="Search"/>
+	
+	{% if results %}
+		<h3>{{ num_of_results }} Results</h3>
+		{% for artist in results%}
+			<a href="/view_music_albums/{{ artist.id }}">{{ artist.artist }}</a><br />
+		{% endfor %}
+	{% else%}
+		<h3>No Results for {{ search }}</h3>
+	{% endif %}
+	
+{% endblock %}

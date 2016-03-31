@@ -1,0 +1,67 @@
+{% extends "tv_base.html" %}
+
+{% block content %}
+
+
+	<div id="page_header"> Handle TV Shows </div>
+	<form method="post" action="">
+		{% for fields in form %}
+			{{ fields.label_tag }} : {{ fields }} <br/>
+		{% endfor %}
+	
+	<input type="submit" id="submit_button" name="submit" />
+	<i>Click to check the file list for the drive letter.</i><br />
+	<input type="submit" id="submit_button" name="cleanup_new_files" value="Cleanup New Files" />
+	<i>Rename the new files and cleanup any samples and non relevant file types.</i><br />
+	<input type="submit" id="submit_button" name="move_new_files" value="Move New Files" />
+	<i>Move the new files to the processing directory for cataloging</i><br />
+	<input type="submit" id="submit_button" name="rename_files_simple" value="Rename Files Simple" />
+	<i>Rename the files to a good naming convention for cataloging.</i><br />
+	<input type="submit" id="submit_button" name="rename_files_complex" value="Rename Files Complex" />
+	<i>Rename with a little more rigor for the stupidly named files.</i><br />
+	<input type="submit" id="submit_button" name="move_files" value="Move Files" />
+	<i>Move the files to their respect shows and seasons.</i><br />
+	<input type="submit" id="submit_button" name="catalog_drive" value="Catalog Drive" />
+	<i>Catalog the shows</i><br />
+	<input type="submit" id="submit_button" name="filter_nzbs" value="Filter Nzbs" />
+	<i>For a given directory check for nzbs of shows and episodes that are already in the database and flag them as duplicates.</i><br />
+	</form>
+
+	{% if problems %}
+		<h2>Problem</h2>
+		{% for files in problems %}
+			{{ files }}<br />
+		{% endfor %}
+	{% endif %}
+	
+	{% if renamed_files %}
+		<table>
+		{% for keys, values in renamed_files.items %}
+			<tr><th>Original File</th><td>{{ keys }}</td></tr>
+			<tr><th>Renamed File</th><td>{{ values }}</td></tr>
+		{% endfor %}
+		</table>
+	{% endif %}
+		
+	{% if cataloged %}
+		<h2>Cataloged Files</h2>
+		{% for files in cataloged %}
+			{{ files.show.show }} <br />
+		{% endfor %}
+	{% endif %}
+	
+	{% if moved_files %}
+		<h2>Moved Files</h2>
+		{% for files in moved_files%}
+			{{ files }}<br />
+		{% endfor %}
+	{% endif %}
+	
+	{% if file_list %}
+		<h2>File List</h2>
+		{% for files in file_list %}
+			----{{ files }}<br />
+		{% endfor %}
+	{% endif %}		
+		
+{% endblock %}

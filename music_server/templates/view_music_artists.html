@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+	<div id="page_header"> Music Artist </div>
+	<form method="post" action="">
+	
+	<table>
+	{% if drives %}
+		<tr><th colspan="0"><h2>Cataloged Drives</h2></th></tr>
+		{% for drive in drives %}
+			<tr><td>{{ drive.drive }}</td>
+			<td><input type="submit" name="{{ drive.drive }}" value="Get All Music From This Drive" /><br /></td>
+		{% endfor %}</tr>
+	{% endif %}
+	</table>
+	{% if artists %}
+		<h2>{{ artists.count }} Artists</h2>
+		{% for artist in artists %}
+			<a href="/view_music_albums/{{ artist.id }}">{{ artist.artist }}</a><br />
+		{% endfor %}
+	{% endif %}
+	
+		
+{% endblock %}

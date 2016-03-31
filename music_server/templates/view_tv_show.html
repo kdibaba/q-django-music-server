@@ -1,0 +1,29 @@
+{% extends "tv_base.html" %}
+
+{% block content %}
+	
+	{% if show %}
+		
+	<div id="page_header"> TV Show </div>
+		<h2><div class=header_button><a href="/add_episodes/{{ show.id }}">{{ show.show }}</a></div></h2>
+		{% for keys, values in episodes.items %}
+		<table cellspacing="0" cellpadding="0">
+			<tr style="background: #EEEEEE"><th colspan="5">Season : {{ keys }}</th></tr>
+			<tr style="background: #EEEEEE"><th></th><th>Episode</th><th>Quality</th><th>File Size</th><th style="width: 800px">File Name</th></tr>
+			{% for episode in values %}
+				{% ifequal episode.get_file_size '0 MB'%}
+					<tr style=color:red;>
+				{% else %}
+				{% endifequal %}
+				<tr class="{% cycle odd,even %}">
+					<td> {{ forloop.counter}} 		</td>
+					<td> {{ episode.episode }} 		</td>
+					<td> {{ episode.quality }} 		</td>
+					<td> {{ episode.get_file_size }}</td>
+					<td> {{ episode.file_name }} 	</td>
+					</tr>
+			{% endfor %}<br />
+		</table>
+		{% endfor %}
+	{% endif %}
+{% endblock %}

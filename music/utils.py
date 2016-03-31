@@ -1,5 +1,5 @@
 
-import os, sys, shutil, win32file, re, time, unicodedata, random
+import os, sys, shutil, re, time, unicodedata, random
 
 from mutagen.id3 import ID3
 from mutagen.mp3 import MP3
@@ -8,10 +8,7 @@ import mutagen.id3
 
 from django.conf import settings
 
-DRIVES = {'W:/': ['0', 'A', 'B', 'C', 'D', 'E', 'F',],
-          'X:/': ['G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',],
-          'Y:/': ['P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-          'Z:/': ['OST', 'VA']}
+DRIVES = {'/home/qma/music/': ['0', 'A', 'B', 'C', 'D', 'E', 'F','G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O','P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z','OST', 'VA']}
 
 def move_new_folders(drive, letter):
     problems = []
@@ -20,6 +17,8 @@ def move_new_folders(drive, letter):
     original_letter = letter
     original_drive = drive
 
+    if letter == 'M':
+        import ipdb; ipdb.set_trace();
     folders = os.listdir(drive + letter + '/')
     for folder in folders:
         letter = folder[0].upper()

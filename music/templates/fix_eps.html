@@ -1,0 +1,66 @@
+{% extends "tv_base.html" %}
+
+{% block content %}
+
+	<form method="post" action="">
+	
+	
+	{% if drives %}<table>
+		<tr><th colspan="0"><h2>Cataloged Drives</h2></th></tr>
+		<tr><th>Drive Name</th><th>Drive Capacity</th><th>Drive Free Space</th><th></th><th></th><th></th>
+		{% for drive in drives %}
+			<tr><td NOWRAP>{{ drive.drive }}</td><td NOWRAP>{{ drive.drive_capacity|filesizeformat }}</td><td NOWRAP>{{ drive.drive_free_space|filesizeformat }}</td>
+			<td><input type="submit" name="{{ drive.drive }}" value="Missing Episodes" /><br /></td>
+			<td><input type="submit" name="{{ drive.drive }}" value="Missing Quality" /><br /></td>
+			<td><input type="submit" name="{{ drive.drive }}" value="Better Quality" /><br /></td>
+		{% endfor %}</tr>
+		</table>
+	{% endif %}
+	
+	
+	{% if all_missing_shows %}<table>
+		<h2>{{ missing_shows_counter }} Missing Episodes </h2>
+		{% for missing_shows in all_missing_shows %}
+			<tr><th>Show</th><th>Season</th><th>Episode</th><th>Link</th>
+			{% for missing_show in missing_shows %}
+				<tr><td>{{ missing_show.Show }}</td>
+					<td>{{ missing_show.Season }}</td>
+					<td>{{ missing_show.Episode }}</td>
+					<td><a href="{{ missing_show.Link }}">Search Episode</a></td>
+				</tr>
+			{% endfor%}
+		{% endfor%}
+	</table>
+	{% endif %}
+	
+	
+	{% if all_missing_qualities %}<table>
+		<h2>{{ missing_qualities_counter }} Missing Qualities </h2>
+		{% for missing_shows in all_missing_qualities %}
+			<tr><th>Show</th><th>Season</th><th>Episode</th><th>{{ missing_shows.count }}</th>
+			{% for missing_show in missing_shows %}
+				<tr><td>{{ missing_show.Show }}</td>
+					<td>{{ missing_show.Season }}</td>
+					<td>{{ missing_show.Episode }}</td>
+				</tr>
+			{% endfor%}
+		{% endfor%}
+	</table>
+	{% endif %}
+	{% if better_qualities %}<table>
+		<h2>{{ better_qualities_counter }} Potential Quality Improvements </h2>
+		{% for missing_shows in better_qualities %}
+			<tr><th>Show</th><th>Season</th><th>Episode</th><th>Quality</th><th>Potential Quality</th><th>Link</th>
+			{% for missing_show in missing_shows %}
+				<tr><td>{{ missing_show.Show }}</td>
+					<td>{{ missing_show.Season }}</td>
+					<td>{{ missing_show.Episode }}</td>
+					<td>{{ missing_show.Quality }}</td>
+					<td>{{ missing_show.Potential }}</td>
+					<td><a href="{{ missing_show.Link }}">Search Episode</a></td>
+				</tr>
+			{% endfor%}
+		{% endfor%}
+	</table>
+	{% endif %}
+{% endblock %}

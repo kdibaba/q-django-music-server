@@ -8,11 +8,11 @@ from django.conf import settings
 from itertools import chain
 from operator import attrgetter
 
-from media.music.forms import *
-from media.music.models import *
-from media.music.utils import *
+from music.forms import *
+from music.models import *
+from music.utils import *
 
-import os, sys, shutil, win32file, re, time, unicodedata, random, pdb, zipfile
+import os, sys, shutil, re, time, unicodedata, random, pdb, zipfile
 sys.stdout = sys.stderr
 
 from mutagen.id3 import ID3
@@ -202,6 +202,7 @@ def catalog_drive_music(catalog_type):
         for drive in DRIVES.keys():
             for letter in DRIVES[drive]:
                 print '\nProcessing albums in directory - ', letter
+                #import ipdb; ipdb.set_trace();
                 directory = drive + letter + "/"
 
                 if loop_counter == loops[-2]:
@@ -210,7 +211,10 @@ def catalog_drive_music(catalog_type):
                     print 'Successfully moved %d albums to their correct directories.' % len(moved_folders)
                     print 'Failed to move %d albums to their correct directories.' % len(fail_to_move)
 
-                files = os.listdir(directory)
+                try:
+                    files = os.listdir(directory)
+                except OSError:
+                    os.makedirs(directory)
 
                 current_albums_in_letter = Music_Album.objects.filter(letter=letter)
 
@@ -242,7 +246,7 @@ def catalog_drive_music(catalog_type):
                     count_folders -= 1
                     if file_object != unicode(file_object, errors='ignore').encode('utf-8'):
                         try:
-                            win32file.MoveFile(directory + file_object, directory + unicode(
+                            shutil.move(directory + file_object, directory + unicode(
                                 file_object, errors='ignore').encode('utf-8'))
                             print 'Renamed folder.'
                         except:
@@ -273,7 +277,7 @@ def catalog_drive_music(catalog_type):
                         continue
                     if songs.__len__() < 1:
                         try:
-                            win32file.MoveFile(directory + file_object, drive + 'EMPTY/' + file_object)
+                            shutil.move(directory + file_object, drive + 'EMPTY/' + file_object)
                         except:
                             print 'Couldnt Move empty folder.'
                         continue
@@ -306,7 +310,7 @@ def catalog_drive_music(catalog_type):
                             print song, ' is a folder.'
                             try:
                                 new_folder_name = directory + song + str(random.randrange(1, 10000000))
-                                win32file.MoveFile(directory + file_object + '/' + song, new_folder_name)
+                                shutil.move(directory + file_object + '/' + song, new_folder_name)
                                 # print 'Successfully moved folder - ', new_folder_name
                             except:
                                 pass  # print 'Failed to move folder - ', new_folder_name
@@ -390,7 +394,7 @@ def catalog_drive_music(catalog_type):
                             safe_song = unicode(song, errors='ignore').encode('utf-8')
                             if song != safe_song:
                                 try:
-                                    win32file.MoveFile(
+                                    shutil.move(
                                         directory + file_object + '/' + song, directory + file_object + '/' + safe_song)
                                     # print 'renamed ' + song + ' to ' + safe_song
                                 except:
@@ -491,7 +495,7 @@ def catalog_drive_music(catalog_type):
                             safe_song = unicode(song, errors='ignore').encode('utf-8')
                             if song != safe_song:
                                 try:
-                                    win32file.MoveFile(
+                                    shutil.move(
                                         directory + file_object + '/' + song, directory + file_object + '/' + safe_song)
                                     # print 'renamed ' + song + ' to ' + safe_song
                                 except:
@@ -535,13 +539,13 @@ def catalog_drive_music(catalog_type):
                     if not music_file_exists:
                         if other_format_exists:
                             try:
-                                win32file.MoveFile(directory + file_object, drive + 'OTHER_FORMATS/' + file_object)
+                                shutil.move(directory + file_object, drive + 'OTHER_FORMATS/' + file_object)
                                 print 'Moved Other format folder - ', file_object
                             except:
                                 print 'Couldnt Move other format folder.'
                         else:
                             try:
-                                win32file.MoveFile(directory + file_object, drive + 'EMPTY/' + file_object)
+                                shutil.move(directory + file_object, drive + 'EMPTY/' + file_object)
                                 print 'Moved No MP3 folder - ', file_object
                             except:
                                 print 'Couldnt Move empty folder.'
@@ -614,7 +618,7 @@ def catalog_drive_music(catalog_type):
                                 if file_object != final_folder_name:
                                     # print 'Folder name havent changed so skipping the rename folder section
                                     # \n', file_object, '\n', final_folder_name
-                                    win32file.MoveFile(directory + file_object, directory + final_folder_name)
+                                    shutil.move(directory + file_object, directory + final_folder_name)
                                     album.folder = final_folder_name
                                     album.album_type = album_type
                                     album.save()
@@ -639,7 +643,7 @@ def catalog_drive_music(catalog_type):
                                     album.delete()
                         else:
                             try:
-                                win32file.MoveFile(directory + file_object, drive + 'UNKNOWN/' + file_object + '.' + str(
+                                shutil.move(directory + file_object, drive + 'UNKNOWN/' + file_object + '.' + str(
                                     random.randrange(1, 10000000)))
                                 # print 'Final Folder Name is UNKNOWN so moving on.'
                             except:
@@ -694,14 +698,14 @@ def check_duplicate(directory, current, rename_to, drive):
             if song not in rename_to_file_list:
                 try:
                     if folder_has_rated_music(directory + current):
-                        win32file.MoveFile(directory + rename_to, drive + 'PARTIAL/' + rename_to)
+                        shutil.move(directory + rename_to, drive + 'PARTIAL/' + rename_to)
                         return 'keep'
                     else:
-                        win32file.MoveFile(directory + current, drive + 'PARTIAL/' + rename_to)
+                        shutil.move(directory + current, drive + 'PARTIAL/' + rename_to)
                         return ''
                 except:
                     try:
-                        win32file.MoveFile(directory + current, drive + 'PARTIAL/' + rename_to + '.' + str(
+                        shutil.move(directory + current, drive + 'PARTIAL/' + rename_to + '.' + str(
                             random.randrange(1, 10000000)))
                     except:
                         print 'Failed to move a partial duplicate album.'
@@ -710,14 +714,14 @@ def check_duplicate(directory, current, rename_to, drive):
     # if all the songs were a match then the folders are identical and the new one should be in the exact match folder
     try:
         if folder_has_rated_music(directory + current):
-            win32file.MoveFile(directory + rename_to, drive + 'EXACT/' + rename_to)
+            shutil.move(directory + rename_to, drive + 'EXACT/' + rename_to)
             return 'keep'
         else:
-            win32file.MoveFile(directory + current, drive + 'EXACT/' + rename_to)
+            shutil.move(directory + current, drive + 'EXACT/' + rename_to)
             return ''
     except:
         try:
-            win32file.MoveFile(directory + current, drive + 'EXACT/' + rename_to + '.' + str(random.randrange(1, 100)))
+            shutil.move(directory + current, drive + 'EXACT/' + rename_to + '.' + str(random.randrange(1, 100)))
         except:
             print 'Failed to move an exact duplicate album.\n'
         return
@@ -778,7 +782,7 @@ def update_front_jpg():
         for song in songs:
             if 'front.jpg' == song.lower() or 'front.jpeg' == song.lower() or 'cover.jpg' == song.lower() or 'cover.jpeg' == song.lower():
                 try:
-                    win32file.MoveFile(albums.drive + ':/' + albums.letter + '/' + albums.folder + '/' +
+                    shutil.move(albums.drive + ':/' + albums.letter + '/' + albums.folder + '/' +
                                        song, albums.drive + ':/' + albums.letter + '/' + albums.folder + '/' + 'Folder.jpg')
                 except:
                     pass
@@ -1007,13 +1011,13 @@ def rename_nzbs(path_to_nzbs, albums=True):
 
         if string != string2:
             try:
-                win32file.MoveFile(path_to_nzbs + nzbs, path_to_nzbs + string2)
+                shutil.move(path_to_nzbs + nzbs, path_to_nzbs + string2)
                 renamed_files.append(nzbs + ' to ' + string2)
             except:
                 problems.append('Renaming of ' + nzbs + ' to ' + string2 + ' failed')
                 if albums:
                     try:
-                        win32file.MoveFile(path_to_nzbs + nzbs, path_to_nzbs + 'failed/' + string2)
+                        shutil.move(path_to_nzbs + nzbs, path_to_nzbs + 'failed/' + string2)
                     except:
                         problems.append('Moving a file that failed to rename also Failed. WOW.')
 
@@ -1131,7 +1135,7 @@ def get_single_album_art(request, album_id):
         path = album.drive + ':/' + album.letter + '/' + album.folder + '/'
         mimetype=''
         try:
-            win32file.DeleteFile(path+'Folder.jpg')
+            os.remove(path+'Folder.jpg')
         except:
             print 'Unable to delete existing Folder.jpg'
             pass
@@ -1161,7 +1165,7 @@ def share_album(request, album_id):
             os.makedirs(share_path)
             files = os.listdir(album_path)
             for file in files:
-                win32file.CopyFile(album_path + '/' + file, share_path + '/' + file, 0)
+                shutil.copy2(album_path + '/' + file, share_path + '/' + file, 0)
             response['message'] = 'Successfully shared album - ' + album.folder
             response['success'] = True
         except:
@@ -1560,7 +1564,7 @@ def copy_favs(request):
         except:
             pass
         try:
-            win32file.CopyFile(songs.drive + ':/' + songs.letter + '/' + songs.album.folder + '/' + songs.filename,
+            shutil.copy2(songs.drive + ':/' + songs.letter + '/' + songs.album.folder + '/' + songs.filename,
                                DEFAULT_DIRECTORY + '/' + 'FAVS' + '/' + songs.album.album_artist.artist.upper().replace('.', ' ') + '/' + songs.filename, 0)
         except:
             print songs.album.folder

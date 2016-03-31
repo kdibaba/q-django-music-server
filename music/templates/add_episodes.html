@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+{% if show %}
+		
+	<h2><div class=nav_button><a href="/add_episodes/{{ show.id }}">{{ show.show }}</a></div></h2>
+	
+	<form method="post" action="">
+	<table class=form>
+		<tr>
+			{% for fields in form %}
+				<th>{{ fields.label }} : </th> <td>{{fields}}</td>
+			{% endfor %}
+			<td><input type="submit" value="Add"/></td>
+		</tr>
+	</table>
+	
+	</form>
+	<table>
+	{% for keys, values in episodes.items %}
+		<tr><td>Season : {{ keys }}</td></tr>
+		<tr><td></td><td>Episode</td><td>Quality</td><td>File Name</td><td>File Size</td></tr>
+		{% for episode in values %}
+			{% ifequal episode.get_file_size '0 MB'%}
+				<tr style=color:red;>
+			{% else %}
+				<tr>
+			{% endifequal %}
+			<td> {{ forloop.counter}} 		</td>
+				<td> {{ episode.episode }} 		</td>
+				<td> {{ episode.quality }} 		</td>
+				<td> {{ episode.file_name }} 	</td>
+				<td> {{ episode.get_file_size }}</td></tr>
+		{% endfor %}
+	{% endfor %}<br />
+	</table>
+	{% endif %}
+	
+{% endblock %}

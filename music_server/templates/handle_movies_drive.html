@@ -1,0 +1,70 @@
+{% extends "tv_base.html" %}
+
+{% block content %}
+	<div id="page_header"> Handle Movies </div>
+	<form class="form" method="post" action="">
+		{% for fields in form %}
+			{{ fields.label_tag }} : {{ fields }} <br/><br/>
+		{% endfor %}
+	
+	<input type="submit" name="submit" />
+	<input type="submit" name="move_files" value="Move Files" />
+	<input type="submit" name="catalog_drive" value="Catalog Drive" />
+	<input type="submit" name="rename_files_simple" value="Rename Files Simple" />
+	<input type="submit" name="rename_files_complex" value="Rename Files Complex" />
+	<input type="submit" name="check_nzbs" value="Check NZBs" />
+	
+	{% if copies %}
+		<h2>{{ num_of_copies }} Copies found</h2>
+		{% for files in copies %}
+			{{ files }}<br />
+		{% endfor %}
+	{% endif %}
+	
+	{% if partial_copies %}
+		<h2>{{ num_of_partial_copies }} Partial copies found</h2>
+		{% for files in partial_copies %}
+			{{ files|safe }}<br />
+		{% endfor %}
+	{% endif %}	
+	
+	{% if problems %}
+		<h2>Problem</h2>
+		{% for files in problems %}
+			{{ files }}<br />
+		{% endfor %}
+	{% endif %}
+	
+	{% if moved_files %}
+		<h2>Moved Files</h2>
+		{% for files in moved_files %}
+			{{ files }}<br />
+		{% endfor %}
+	{% endif %}	
+		
+	{% if renamed_files %}
+		<h2>Renamed Files</h2>
+		<center><table>
+		{% for keys, values in renamed_files.items %}
+			<tr><th>Original File</th><td>{{ keys }}</td></tr>
+			<tr><th>Renamed File</th><td>{{ values }}</td></tr>
+			<tr></tr>
+		{% endfor %}
+		</table></center>
+	{% endif %}
+			
+	{% if cataloged %}
+		<h2>Cataloged Files</h2>
+		{% for files in cataloged %}
+			{{ files }} <br />
+		{% endfor %}
+	{% endif %}
+	
+	{% if file_list %}
+		<h2>Complete file List</h2>
+		{% for files in file_list %}
+			----{{ files }}<br />
+		{% endfor %}
+	{% endif %}		
+		
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "tv_base.html" %}
+
+{% block content %}
+
+
+	<div id="page_header"> Search TV Shows </div>
+	<form method="post" action="">
+	<input id="search" type="text" name="search"/><input type="submit" value="Search"/>
+	
+	{% if results %}
+		<h3>{{ num_of_results }} Results</h3>
+		{% for show in results%}
+			<a href="/view_tv_show/{{ show.id }}">{{ show.show }}</a><br />
+		{% endfor %}
+	{% else%}
+		<h3>No Results for {{ search }}</h3>
+	{% endif %}
+	
+{% endblock %}

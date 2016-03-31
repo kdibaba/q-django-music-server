@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+	
+	<div id="page_header"> Music Albums </div>
+	{% if albums %}
+		{% for album in albums %}
+			{{ album.artist.artist }} - {{ album.album }}<br/>
+		{% endfor %}
+	{% endif %}
+	
+{% endblock %}

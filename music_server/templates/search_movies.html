@@ -1,0 +1,21 @@
+{% extends "tv_base.html" %}
+
+{% block content %}
+
+	<div id="page_header"> Search Movies </div>
+	<form method="post" action="">
+	<input id="search" type="text" name="search"/><input type="submit" value="Search"/>
+	
+	{% if results %}
+		<h3>{{ num_of_results }} Results</h3>
+		<table>
+		<tr><th>Drive</th><th>Movie Name</th><th>File Name</th><th>File Size</th></tr>
+		{% for movie_name in results%}
+			<tr class="{% cycle odd,even %}"><td>{{ movie_name.movie_name }}</td><td>{{ movie_name.drive.drive }}</td><td>{{ movie_name.file_name }}</td><td>{{ movie_name.get_file_size }}</td></tr>
+		{% endfor %}
+		</table>
+	{% else%}
+		<h3>No Results for {{ search }}</h3>
+	{% endif %}
+	
+{% endblock %}

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	<head>
+	    <title>{% block title %}Q Music{% endblock %}</title>
+	    <LINK REL="SHORTCUT ICON" HREF="/static/images/logo_icon.jpg">
+	    <link href='http://fonts.googleapis.com/css?family=Volkhov' rel='stylesheet' type='text/css'>
+	    <link href='http://fonts.googleapis.com/css?family=Kelly+Slab' rel='stylesheet' type='text/css'>
+	    <link href='http://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
+	    <link rel="stylesheet" type="text/css" href="/static/css/base.css" />
+	    <link rel="stylesheet" type="text/css" href="/static/css/music.css" />
+	    <link type="text/css" href="/static/css/jplayer.blue.monday.css" rel="stylesheet" />
+	    <script src="/static/javascript/lib/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+	    <script src="/static/javascript/lib/jquery.jplayer.js" type="text/javascript" charset="utf-8"></script>
+	    <script src="/static/javascript/lib/jplayer.playlist.min.js" type="text/javascript" charset="utf-8"></script>
+	    <script src="/static/javascript/lib/spin.min.js" type="text/javascript" charset="utf-8"></script>
+	    <script src="/static/javascript/base.js" type="text/javascript" charset="utf-8"></script>
+	    {% block head %}{% endblock %}
+	    {% block extrahead %}{% endblock %}
+	</head>
+	<body class="{{ theme }}">
+		<div id="site_header_wrapper">
+			<div id="site_header">
+				<div id="site_title">Q Music</div>
+		   		{% if request.user.is_authenticated  %}
+		   		<div id="logout">
+		   			<div id="theme_wrapper">
+			   			<div class="toggleButton blackButton"></div>
+			   			<div class="toggleButton whiteButton"></div>
+			   			<div class="toggleButton redButton"></div>
+		   			</div>
+		   			<text>Logged In : {{request.user.username.title}} 
+		   			{% if request.user.is_superuser %}<a href="/music_admin/">SuperUser</a>
+		   			{% else %}[{% if request.user.is_staff %}Member
+		   			{% else %}[{% if not request.user.is_staff or not request.user.is_superuser %}Guest{% endif %}]{% endif %}]{% endif %}</text>
+		   			<a href="/logout">Logout</a>
+		   		</div>
+		    	{% endif %}</text>
+		    </div>
+		    <div id="navigation">
+				<div class=nav_button>
+					<div id="menu_home" onclick="location.href='#/home'" ><p>Home</p></div>
+					<div ondblclick="location.href='#/artists/all/0/'" id="menu_artists">
+						<p>Artists</p>
+						<div class="nav_buttons nav_button_artists" style="display:none;">
+							{% for letter in letter_list %}
+								<div class="sub_menu_link trigger_url" onclick="location.href='/#/artists/{{letter}}/0/'">{{letter}}</div>
+							{% endfor %}
+						</div>
+						</div>
+					<div ondblclick="location.href='#/albums/all/0/'" id="menu_albums">
+						<p>Albums</p>
+						<div class="nav_buttons nav_button_albums" style="display:none;">
+							{% for letter in albums_list %}
+								<div class="sub_menu_link trigger_url" onclick="location.href='/#/albums/{{letter}}/0/'">{{letter}}</div>
+							{% endfor %}
+						</div>
+						</div>
+					<div id="menu_search">
+						<p>Search</p>
+					</div>
+					<div id="menu_add">
+						<p>Add Music</p>
+						<div class="nav_buttons nav_button_add" style="display:none;">
+							{% if request.user.is_superuser  %}<div class="sub_menu_link" onclick="add_music('add')">Add New</div>{% endif %}
+							{% if request.user.is_superuser  %}<div class="sub_menu_link" onclick="add_music('rebuild')">Rebuild DB</div>{% endif %}
+							<div class="sub_menu_link" onclick="location.href='/add_music/upload/'">Upload</div>
+						</div>
+						</div>
+				</div>
+			</div>
+			<div id="mask"></div>
+			<div id="searchPromptWrapper" style="display:none;">
+				<div id="searchPrompt">
+					<input class="" type="text" id="searchBox" placeholder="Search My Library" /> 
+					<button id="close_button" style="margin-top:11px;" onclick="close_search()">X</button>
+				</div>
+			</div>
+		</div>
+			<div id="message_wrapper">
+				<div id="status_message" style="display:none;"></div>
+			</div>
+		<div id="site_body">
+			{% block content %}
+			<div id=content>
+				
+				<div id="welcome_message">
+					<p class="hello_msg">Hello {{ request.user.first_name }}!</p>
+				</div>
+				
+					<table id="stats">
+						<tr><td colspan="0"><h1>Status Report</h1></td></tr>
+						<tr><td>Artists : </td><td>{{home_data.artists_count}}</td></tr>
+						<tr><td>Albums : </td><td>{{home_data.albums_count}}</td></tr>
+						<tr><td>Songs : </td><td>{{home_data.songs_count}}</td></tr>
+						<tr><td>Albums with Art : </td><td>{{home_data.album_art}}</td></tr>
+						<tr><td>Albums without Art : </td><td>{{home_data.missing_album_art}}</td></tr>
+					</table>
+			   	
+			</div>
+			{% endblock %}
+			</div>
+			<div id="footer_wrapper">
+				<div id="footer">
+				</div>
+			</div>
+	</body>
+</html>

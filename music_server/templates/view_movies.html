@@ -1,0 +1,47 @@
+{% extends "tv_base.html" %}
+
+{% block content %}
+
+	<div id="page_header"> Movies </div>
+	<form method="post" action="">
+	
+	<table cellspacing="0" cellpadding="0">
+	{% if drives %}
+		<tr style="background: #EEEEEE"><th colspan="5"><h2>Cataloged Drives</h2></th></tr>
+		<tr style="background: #EEEEEE"><th>Drives</th>
+										<th>Drive Capacity</th>
+										<th>Drive Free Space</th>
+										<th>Drive Date</th></tr>
+		{% for drive in drives %}
+			<tr><td><input type="submit" id="submit_button" name="{{ drive.drive }}" value="{{ drive.drive }}" /></td>
+				<td>{{ drive.drive_capacity|filesizeformat }}</td>
+				<td>{{ drive.drive_free_space|filesizeformat }}</td>
+				<td>{{ drive.drive_date|date:"m/d/Y"|lower }}</td>
+				</tr>
+		{% endfor %}
+	{% endif %}
+	</table>
+	{% if movies %}
+		<h2>{{ movies.count }} Movies</h2>
+		<table cellspacing="0" cellpadding="0">
+		<tr><th>Drive</th><th>Movie Name</th><th>File Name</th><th>File Size</th></tr>
+		{% for movie in movies %}
+			<tr class="{% cycle odd,even %}"><td>{{ movie.drive.drive }}</td><td>{{ movie.movie_name }}</td><td>{{ movie.file_name }}</td><td>{{ movie.get_file_size }}</td></tr>
+		{% endfor %}
+		</table>	
+	
+	{% else %}
+	{% if all_movies %}
+		<h2>All Movies - {{ all_movies.count }} Movies</h2>
+		<table  cellspacing="0" cellpadding="0">
+		<tr><th>Drive</th><th>Movie Name</th><th>File Name</th><th>File Size</th></tr>
+		{% for movie in all_movies %}
+			<tr class="{% cycle odd,even %}"><td>{{ movie.drive.drive }}</td><td>{{ movie.movie_name }}</td><td>{{ movie.file_name }}</td><td>{{ movie.get_file_size }}</td></tr>
+		{% endfor %}
+		</table>
+	{% endif %}
+	{% endif %}
+	
+	
+		
+{% endblock %}
